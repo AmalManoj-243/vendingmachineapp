@@ -99,16 +99,25 @@ const CategoriesScreen = ({ navigation }) => {
       onEndReached={fetchAdditionalCategories}
       showsVerticalScrollIndicator={false}
       onEndReachedThreshold={0.2}
-      ListFooterComponent={loading && <Loader visible={loading} animationSource={require('@assets/animations/loading.json')} />}
+      ListFooterComponent={loading && <Loader visible={loading} animationSource={require('@assets/animations/loading_up_down.json')} />}
     />
   );
+
+  // Check if categories are empty and not loading to avoid brief display of empty state during initial load
+  const renderCategories = () => {
+    if (categories.length === 0 && !loading) {
+      return renderEmptyState();
+    }
+    return renderContent();
+  };
+  
 
   return (
     <SafeAreaView>
       <NavigationHeader title="Categories" onBackPress={() => navigation.goBack()} />
       <SearchContainer placeholder="Search Categories" onChangeText={handleSearchTextChange} />
       <RoundedContainer>
-        {categories.length === 0 ? renderEmptyState() : renderContent()}
+        {renderCategories()}
       </RoundedContainer>
     </SafeAreaView>
   );
