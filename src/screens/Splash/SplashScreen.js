@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { View, Image, StyleSheet, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Font from 'expo-font';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
+import { authStore } from '@stores/auth';
 
 const SplashScreen = () => {
-
     const navigation = useNavigation();
     const [fontsLoaded, setFontsLoaded] = useState(false);
+    const setLoggedInUser = authStore(state => state.login)
+
 
     useEffect(() => {
         async function loadFonts() {
@@ -28,9 +31,19 @@ const SplashScreen = () => {
     }, []);
 
     useEffect(() => {
+        async function checkUserData() {
+            const storedUserData = await AsyncStorage.getItem('userData');
+            if (storedUserData) {
+                const userData = JSON.parse(storedUserData);
+                setLoggedInUser(userData);
+                navigation.navigate('OptionsScreen');
+            } else {
+                navigation.navigate('LoginScreen');
+            }
+        }
         if (fontsLoaded) {
             const timeout = setTimeout(() => {
-                navigation.replace('AppNavigator');
+                checkUserData()
             }, 1000);
             return () => clearTimeout(timeout);
         }
@@ -60,14 +73,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     image: {
-        width: '80%',
-        height: '80%',
+        width: '45%',
+        height: '45%',
     },
     versionText: {
+        position: 'absolute',
+        bottom: 30,
         fontSize: 16,
         marginTop: 20,
-        color: COLORS.orange,
-        fontFamily: FONT_FAMILY.urbanistMedium,
+        color: COLORS.primaryThemeColor,
+        fontFamily: FONT_FAMILY.urbanistBold,
     },
 });
 

@@ -6,7 +6,9 @@ import AppNavigator from "./AppNavigator";
 import { ProductsScreen, SplashScreen } from "@screens";
 import { OptionsScreen } from "@screens/Home/Options";
 import { TaskManagerScreen } from "@screens/Home/Options/TaskManager";
-import { AuditScreen } from "@screens/Home/Options/Audit";
+import { AuditForm, AuditScreen } from "@screens/Home/Options/Audit";
+import { LoginScreen } from "@screens/Auth";
+import { Scanner } from "@components/Scanner";
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +19,17 @@ const StackNavigator = () => {
       <Stack.Screen
         name="Splash"
         component={SplashScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Scanner"
+        component={Scanner}
+        options={{ headerShown: false }}
+      />
+      {/* Login Screen */}
+      <Stack.Screen
+        name="LoginScreen"
+        component={LoginScreen}
         options={{ headerShown: false }}
       />
       {/* App Navigator - Bottom Tabs */}
@@ -31,10 +44,16 @@ const StackNavigator = () => {
         component={OptionsScreen}
         options={{ headerShown: false }}
       />
-        {/* Audit Screen */}
-        <Stack.Screen
+      {/* Audit Screen */}
+      <Stack.Screen
         name="AuditScreen"
         component={AuditScreen}
+        options={{ headerShown: false }}
+      />
+      {/* Audit Form */}
+      <Stack.Screen
+        name="AuditForm"
+        component={AuditForm}
         options={{ headerShown: false }}
       />
       <Stack.Screen

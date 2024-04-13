@@ -1,3 +1,4 @@
+import { FONT_FAMILY } from '@constants/theme';
 import { BaseToast, ErrorToast } from 'react-native-toast-message';
 export default CustomToast = {
     success: (props) => (
@@ -8,11 +9,11 @@ export default CustomToast = {
             text1Style={{
                 fontSize: 15,
                 fontWeight: '400',
-                fontFamily: 'raleway'
+                fontFamily: FONT_FAMILY.urbanistBold
             }}
             text2Style={{
                 fontSize: 13,
-                fontFamily: 'raleway',
+                fontFamily: FONT_FAMILY.urbanistBold,
                 fontWeight: '400',
             }}
         />
@@ -23,12 +24,12 @@ export default CustomToast = {
             {...props}
             text1Style={{
                 fontSize: 15,
-                fontFamily: 'raleway',
+                fontFamily: FONT_FAMILY.urbanistBold,
                 fontWeight: '400',
             }}
             text2Style={{
                 fontSize: 13,
-                fontFamily: 'raleway',
+                fontFamily: FONT_FAMILY.urbanistBold,
                 fontWeight: '400',
             }}
         />

@@ -1,11 +1,11 @@
 import { View, Text } from 'react-native'
 import React, { useState } from 'react'
 import { RoundedContainer, SafeAreaView } from '@components/containers'
-import { VerticalScrollableCalendar } from '@components/Calendar';
 import { NavigationHeader } from '@components/Header';
+import { FABButton } from '@components/common/Button';
 
 const AuditScreen = ({ navigation }) => {
-    const [date, setDate] = useState(new Date());
+   
     return (
         <SafeAreaView>
             <NavigationHeader
@@ -13,6 +13,7 @@ const AuditScreen = ({ navigation }) => {
                 onBackPress={() => navigation.goBack()}
             />
             <RoundedContainer>
+                <FABButton onPress={()=> navigation.navigate('AuditForm')}/>
             </RoundedContainer>
         </SafeAreaView>
     )

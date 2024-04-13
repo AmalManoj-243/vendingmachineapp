@@ -21,6 +21,8 @@ const COLORS = {
   blue: '#5D5FEE',
   primaryThemeColor: '#2e294e',
   orange: '#F37021',
+  button: '#F37021',
+  red: '#ff3333',
   lightGrey: '	#D3D3D3',
   grey: '#F0F0F0'
 };
@@ -80,6 +82,3 @@ export {
   BUTTON_SIZE,
   SIZE
 };
-
-// export default THEME;
-
