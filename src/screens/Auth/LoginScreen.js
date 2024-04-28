@@ -18,6 +18,7 @@ import { TextInput } from "@components/common/TextInput";
 import { RoundedScrollContainer, SafeAreaView } from "@components/containers";
 import { authStore } from "@stores/auth";
 import { showToastMessage } from "@components/Toast";
+import { Checkbox } from "react-native-paper";
 
 LogBox.ignoreLogs(["new NativeEventEmitter"]);
 LogBox.ignoreAllLogs();
@@ -26,6 +27,11 @@ const LoginScreen = () => {
 
   const navigation = useNavigation();
   const setUser = authStore(state => state.login)
+  const [checked, setChecked] = useState(false);
+
+  const updateCheckedState = (value) => {
+    setChecked(value);
+  };
   // destructuring Styles
   const { container, tinyLogo, imageContainer } = styles;
 
@@ -46,6 +52,10 @@ const LoginScreen = () => {
     }
     if (!inputs.password) {
       handleError("Please input password", "password");
+      isValid = false;
+    }
+    if (!checked) {
+      showToastMessage('Please agree Privacy Policy')
       isValid = false;
     }
     if (isValid) {
@@ -132,6 +142,10 @@ const LoginScreen = () => {
                 column={true}
                 login={true}
               />
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                <Checkbox onPress={() => navigation.navigate('PrivacyPolicy', { updateCheckedState })} status={checked ? 'checked' : 'unchecked'} color={COLORS.primaryThemeColor} />
+                <Text style={{ fontFamily: FONT_FAMILY.urbanistBold, fontSize: 15 }}>I agree to the Privacy Policy</Text>
+              </View>
               <View style={styles.bottom}>
                 <Button title="Login" onPress={validate} />
               </View>

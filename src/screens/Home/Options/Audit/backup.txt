@@ -1,5 +1,5 @@
-import { View, StyleSheet, Keyboard, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, StyleSheet, Keyboard, FlatList, TouchableOpacity, Image } from 'react-native'
+import React, { useState } from 'react'
 import { RoundedScrollContainer, SafeAreaView } from '@components/containers'
 import { NavigationHeader } from '@components/Header'
 import { TextInput as FormInput } from '@components/common/TextInput'
@@ -12,6 +12,7 @@ import { format } from 'date-fns'
 import useAuthStore from '@stores/auth/authStore'
 import { ActionModal } from '@components/Modal'
 import { formatData } from '@utils/formatters'
+import { EmptyItem } from '@components/common/empty'
 import { AntDesign } from '@expo/vector-icons';
 
 const AuditForm = ({ navigation }) => {
@@ -19,12 +20,13 @@ const AuditForm = ({ navigation }) => {
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const [url, setUrl] = useState('')
   const [imageUrls, setImageUrls] = useState([])
+  console.log("🚀 ~ AuditForm ~ imageUrls:", imageUrls)
   const [displayBillDetails, setDisplayBillDetails] = useState({})
   const [collectionType, setCollectionType] = useState(null);
   const [errors, setErrors] = useState({});
   const [ledger, setLedger] = useState({})
-  const [imageLoading, setImageLoading] = useState(true);
   const [scannedBillDetails, setScannedBillDetails] = useState({});
+  const [isActionVisible, setIsActionVisible] = useState(false)
   const loginUser = useAuthStore(state => state.user)
 
   let scannedBillName;
@@ -465,21 +467,10 @@ const AuditForm = ({ navigation }) => {
     setImageUrls(newImageUrls);
   };
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setImageLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timeout);
-  }, []);
-
   const ListAction = ({ image, onPress, index }) => {
     return (
       <View style={styles.listContainer} onPress={onPress}>
-        {imageLoading && <ActivityIndicator size="small" color={'black'} style={{ position: 'absolute', top: 30 }} />}
-        <Image source={{ uri: image }} style={styles.image}
-          onLoad={() => setImageLoading(true)}
-        />
+        <Image source={{ uri: image }} style={styles.image} />
         <View style={styles.deleteIconContainer}>
           <TouchableOpacity onPress={() => handleDeleteImage(index)}>
             <AntDesign name="delete" size={24} color="white" />
@@ -546,17 +537,17 @@ const AuditForm = ({ navigation }) => {
         {/* Options Modal Camera or Gallery */}
         <ActionModal title={'Attach file'} setImageUrl={(url) => setImageUrls(prevUrls => [...prevUrls, url])} />
         {imageUrls && imageUrls.length > 0 && (
-          <View style={styles.uploadsContainer}>
-            <Text style={styles.label}>Uploads</Text>
-            <FlatList
-              data={formatData(imageUrls, 4)}
-              numColumns={4}
-              keyExtractor={(item, index) => index.toString()}
-              contentContainerStyle={{ padding: 10 }}
-              showsVerticalScrollIndicator={false}
-              renderItem={renderItem}
-            />
-          </View>
+            <View style={styles.uploadsContainer}>
+              <Text style={styles.label}>Uploads</Text>
+              <FlatList
+                data={formatData(imageUrls, 4)}
+                numColumns={4}
+                keyExtractor={(item, index) => index.toString()}
+                contentContainerStyle={{ padding: 10 }}
+                showsVerticalScrollIndicator={false}
+                renderItem={renderItem}
+              />
+            </View>
         )}
         <SignaturePad setScrollEnabled={setScrollEnabled} setUrl={setUrl} title={'Customer/Vendor Signature'} />
         <FormInput label={'Remarks'} multiline={true} numberOfLines={5} />
@@ -621,6 +612,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.urbanistBold,
     color: COLORS.black,
     paddingHorizontal: 10,
+    // alignSelf: 'center',
     marginTop: 5
   },
   itemInvisible: {

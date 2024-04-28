@@ -7,7 +7,7 @@ import { ProductsScreen, SplashScreen } from "@screens";
 import { OptionsScreen } from "@screens/Home/Options";
 import { TaskManagerScreen } from "@screens/Home/Options/TaskManager";
 import { AuditForm, AuditScreen } from "@screens/Home/Options/Audit";
-import { LoginScreen } from "@screens/Auth";
+import { LoginScreen, PrivacyPolicy } from "@screens/Auth";
 import { Scanner } from "@components/Scanner";
 
 const Stack = createNativeStackNavigator();
@@ -30,6 +30,12 @@ const StackNavigator = () => {
       <Stack.Screen
         name="LoginScreen"
         component={LoginScreen}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="PrivacyPolicy"
+        component={PrivacyPolicy}
         options={{ headerShown: false }}
       />
       {/* App Navigator - Bottom Tabs */}

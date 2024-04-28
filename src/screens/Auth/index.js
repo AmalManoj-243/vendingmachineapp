@@ -1,2 +1,3 @@
 import LoginScreen from "./LoginScreen";
-export { LoginScreen }
+import PrivacyPolicy from "./PrivacyPolicy";
+export { LoginScreen, PrivacyPolicy }
