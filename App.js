@@ -7,7 +7,6 @@ import CustomToast from '@components/Toast/CustomToast';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler'; // Import GestureHandlerRootView
 import StackNavigator from '@navigation/StackNavigator';
-
 export default function App() {
 
   LogBox.ignoreLogs(["new NativeEventEmitter"]);

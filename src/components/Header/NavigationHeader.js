@@ -8,7 +8,7 @@ const NavigationHeader = ({ title, onBackPress, color = COLORS.white, background
 
     const isPrimaryTheme = backgroundColor === COLORS.primaryThemeColor;
 
-    const logoSource = isPrimaryTheme ? require('@assets/images/header/transparent_logo_header.png') : require('@assets/images/header/logo_header.png');
+    const logoSource = isPrimaryTheme ? require('@assets/images/header/transparent_logo_header.png') : require('@assets/images/header/logo_header_bg_white.png');
 
     return (
         <View style={[styles.container, { backgroundColor }]}>

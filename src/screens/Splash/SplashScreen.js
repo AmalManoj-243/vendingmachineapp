@@ -36,9 +36,16 @@ const SplashScreen = () => {
             if (storedUserData) {
                 const userData = JSON.parse(storedUserData);
                 setLoggedInUser(userData);
-                navigation.navigate('AppNavigator');
+                // Reset the navigation stack to prevent going back to the splash screen
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'AppNavigator' }],
+                });
             } else {
-                navigation.navigate('LoginScreen');
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'LoginScreen' }],
+                });
             }
         }
         if (fontsLoaded) {

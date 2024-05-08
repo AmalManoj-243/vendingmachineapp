@@ -18,15 +18,33 @@
       "supportsTablet": true
     },
     "android": {
+      "splash": {
+        "image": "./assets/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/android/icon_foreground.png",
         "backgroundImage": "./assets/android/icon_background.png",
         "monochromeImage": "./assets/android/icon_monochrome.png",
         "backgroundColor": "#ffffff"
       },
-      "icon": "./assets/android/icon.png"  
+      "icon": "./assets/android/icon.png",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA"
+      ],
+      "package": "com.shansapp.android"
     },
     "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
       "expo-font",
       [
         "expo-image-picker",
@@ -42,6 +60,11 @@
           "recordAudioAndroid": true
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "f71be027-4312-4571-8b87-30fa722a452d"
+      }
+    }
   }
 }

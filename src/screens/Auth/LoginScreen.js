@@ -109,14 +109,14 @@ const LoginScreen = () => {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <SafeAreaView backgroundColor={COLORS.primaryThemeColor} style={container}>
+      <SafeAreaView style={container}>
         <Loader visible={loading} animationSource={require('@assets/animations/loading.json')} />
         {/* <ScrollView style={{ paddingHorizontal: 15, flex: 1, backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20 }}> */}
+            <View style={imageContainer}>
+              <Image source={require('@assets/images/header/logo_header.png')} style={{ width: 300, height: 180, alignSelf: 'center' }} />
+            </View>
         <RoundedScrollContainer backgroundColor={COLORS.white} paddingHorizontal={15} borderTopLeftRadius={40} borderTopRightRadius={40}>
           <View style={{ paddingTop: 50 }}>
-            <View style={imageContainer}>
-              <Image source={require('@assets/images/header/logo_header.png')} style={{ width: 200, height: 119, alignSelf: 'center' }} />
-            </View>
             <View style={{ marginVertical: 5, marginHorizontal: 10 }}>
               <View style={{ marginTop: 0, marginBottom: 15 }}>
                 <Text style={{ fontSize: 25, fontFamily: FONT_FAMILY.urbanistBold, color: '#2e2a4f' }}>Login</Text>

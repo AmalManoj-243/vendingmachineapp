@@ -1,11 +1,13 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { View, Dimensions, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import { View, Dimensions, StyleSheet, ActivityIndicator, BackHandler } from 'react-native';
 import { CarouselPagination, ImageContainer, ListHeader, Header, NavigationBar } from '@components/Home';
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { fetchProducts } from '@api/services/generalApi';
 import { ProductsList } from '@components/Product';
 import { RoundedContainer, SafeAreaView } from '@components/containers';
 import { formatData } from '@utils/formatters';
+import { COLORS } from '@constants/theme';
+import { showToastMessage } from '@components/Toast';
 
 const { height } = Dimensions.get('window');
 
@@ -15,10 +17,38 @@ const HomeScreen = ({ navigation }) => {
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
   const [allDataLoaded, setAllDataLoaded] = useState(false);
+  const [backPressCount, setBackPressCount] = useState(0);
+  console.log("🚀 ~ HomeScreen ~ backPressCount:", backPressCount)
+  console.log("🚀 ~ HomeScreen ~ backPressCount:", backPressCount)
 
   useEffect(() => {
     fetchInitialProducts();
   }, []);
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+    return () => backHandler.remove();
+  }, [handleBackPress]);
+
+  const handleBackPress = useCallback(() => {
+    if (navigation.isFocused()) {
+      if (backPressCount === 0) {
+        showToastMessage('Press back again to exit');
+        setBackPressCount(1);
+        return true;
+      } else if (backPressCount === 1) {
+        BackHandler.exitApp();
+      }
+    }
+    return false;
+  }, [backPressCount, navigation]);
+
+  useEffect(() => {
+    const backPressTimer = setTimeout(() => {
+      setBackPressCount(0);
+    }, 2000);
+    return () => clearTimeout(backPressTimer);
+  }, [backPressCount]);
 
   const fetchInitialProducts = async () => {
     setLoading(true);
@@ -71,44 +101,44 @@ const HomeScreen = ({ navigation }) => {
 
 
   return (
-    <SafeAreaView>
+    <SafeAreaView backgroundColor={COLORS.primaryThemeColor}>
       {/* rounded border */}
       <RoundedContainer>
-      {/* Header */}
-      <Header />
-      {/* Navigation Header */}
-      <NavigationBar
-        onSearchPress={() => navigation.navigate('')}
-        onOptionsPress={() => navigation.navigate('OptionsScreen')}
-        onScannerPress={() => navigation.navigate('')}
-      />
-      {/* Carousel */}
-      <CarouselPagination />
-
-      {/* Section */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 8 }}>
-        <ImageContainer source={require('@assets/images/Home/section/pickup.png')} onPress={() => navigateToScreen('Pickup')} backgroundColor="#f37021" title="Pickup" />
-        <ImageContainer source={require('@assets/images/Home/section/services.png')} onPress={() => navigateToScreen('Services')} backgroundColor="#f37021" title="Services" />
-        <ImageContainer source={require('@assets/images/Home/section/customer.png')} onPress={() => navigateToScreen('Customer')} backgroundColor="#f37021" title="Customer" />
-      </View>
-
-      {/* Bottom sheet */}
-      <BottomSheet snapPoints={snapPoints}>
-        {/* Product list header */}
-        <ListHeader title="Products" />
-        {/* flatlist */}
-        <BottomSheetFlatList
-          data={formatData(products, 3)}
-          numColumns={3}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          contentContainerStyle={{ paddingBottom: '25%' }}
-          onEndReached={fetchMoreProducts}
-          showsVerticalScrollIndicator={false}
-          onEndReachedThreshold={0.1}
-          ListFooterComponent={loading && <ActivityIndicator size="large" color="#0000ff" />}
+        {/* Header */}
+        <Header />
+        {/* Navigation Header */}
+        <NavigationBar
+          onSearchPress={() => navigation.navigate('')}
+          onOptionsPress={() => navigation.navigate('OptionsScreen')}
+          onScannerPress={() => navigation.navigate('')}
         />
-      </BottomSheet>
+        {/* Carousel */}
+        <CarouselPagination />
+
+        {/* Section */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 8 }}>
+          <ImageContainer source={require('@assets/images/Home/section/pickup.png')} onPress={() => navigateToScreen('Pickup')} backgroundColor="#f37021" title="Pickup" />
+          <ImageContainer source={require('@assets/images/Home/section/services.png')} onPress={() => navigateToScreen('Services')} backgroundColor="#f37021" title="Services" />
+          <ImageContainer source={require('@assets/images/Home/section/customer.png')} onPress={() => navigateToScreen('Customer')} backgroundColor="#f37021" title="Customer" />
+        </View>
+
+        {/* Bottom sheet */}
+        <BottomSheet snapPoints={snapPoints}>
+          {/* Product list header */}
+          <ListHeader title="Products" />
+          {/* flatlist */}
+          <BottomSheetFlatList
+            data={formatData(products, 3)}
+            numColumns={3}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString()}
+            contentContainerStyle={{ paddingBottom: '25%' }}
+            onEndReached={fetchMoreProducts}
+            showsVerticalScrollIndicator={false}
+            onEndReachedThreshold={0.1}
+            ListFooterComponent={loading && <ActivityIndicator size="large" color="#0000ff" />}
+          />
+        </BottomSheet>
       </RoundedContainer>
     </SafeAreaView>
   );

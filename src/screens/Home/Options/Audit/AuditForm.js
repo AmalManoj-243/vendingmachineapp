@@ -25,13 +25,26 @@ const AuditForm = ({ navigation }) => {
   const [collectionType, setCollectionType] = useState(null);
   const [errors, setErrors] = useState({});
   const [ledger, setLedger] = useState({})
-  // console.log("🚀 ~ AuditForm ~ ledger:", ledger)
   const [imageLoading, setImageLoading] = useState(true);
   const [scannedBillDetails, setScannedBillDetails] = useState({});
   const [remarks, setRemarks] = useState('')
   const [splittedBillName, setSplittedBillName] = useState('')
-  // console.log("🚀 ~ AuditForm ~ splittedBillName:", splittedBillName)
   const loginUser = useAuthStore(state => state.user)
+
+  useEffect(() => {
+    resetFormState();
+  }, [splittedBillName]);
+
+  // clear all states when scan another data
+  const resetFormState = () => {
+    setImageUrls([]);
+    setDisplayBillDetails({});
+    setScannedBillDetails({});
+    setCollectionType(null);
+    setErrors({});
+    setLedger({});
+    setRemarks('');
+  };
 
   // Function to handle scanned data
   const handleScan = async (data) => {
@@ -42,6 +55,8 @@ const AuditForm = ({ navigation }) => {
     const billSequence = billParts.slice(1).join('-')
     setSplittedBillName(billName)
 
+    resetFormState();
+    
     try {
       let response, billDetails;
       // console.log("Response of customer data", billDetails)
@@ -162,10 +177,13 @@ const AuditForm = ({ navigation }) => {
 
         case "Spare Issue":
           response = await fetchBills.sparePartsIssueDetails(billSequence);
-          billDetails = response[0];
-          console.log("Bill data", billDetails);
+          if (response[0]) {
+            const spareAuditDetail = await fetchBills.sparePartsIssueAuditDetails(response[0]?._id)
+            console.log("🚀 ~ handleScan ~ spareAuditDetail:", spareAuditDetail)
+            billDetails = spareAuditDetail[0];
+          }
+          console.log("Bill data Spare Issue", billDetails);
           break;
-
         default:
           console.log("Unknown bill type");
       }
@@ -176,9 +194,10 @@ const AuditForm = ({ navigation }) => {
             billDetails?.supplier?.supplier_name ||
             billDetails?.capital_chart_of_account_name ||
             billDetails?.expense_chart_of_account_name ||
+            billDetails?.chart_of_account_name ||
             billDetails?.sales_person?.sales_person_name || '',
           documentNumber: billDetails.sequence_no || '',
-          totalAmount: billDetails.total_amount || billDetails.amount || '',
+          totalAmount: billDetails.total_amount || billDetails.amount || billDetails?.spare_parts_line[0].totalCount[0].total_calculated_amounts || '',
           businessType: billDetails.bussiness_type_id || '',
           paymentMethod: billDetails?.payment_method_id ||
             billDetails?.register_payments?.[0]?.payment_method_id ||
@@ -230,7 +249,18 @@ const AuditForm = ({ navigation }) => {
       // collectionType: "Scanned Collection type is required",
     };
 
+    // for (const field in errorMessages) {
+    //   if (!displayBillDetails[field]) {
+    //     updateErrorState(errorMessages[field], field);
+    //     isValid = false;
+    //   }
+    // }
     for (const field in errorMessages) {
+      // Skip validation for displayName field if bill name is "Spare Issue"
+      if (field === "displayName" && splittedBillName === "Spare Issue") {
+        continue;
+      }
+
       if (!displayBillDetails[field]) {
         updateErrorState(errorMessages[field], field);
         isValid = false;
@@ -301,19 +331,19 @@ const AuditForm = ({ navigation }) => {
         case "Sales Return":
           // Handling for Sales Return 
           auditingData.register_payment_id = null,
-          auditingData.register_payment_sequence_no = null,
           auditingData.chq_type = scannedBillDetails?.chq_type ?? null;
-          auditingData.chq_date = scannedBillDetails?.chq_date ?? null;
+          auditingData.register_payment_sequence_no = null,
           auditingData.chq_no = scannedBillDetails.chq_no ?? null;
+          auditingData.chq_date = scannedBillDetails?.chq_date ?? null;
           auditingData.customer_id = scannedBillDetails?.customer?.customer_id;
           auditingData.customer_name = displayBillDetails?.displayName;
           auditingData.un_taxed_amount = scannedBillDetails?.total_untaxed_amount
           break;
         case "Cash rec":
+          auditingData.customer_id = null;
           auditingData.chq_no = scannedBillDetails?.chq_type ?? null,
           auditingData.chq_date = scannedBillDetails?.chq_type ?? null,
           auditingData.chq_type = scannedBillDetails?.chq_type ?? null,
-          auditingData.customer_id = null;
           auditingData.register_payment_sequence_no = scannedBillDetails?.register_payments[0]?.sequence_no ?? null;
           auditingData.ledger_id = ledger?.ledger_id ?? null;
           auditingData.ledger_type = ledger?.ledger_type ?? null;
@@ -326,7 +356,7 @@ const AuditForm = ({ navigation }) => {
           auditingData.ledger_name = ledger?.ledger_name ?? null;
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
           break;
-        case "Bank rec":
+        case "Bank rec": //BNKPAY
           auditingData.un_taxed_amount = displayBillDetails?.totalAmount ?? 0,
           auditingData.ledger_id = ledger?.ledger_id ?? null;
           auditingData.ledger_type = ledger?.ledger_type ?? null;
@@ -342,8 +372,9 @@ const AuditForm = ({ navigation }) => {
           auditingData.chart_of_accounts_name = scannedBillDetails?.paid_through_chart_of_account_name ?? null;
           break;
         case "SUPREC":
-          auditingData.customer_id = loginUser?.company?.company_id ?? null;
-          auditingData.customer_name = customer?.customerName ?? null;
+          auditingData.un_taxed_amount = displayBillDetails?.totalAmount ?? null;
+          auditingData.supplier_name = scannedBillDetails?.chart_of_account_name ?? '';
+          auditingData.supplier_id = scannedBillDetails?.chart_of_account_id ?? null;
           auditingData.ledger_id = ledger?.ledger_id ?? null;
           auditingData.ledger_type = ledger?.ledger_type ?? null;
           auditingData.ledger_name = ledger?.ledger_name ?? null;
@@ -399,8 +430,9 @@ const AuditForm = ({ navigation }) => {
           auditingData.un_taxed_amount = displayBillDetails?.totalAmount ?? 0;
           break;
         case "PETEXP":
-          auditingData.supplier_id = scannedBillDetails?.supplier?.supplier_id ?? null;
-          auditingData.supplier_name = scannedBillDetails?.supplier?.supplier_name ?? null;
+          auditingData.supplier_id =  null;
+          auditingData.supplier_name =  null;
+          auditingData.un_taxed_amount = displayBillDetails?.totalAmount ?? 0;
           auditingData.ledger_id = ledger?.ledger_id ?? null;
           auditingData.ledger_type = ledger?.ledger_type ?? null;
           auditingData.ledger_name = ledger?.ledger_name ?? null;
@@ -431,8 +463,9 @@ const AuditForm = ({ navigation }) => {
           auditingData.employee_ledger_name = scannedBillDetails?.employee_ledger ?? null;
           break;
         case "Spare Issue":
-          auditingData.customer_id = loginUser?.company?.company_id ?? null;
-          auditingData.customer_name = customer?.customerName ?? null;
+          auditingData.un_taxed_amount = displayBillDetails?.totalAmount ?? 0;
+          auditingData.supplier_id = null;
+          auditingData.sales_person_name = '';
           break;
         case "JobInvoice":
           auditingData.customer_id = loginUser?.company?.company_id ?? null;

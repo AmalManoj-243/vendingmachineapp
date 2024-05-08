@@ -18,6 +18,7 @@ export const DETAIL_API_ENDPOINTS = {
     CAPITAL_PAYMENT_DETAILS: '/viewCapitalPayment',
     JOB_INVOICE_DETAILS: '/viewJobInvoice',
     SPARE_PARTS_ISSUE_DETAILS: '/viewSparePartsIssue',
+    SPARE_PARTS_ISSUE_AUDIT_DETAILS:'/viewSparePartsIssue/auditing/spare_parts_issue_details',
     PETTY_CASH_ALLOTMENT_DETAILS: '/viewPettyCashAllotement',
     PETTY_CASH_EXPENSE_DETAILS: '/viewPettyCashExpence',
     PETTY_CASH_TRANSFER_DETAILS: '/viewPettyCashTransfer',

@@ -34,6 +34,17 @@ const fetchLedgerDetail = async (ledgerId) => {
   }
 }
 
+// Function to fetch collection type details
+const fetchSparePartsIssueAuditDetail = async (issueId) => {
+  try {
+    const response = await get(`${DETAIL_API_ENDPOINTS.SPARE_PARTS_ISSUE_AUDIT_DETAILS}/${issueId}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+}
+
 // Object containing functions to fetch transaction auditing details
 export const fetchBills = {
 
@@ -63,6 +74,10 @@ export const fetchBills = {
 
   sparePartsIssueDetails: async (sequenceNo) => {
     return fetchDetails(DETAIL_API_ENDPOINTS.SPARE_PARTS_ISSUE_DETAILS, sequenceNo);
+  },
+
+  sparePartsIssueAuditDetails: async (issueId) => {
+    return fetchSparePartsIssueAuditDetail(issueId);
   },
 
   pettyCashAllotmentDetails: async (sequenceNo) => {
