@@ -7,6 +7,7 @@ import CustomToast from '@components/Toast/CustomToast';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler'; // Import GestureHandlerRootView
 import StackNavigator from '@navigation/StackNavigator';
+import { Provider } from 'react-native-paper';
 export default function App() {
 
   LogBox.ignoreLogs(["new NativeEventEmitter"]);
@@ -18,6 +19,7 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider>
       <NavigationContainer>
         <SafeAreaProvider>
           <BottomSheetModalProvider>
@@ -26,6 +28,7 @@ export default function App() {
           <Toast config={CustomToast} />
         </SafeAreaProvider>
       </NavigationContainer>
+      </Provider>
     </GestureHandlerRootView>
   );
 }

@@ -36,6 +36,22 @@ export const fetchCategories = async ({ offset, limit, searchText }) => {
   }
 };
 
+
+export const fetchInventoryBoxRequest = async ({ offset, limit, search }) => {
+  try {
+    const queryParams = {
+      offset,
+      limit,
+      name: search
+    };
+    const response = await get(API_ENDPOINTS.VIEW_INVENTORY_BOX_REQUEST, queryParams);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};
+
 export const fetchAuditing = async ({ offset, limit }) => {
   try {
     const queryParams = {

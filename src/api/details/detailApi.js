@@ -92,6 +92,9 @@ export const fetchBills = {
     return fetchDetails(DETAIL_API_ENDPOINTS.SALARY_PAYMENT_DETAILS, sequenceNo);
   },
 
+  salaryAdvancePaymentDetails: async (sequenceNo) => {
+    return fetchDetails(DETAIL_API_ENDPOINTS.SALARY_ADVANCE_PAYMENT_DETAILS, sequenceNo);
+  },
 
   pettyCashTransferDetails: async (sequenceNo) => {
     return fetchDetails(DETAIL_API_ENDPOINTS.PETTY_CASH_TRANSFER_DETAILS, sequenceNo);
@@ -135,6 +138,11 @@ export const fetchBills = {
   ledgerTypeDetails: async (sequenceNo) => {
     return fetchDetails(DETAIL_API_ENDPOINTS.LEDGER_TYPE_DETAILS, sequenceNo);
   },
+
+  chequeLedgerDetails: async (sequenceNo) => {
+    return fetchDetails(DETAIL_API_ENDPOINTS.CHEQUE_LEDGER, sequenceNo);
+  },
+  
 
   collectionTypeDetails: async (businessTypeId, paymentMethodId) => {
     return fetchCollectionType(businessTypeId, paymentMethodId);

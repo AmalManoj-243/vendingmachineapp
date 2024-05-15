@@ -16,7 +16,7 @@ const Scanner = ({ route }) => {
     const translateYValue = useRef(new Animated.Value(0)).current;
 
     // Get the onScan function from navigation params
-    const { onScan } = route?.params;
+    const { onScan } = route?.params || {};
     
     // navigation
     const navigation = useNavigation()

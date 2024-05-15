@@ -6,7 +6,7 @@ import { COLORS } from '@constants/theme';
 
 const RoundedContainer = ({ children, backgroundColor=COLORS.white }) => {
   return (
-    <View style={{ flex: 1, backgroundColor: backgroundColor, borderTopLeftRadius: 25, borderTopRightRadius: 25 }}>
+    <View style={{ flex: 1, backgroundColor: backgroundColor, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
       {children}
     </View>
   );

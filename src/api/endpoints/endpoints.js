@@ -6,7 +6,8 @@ export const API_ENDPOINTS = {
     VIEW_WAREHOUSE: `/viewWarehouses`,
     VIEW_CUSTOMER: '/viewCustomers',
     VIEW_QUOTATION: '/viewQuotation',
-    VIEW_AUDITING: '/viewAuditing'
+    VIEW_AUDITING: '/viewAuditing',
+    VIEW_INVENTORY_BOX_REQUEST: '/viewInventoryboxrequest'
 };
 
 export const DETAIL_API_ENDPOINTS = {
@@ -32,6 +33,8 @@ export const DETAIL_API_ENDPOINTS = {
     SUPPLIER_RECEIPTS_DETAILS: '/viewSupplierReceipt',
     SUPPLIER_PAYMENTS_DETAILS: '/viewPaymentMade',
     LEDGER_TYPE_DETAILS: '/viewMasterLedger',
-    SALARY_PAYMENT_DETAILS: '/viewSalaryAdvance',
-    COLLECTION_TYPE_DETAILS: '/viewCollectionType'
+    SALARY_PAYMENT_DETAILS: '/viewSalaryPayment',
+    SALARY_ADVANCE_PAYMENT_DETAILS: '/viewSalaryAdvance',
+    COLLECTION_TYPE_DETAILS: '/viewCollectionType',
+    CHEQUE_LEDGER:'/viewChequeLedger',
 };

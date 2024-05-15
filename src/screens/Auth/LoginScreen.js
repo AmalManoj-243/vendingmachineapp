@@ -80,7 +80,7 @@ const LoginScreen = () => {
           inputs.username === userData.username,
           inputs.password === userData.password
         ) {
-          await AsyncStorage.setItem("userToken", userToken);
+          // await AsyncStorage.setItem("userToken", userToken);
           await AsyncStorage.setItem("userData", JSON.stringify(userData));
           setUser(userData)
           navigation.navigate("AppNavigator");
