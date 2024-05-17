@@ -100,7 +100,7 @@ const InventoryScreen = ({ navigation }) => {
               actions={[
                 { icon: 'barcode-scan', label: 'Scan', labelStyle: { fontFamily: FONT_FAMILY.urbanistSemiBold, color: COLORS.primaryThemeColor }, onPress: () => navigation.navigate('Scanner', { onScan: handleScan }) },
                 { icon: 'pencil', label: 'Box no', labelStyle: { fontFamily: FONT_FAMILY.urbanistSemiBold, color: COLORS.primaryThemeColor }, onPress: () => setIsVisibleModal(true) },
-                { icon: 'pencil', label: 'Detail', labelStyle: { fontFamily: FONT_FAMILY.urbanistSemiBold, color: COLORS.primaryThemeColor }, onPress: () => navigation.navigate('InventoryDetails') },
+                { icon: 'pencil', label: 'Detail', labelStyle: { fontFamily: FONT_FAMILY.urbanistSemiBold, color: COLORS.primaryThemeColor }, onPress: () => navigation.navigate('InventoryDetails', {inventoryDetails: []}) },
               ]}
               onStateChange={({ open }) => setIsFabOpen(open)}
             />

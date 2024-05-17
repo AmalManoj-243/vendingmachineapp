@@ -7,7 +7,7 @@ import { FONT_FAMILY } from '@constants/theme';
 const InventoryList = ({ item, onPress }) => {
 
   return (
-    <TouchableOpacity onPress={onPress} style={styles.itemContainer}>
+    <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.itemContainer}>
       <View style={styles.leftColumn}>
         <Text style={styles.head}>{item?.boxes?.name || '-'}</Text>
         <View style={{ justifyContent: 'space-between', flexDirection: 'row', flex: 1 }}>

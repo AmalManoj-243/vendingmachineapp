@@ -10,6 +10,16 @@ export const API_ENDPOINTS = {
     VIEW_INVENTORY_BOX_REQUEST: '/viewInventoryboxrequest'
 };
 
+export const DROP_DOWN_API_ENDPOINTS = {
+    INVOICE: '/viewInvoice/invoice/invoice_dropdown',
+    SALES_RETURN: '/viewReturn/return/return_dropdown?type=sales_return',
+    PURCHASE_RETURN: '/viewReturn/return/return_dropdown?type=purchase_return',
+    SERVICE_RETURN: '/viewServiceReturn/service_return/service_return_dropdown',
+    STOCK_TRANSFER: '/viewStockTransfer/stock_transaction/stock_transaction_dropdown',
+    SERVICE: '/viewJobRegistration/job_registration/dropdown',
+    VENDOR_BILL: '/viewVendorBill/vendor_bill/vendor_bill_drop_down'
+};
+
 export const DETAIL_API_ENDPOINTS = {
     // Transaction Auditing ENDPOINTS
     GET_INVOICE_DETAILS: '/viewInvoice',

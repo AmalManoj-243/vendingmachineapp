@@ -1,16 +1,29 @@
 import React from 'react'
-import { RoundedScrollContainer, SafeAreaView } from '@components/containers'
+import { ButtonContainer, RoundedScrollContainer, SafeAreaView } from '@components/containers'
 import { NavigationHeader } from '@components/Header'
 import Text from '@components/Text'
-import { View, StyleSheet, Platform, TouchableOpacity, FlatList } from 'react-native';
-import { COLORS, FONT_FAMILY } from '@constants/theme';
+import { View, StyleSheet, FlatList } from 'react-native';
+import { FONT_FAMILY } from '@constants/theme';
 import { DetailField } from '@components/common/Detail';
 import { EmptyState } from '@components/common/empty';
 import { formatDate } from '@utils/common/date';
 import InventoryBoxList from './InventoryBoxList';
+import useAuthStore from '@stores/auth/authStore';
+import { Button } from '@components/common/Button';
 
 const InventoryDetails = ({ navigation, route }) => {
+
   const { inventoryDetails } = route?.params || {};
+  console.log("🚀 ~ InventoryDetails ~ inventoryDetails:", inventoryDetails)
+  const currentUser = useAuthStore(state => state.user)
+
+  const isResponsible = (userId) => {
+    if (currentUser && (userId === currentUser.related_profile._id)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   const renderItem = ({ item }) => {
     if (item.empty) {
@@ -20,7 +33,7 @@ const InventoryDetails = ({ navigation, route }) => {
   };
 
   const renderEmptyState = () => (
-    <EmptyState imageSource={require('@assets/images/EmptyData/empty_inventory_box.png')} message={''} />
+    <EmptyState imageSource={require('@assets/images/EmptyData/empty_inventory_box.png')} message={'Box items is empty'} />
   );
 
   const renderContent = () => (
@@ -40,6 +53,7 @@ const InventoryDetails = ({ navigation, route }) => {
     }
     return renderContent();
   };
+
   return (
     <SafeAreaView>
       <NavigationHeader
@@ -50,9 +64,24 @@ const InventoryDetails = ({ navigation, route }) => {
         <DetailField label={'Inventory Box'} value={inventoryDetails?.name} />
         <DetailField label={'Location'} value={inventoryDetails?.location_name} />
         <DetailField label={'Date'} value={formatDate(inventoryDetails?.date, "yyyy-MM-dd hh:mm a")} />
-        <View style={{marginVertical:10}}/>
+        <View style={{ marginVertical: 10 }} />
         <Text style={styles.label}>Box Items</Text>
         {renderInventoryRequest()}
+        {
+          currentUser && isResponsible(inventoryDetails?.responsible_person?._id)
+            || inventoryDetails?.employees?.some(employee => isResponsible(employee._id)) ?
+            (<ButtonContainer>
+              <Button title={'Box Opening Request'} onPress={() => navigation.navigate('InventoryForm')} />
+            </ButtonContainer>)
+            : <Text style={styles.notification}>You do not have permission to open the box request</Text>
+        }
+        {
+          currentUser ?
+            (<ButtonContainer>
+              <Button title={'Box Opening Request'} onPress={() => navigation.navigate('InventoryForm')} />
+            </ButtonContainer>)
+            : <Text style={styles.notification}>You do not have permission to open the box request</Text>
+        }
       </RoundedScrollContainer>
     </SafeAreaView>
   )
@@ -62,7 +91,16 @@ const styles = StyleSheet.create({
   label: {
     marginVertical: 5,
     fontSize: 16,
-    color: COLORS.primaryThemeColor,
+    color: '#B56727',
+    fontFamily: FONT_FAMILY.urbanistBold,
+  },
+  notification: {
+    // position:'absolute',
+    marginTop: 10,
+    alignSelf: 'center',
+    bottom: 50,
+    fontSize: 16,
+    color: 'red',
     fontFamily: FONT_FAMILY.urbanistSemiBold,
   },
 });

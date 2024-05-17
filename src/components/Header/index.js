@@ -1,2 +1,3 @@
 import NavigationHeader from "./NavigationHeader";
-export { NavigationHeader }
+import BottomSheetHeader from "./BottomSheetHeader";
+export { NavigationHeader, BottomSheetHeader }

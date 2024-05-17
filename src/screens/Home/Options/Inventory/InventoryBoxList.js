@@ -25,9 +25,9 @@ const styles = StyleSheet.create({
   itemContainer: {
     marginHorizontal: 10,
     marginVertical: 5,
-    backgroundColor:COLORS.orange,
+    backgroundColor:COLORS.listContainer,
     borderRadius: 15,
-    borderWidth:3,
+    borderWidth:2,
     borderColor:'white',
     ...Platform.select({
       android: {
@@ -52,17 +52,17 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.urbanistBold,
     fontSize: 16,
     marginBottom: 5,
-    color: COLORS.white
+    color: COLORS.listText
   },
   content: {
-    color: COLORS.white,
+    color: COLORS.listText,
     marginBottom: 5,
     fontSize: 15,
     fontFamily: FONT_FAMILY.urbanistBold,
     textTransform: 'capitalize'
   },
   contentRight: {
-    color: COLORS.white,
+    color: COLORS.listText,
     fontFamily: FONT_FAMILY.urbanistBold,
     fontSize: 15,
   },

@@ -26,7 +26,7 @@ const COLORS = {
   lightGrey: '	#D3D3D3',
   grey: '#F0F0F0',
   listText: '#ffff',
-  listContainer: '#423B6F'
+  listContainer: '#B56727'
 };
 
 // sizes

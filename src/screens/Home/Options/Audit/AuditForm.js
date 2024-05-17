@@ -22,11 +22,9 @@ const AuditForm = ({ navigation }) => {
   const [url, setUrl] = useState('')
   const [imageUrls, setImageUrls] = useState([])
   const [displayBillDetails, setDisplayBillDetails] = useState({})
-  // console.log("🚀 ~ AuditForm ~ displayBillDetails:", displayBillDetails)
   const [collectionType, setCollectionType] = useState(null);
   const [errors, setErrors] = useState({});
   const [ledger, setLedger] = useState({})
-  // console.log("🚀 ~ AuditForm ~ ledger:", ledger)
   const [imageLoading, setImageLoading] = useState(true);
   const [scannedBillDetails, setScannedBillDetails] = useState({});
   const [remarks, setRemarks] = useState('')
