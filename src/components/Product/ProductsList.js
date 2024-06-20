@@ -1,42 +1,35 @@
-import { View, StyleSheet, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
 import Text from '@components/Text';
 import { FONT_FAMILY } from '@constants/theme';
 
-const ProductsList = ({ item, onPress, showPrice }) => {
-
-    const textContainerPosition = showPrice ? -60 : -80
-
+const ProductsList = ({ item, onPress }) => {
     const errorImage = require('@assets/images/error/error.png');
+    const [imageLoading, setImageLoading] = useState(true);
+
     useEffect(() => {
         const timeout = setTimeout(() => {
-            // Stop the loading indicator after a timeout (e.g., 10 seconds)
             setImageLoading(false);
         }, 10000); // Adjust the timeout as needed
 
         return () => clearTimeout(timeout);
     }, []);
 
-    const [imageLoading, setImageLoading] = useState(true);
     const truncatedName =
-        item?.product_name?.length > 15 ? item?.product_name?.substring(0, 35) + '...' : item?.product_name;
+        item?.product_name?.length > 35 ? item?.product_name?.substring(0, 60) + '...' : item?.product_name;
 
     return (
         <TouchableOpacity onPress={onPress} style={styles.container}>
-            {imageLoading && <ActivityIndicator size="small" color={'black'} style={{ position: 'absolute', top: 30 }} />}
+            {imageLoading && <ActivityIndicator size="small" color="black" style={styles.activityIndicator} />}
             <Image
                 source={item?.image_url ? { uri: item.image_url } : errorImage}
                 style={styles.image}
                 onLoad={() => setImageLoading(false)}
                 onError={() => setImageLoading(false)}
             />
-            <View style={{ paddingTop: 50 }} />
-            <View style={[styles.textContainer, { bottom: textContainerPosition }]}>
-                <Text style={styles.name}>{truncatedName}</Text>
+            <View style={styles.textContainer}>
+                <Text style={styles.name}>{truncatedName?.trim()}</Text>
             </View>
-            {showPrice && <View style={[styles.bottomBar, { backgroundColor: 'transparent' }]}>
-                <Text style={styles.price}>Price{' '}:{' '}{item?.portal_price}{' '}AED</Text>
-            </View>}
         </TouchableOpacity>
     );
 };
@@ -50,47 +43,36 @@ const styles = StyleSheet.create({
         margin: 6,
         borderWidth: 0.5,
         borderRadius: 10,
-        marginTop: 5,
+        paddingVertical: 10,
         borderColor: 'grey',
-        backgroundColor: "white",
+        backgroundColor: 'white',
+        width: 150,  // Set a fixed width
+        height: 180, // Adjusted height to make space for text
+    },
+    activityIndicator: {
+        position: 'absolute',
+        top: 30,
+        left: 50,
     },
     image: {
-        width: 80,
-        height: 80,
-        resizeMode: 'cover',
+        width: 85,  // Adjusted width as necessary
+        height: 100, // Adjusted height as necessary
+        resizeMode: 'contain',
         borderRadius: 8,
-        marginTop: 10,
+        alignSelf: 'center',  // Center image horizontally
     },
     textContainer: {
-        position: 'absolute',
-        top: 10,
-        left: 0,
-        right: 0,
-        // bottom: -60,
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingHorizontal: 5,
+        // paddingVertical: 5,
     },
     name: {
-        marginHorizontal: 8,
-        marginVertical: 8,
         fontSize: 12,
         textAlign: 'center',
         textTransform: 'capitalize',
         color: '#2E2B2B',
-        fontFamily: FONT_FAMILY.urbanistBold
-    },
-    price: {
-        fontSize: 12,
-        color: 'grey',
         fontFamily: FONT_FAMILY.urbanistBold,
-    },
-    bottomBar: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        paddingVertical: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
 });

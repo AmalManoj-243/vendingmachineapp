@@ -97,7 +97,7 @@ const ActionModal = ({ title, setImageUrl }) => {
                     borderTopLeftRadius: 30,
                     backgroundColor: 'white',
                     justifyContent: 'flex-start',
-                    marginTop: screenHeight / 1.3,
+                    marginTop: screenHeight / 1.8,
                 }}
             >
                 <View style={{ backgroundColor: COLORS.primaryThemeColor, borderTopRightRadius: 25, borderTopLeftRadius: 25, padding: 8 }}>

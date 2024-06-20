@@ -38,9 +38,9 @@ const CustomerScreen = ({ navigation }) => {
       return <EmptyItem />;
     }
     return (
-      <TouchableOpacity activeOpacity={0.7}>
+      <TouchableOpacity activeOpacity={0.7} onPress={()=> navigation.navigate('CustomerDetails', {details: item})}>
         <View style={{ flexDirection: 'row', alignItems: 'center', margin: 5 }}>
-          <Image source={require('@assets/icons/common/user_bg.png')} tintColor={COLORS.orange} style={{ width: 45, height: 45 }} />
+          <Image source={require('@assets/icons/common/user_bg.png')} tintColor={COLORS.primaryThemeColor} style={{ width: 45, height: 45 }} />
           <View style={{ width: 10 }} />
           <Text style={{ fontFamily: FONT_FAMILY.urbanistBold, fontSize: 14, flex: 1, color: COLORS.primaryThemeColor }}>{item?.name.trim() || '-'}</Text>
         </View>

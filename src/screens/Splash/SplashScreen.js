@@ -67,7 +67,7 @@ const SplashScreen = () => {
                 style={styles.image}
                 resizeMode="contain"
             />
-            <Text style={styles.versionText}>Version 1.0.0</Text>
+            <Text style={styles.versionText}>Version 1.0.2</Text>
         </View>
     );
 };

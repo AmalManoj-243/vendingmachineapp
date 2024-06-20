@@ -11,6 +11,8 @@ import { OverlayLoader } from '@components/Loader';
 import { CustomListModal, EmployeeListModal } from '@components/Modal';
 import { reasons } from '@constants/dropdownConst';
 import { fetchEmployeesDropdown } from '@api/dropdowns/dropdownApi';
+import { Button } from '../Button';
+import { useProductStore } from '@stores/product';
 
 const ProductDetail = ({ navigation, route }) => {
   const { detail = {} } = route?.params;
@@ -24,6 +26,7 @@ const ProductDetail = ({ navigation, route }) => {
   const [employee, setEmployee] = useState([]);
   const currentUser = useAuthStore(state => state.user);
   const warehouseId = currentUser?.warehouse?.warehouse_id || '';
+  const addProduct = useProductStore((state) => state.addProduct);
 
   const isResponsibleOrEmployee = (inventoryDetails) => {
     const responsiblePersonId = inventoryDetails?.responsible_person?._id;
@@ -130,7 +133,7 @@ const ProductDetail = ({ navigation, route }) => {
             boxDetail.box_name.map((boxName, idx) => (
               <TouchableOpacity
                 key={`${index}-${idx}`}
-                style={{ marginTop: 10,  borderColor: COLORS.primaryThemeColor, padding:5, width:'40%', alignItems:'center', borderRadius:8,  backgroundColor: COLORS.lightGrey }}
+                style={{ marginTop: 10, borderColor: COLORS.primaryThemeColor, padding: 5, width: '40%', alignItems: 'center', borderRadius: 8, backgroundColor: COLORS.lightGrey }}
                 onPress={() => handleBoxNamePress(boxName)}
               >
                 <Text style={{ fontFamily: FONT_FAMILY.urbanistBold, color: COLORS.orange, fontSize: 14 }}>Box Name: {boxName}</Text>
@@ -146,6 +149,18 @@ const ProductDetail = ({ navigation, route }) => {
         </View>
       );
     }
+  };
+
+  const handleAddProduct = () => {
+    const newProduct = {
+      id: details._id,
+      name: details.product_name,
+      quantity: details.total_product_quantity,
+      price: details.cost, 
+      imageUrl: details.image_url
+    };
+    addProduct(newProduct);
+    // showToastMessage("Product added to cart");
   };
 
   return (
@@ -197,9 +212,20 @@ const ProductDetail = ({ navigation, route }) => {
             <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>Price:</Text>
             <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>{details.cost || 'N/A'} AED</Text>
           </View>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 }}>
+            <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>Minimal Sales Price:</Text>
+            <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>{details?.minimal_sales_price?.toString() || 'N/A'}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 }}>
+            <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>Sale Price:</Text>
+            <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>{details?.sale_price?.toString() || 'N/A'}</Text>
+          </View>
         </View>
         {renderStockDetails()}
         {renderInventoryBoxDetails()}
+        {/* Button to add product in cart */}
+        <View  style={{flex:1}}/>
+          <Button title={'Add Products'} onPress={handleAddProduct} />
       </RoundedScrollContainer>
       <CustomListModal
         isVisible={isVisibleCustomListModal}
