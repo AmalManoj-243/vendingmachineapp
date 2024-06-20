@@ -15,7 +15,12 @@ import { Button } from '../Button';
 import { useProductStore } from '@stores/product';
 
 const ProductDetail = ({ navigation, route }) => {
-  const { detail = {} } = route?.params;
+  const { detail = {}, fromCustomerDetails = {} } = route?.params;
+  console.log("🚀 ~ ProductDetail ~ fromCustomerDetails:", fromCustomerDetails)
+  console.log("🚀 ~ ProductDetail ~ empDetails:", fromCustomerDetails)
+
+  const products = useProductStore(state => state.products)
+  console.log("🚀 ~ ProductDetail ~ products:", products)
   const [details, setDetails] = useState({});
   const [loading, setLoading] = useState(false);
   const [getDetail, setGetDetail] = useState(null);
@@ -151,16 +156,27 @@ const ProductDetail = ({ navigation, route }) => {
     }
   };
 
+  
   const handleAddProduct = () => {
     const newProduct = {
-      id: details._id,
-      name: details.product_name,
-      quantity: details.total_product_quantity,
-      price: details.cost, 
-      imageUrl: details.image_url
+      id: detail._id,
+      name: detail.product_name,
+      quantity: detail.total_product_quantity,
+      price: detail.cost,
+      imageUrl: detail.image_url
     };
-    addProduct(newProduct);
-    // showToastMessage("Product added to cart");
+
+    const exist = products.some(p => p.id === newProduct.id);
+    if (exist) {
+      showToastMessage('Product already added');
+    } else {
+      addProduct(newProduct);
+      if (Object.keys(fromCustomerDetails).length > 0) {
+        navigation.navigate('CustomerDetails', { details: fromCustomerDetails });
+      } else {
+        navigation.navigate('CustomerScreen');
+      }
+    }
   };
 
   return (
@@ -224,8 +240,8 @@ const ProductDetail = ({ navigation, route }) => {
         {renderStockDetails()}
         {renderInventoryBoxDetails()}
         {/* Button to add product in cart */}
-        <View  style={{flex:1}}/>
-          <Button title={'Add Products'} onPress={handleAddProduct} />
+        <View style={{ flex: 1 }} />
+        <Button title={'Add Products'} onPress={handleAddProduct} />
       </RoundedScrollContainer>
       <CustomListModal
         isVisible={isVisibleCustomListModal}

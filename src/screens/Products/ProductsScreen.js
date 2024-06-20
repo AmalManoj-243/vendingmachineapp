@@ -15,6 +15,7 @@ import useDebouncedSearch from '@hooks/useDebouncedSearch';
 
 const ProductsScreen = ({ navigation, route }) => {
   const categoryId = route?.params?.id;
+  const {fromCustomerDetails} = route.params || {};
 
   const isFocused = useIsFocused();
   const { data, loading, fetchData, fetchMoreData } = useDataFetching(fetchProducts);
@@ -40,7 +41,7 @@ const ProductsScreen = ({ navigation, route }) => {
     if (item.empty) {
       return <View style={[styles.itemStyle, styles.itemInvisible]} />;
     }
-    return <ProductsList item={item} onPress={() => navigation.navigate('ProductDetail', { detail: item })} />;
+    return <ProductsList item={item} onPress={() => navigation.navigate('ProductDetail', { detail: item, fromCustomerDetails })} />;
   };
 
   const renderEmptyState = () => (

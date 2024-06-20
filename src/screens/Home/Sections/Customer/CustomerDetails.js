@@ -106,7 +106,7 @@ const CustomerDetails = ({ navigation, route }) => {
           width="50%"
           alignSelf="flex-end"
           marginTop={10}
-          onPress={() => navigation.navigate('Products')}
+          onPress={() => navigation.navigate('Products', { fromCustomerDetails: details })}
         />
         {products.length === 0 ? (
           <EmptyState imageSource={require('@assets/images/EmptyData/empty_cart.png')} message="Items are empty" />
@@ -136,7 +136,7 @@ const CustomerDetails = ({ navigation, route }) => {
                     <Text style={styles.totalPriceLabel}>{totalAmount.toFixed(2)} AED</Text>
                   </View>
                 </View>
-                <Button backgroundColor={COLORS.primaryThemeColor} title={'Place Order'}/>
+                <Button backgroundColor={COLORS.primaryThemeColor} title={'Place Order'} />
               </View>
             )}
           </View>

@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
   footerContainer: {
     padding: 10,
     backgroundColor: COLORS.white,
+    borderTopWidth: 1,
   },
   totalPriceContainer: {
     flexDirection: 'column',
