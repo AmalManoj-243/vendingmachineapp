@@ -8,7 +8,7 @@ import { DetailField } from '@components/common/Detail';
 import { EmptyState } from '@components/common/empty';
 import { formatDate } from '@utils/common/date';
 import InventoryBoxList from './InventoryBoxList';
-import useAuthStore from '@stores/auth/authStore';
+import { useAuthStore } from '@stores/auth';
 import { Button } from '@components/common/Button';
 import { styles } from './styles';
 import { reasons } from '@constants/dropdownConst';

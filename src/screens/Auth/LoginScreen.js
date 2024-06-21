@@ -16,7 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import Text from "@components/Text";
 import { TextInput } from "@components/common/TextInput";
 import { RoundedScrollContainer, SafeAreaView } from "@components/containers";
-import { authStore } from "@stores/auth";
+import { useAuthStore } from "@stores/auth";
 import { showToastMessage } from "@components/Toast";
 import { Checkbox } from "react-native-paper";
 
@@ -26,7 +26,7 @@ LogBox.ignoreAllLogs();
 const LoginScreen = () => {
 
   const navigation = useNavigation();
-  const setUser = authStore(state => state.login)
+  const setUser = useAuthStore(state => state.login)
   const [checked, setChecked] = useState(false);
 
   const updateCheckedState = (value) => {

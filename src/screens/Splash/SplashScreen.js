@@ -4,12 +4,12 @@ import { useNavigation } from '@react-navigation/native';
 import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
-import { authStore } from '@stores/auth';
+import { useAuthStore } from '@stores/auth';
 
 const SplashScreen = () => {
     const navigation = useNavigation();
     const [fontsLoaded, setFontsLoaded] = useState(false);
-    const setLoggedInUser = authStore(state => state.login)
+    const setLoggedInUser = useAuthStore(state => state.login)
 
 
     useEffect(() => {

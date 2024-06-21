@@ -9,7 +9,7 @@ import SignaturePad from '@components/SignaturePad'
 import Text from '@components/Text'
 import { fetchBills } from '@api/details/detailApi'
 import { format } from 'date-fns'
-import useAuthStore from '@stores/auth/authStore'
+import { useAuthStore } from '@stores/auth';
 import { ActionModal } from '@components/Modal'
 import { formatData } from '@utils/formatters'
 import { AntDesign } from '@expo/vector-icons';

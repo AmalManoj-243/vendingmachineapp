@@ -2,7 +2,7 @@
 
 import { get } from "./utils";
 import { API_ENDPOINTS } from "@api/endpoints";
-import useAuthStore from "@stores/auth/authStore";
+import { useAuthStore } from '@stores/auth';
 import handleApiError from "../utils/handleApiError";
 
 // Debugging output for useAuthStore

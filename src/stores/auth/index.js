@@ -1,2 +1,2 @@
-import authStore from "./authStore";
-export { authStore }
+import useAuthStore from "./useAuthStore"; 
+export { useAuthStore }

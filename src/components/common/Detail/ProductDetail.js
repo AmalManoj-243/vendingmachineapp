@@ -6,7 +6,7 @@ import { NavigationHeader } from '@components/Header';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import { fetchInventoryDetailsByName, fetchProductDetails } from '@api/details/detailApi';
 import { showToastMessage } from '@components/Toast';
-import useAuthStore from '@stores/auth/authStore';
+import { useAuthStore } from '@stores/auth';
 import { OverlayLoader } from '@components/Loader';
 import { CustomListModal, EmployeeListModal } from '@components/Modal';
 import { reasons } from '@constants/dropdownConst';
@@ -16,11 +16,7 @@ import { useProductStore } from '@stores/product';
 
 const ProductDetail = ({ navigation, route }) => {
   const { detail = {}, fromCustomerDetails = {} } = route?.params;
-  console.log("🚀 ~ ProductDetail ~ fromCustomerDetails:", fromCustomerDetails)
-  console.log("🚀 ~ ProductDetail ~ empDetails:", fromCustomerDetails)
-
   const products = useProductStore(state => state.products)
-  console.log("🚀 ~ ProductDetail ~ products:", products)
   const [details, setDetails] = useState({});
   const [loading, setLoading] = useState(false);
   const [getDetail, setGetDetail] = useState(null);
@@ -163,7 +159,8 @@ const ProductDetail = ({ navigation, route }) => {
       name: detail.product_name,
       quantity: detail.total_product_quantity,
       price: detail.cost,
-      imageUrl: detail.image_url
+      imageUrl: detail.image_url,
+      uom: detail?.uom?.[0]
     };
 
     const exist = products.some(p => p.id === newProduct.id);

@@ -4,7 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { ButtonContainer, SafeAreaView } from "@components/containers";
 import { Button } from "@components/common/Button";
 import { COLORS, FONT_FAMILY } from "@constants/theme";
-import useAuthStore from "@stores/auth/authStore";
+import { useAuthStore } from '@stores/auth';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LogoutModal } from "@components/Modal";
 

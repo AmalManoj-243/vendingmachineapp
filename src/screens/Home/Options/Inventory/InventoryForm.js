@@ -20,7 +20,7 @@ import { Button } from "@components/common/Button";
 import { COLORS } from "@constants/theme";
 import { showToastMessage } from "@components/Toast";
 import { post, put } from "@api/services/utils";
-import useAuthStore from "@stores/auth/authStore";
+import { useAuthStore } from '@stores/auth';
 import Toast from "react-native-toast-message";
 import { OverlayLoader } from "@components/Loader";
 

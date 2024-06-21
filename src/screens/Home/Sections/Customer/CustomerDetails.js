@@ -9,12 +9,18 @@ import { Ionicons, AntDesign } from '@expo/vector-icons';
 import { EmptyState } from '@components/common/empty';
 import { COLORS } from '@constants/theme';
 import styles from './styles';
+import { format } from 'date-fns';
+import { useAuthStore } from '@stores/auth';
+import { post } from '@api/services/utils';
+import Toast from 'react-native-toast-message';
 
 const CustomerDetails = ({ navigation, route }) => {
   const { details } = route?.params || {};
+  const currentUser = useAuthStore(state => state.user);
   const products = useProductStore(state => state.products);
   const removeProduct = useProductStore(state => state.removeProduct);
   const addProduct = useProductStore(state => state.addProduct);
+  const clearProducts = useProductStore(state => state.clearProducts);
 
   const handleDelete = (productId) => {
     removeProduct(productId);
@@ -93,6 +99,57 @@ const CustomerDetails = ({ navigation, route }) => {
       </View>
     </View>
   );
+
+  const placeOrder = async () => {
+    const date = format(new Date(), 'yyyy-MM-dd');
+    const orderItems = products.map((product) => ({
+      product_id: product.id,
+      tax_type_id: "648d9b54ef9cd868dfbfa37b",
+      tax_value: 0.05,
+      uom_id: product?.uom?.uom_id || null,
+      uom: product?.uom?.uom_name || 'Pcs',
+      qty: product.quantity,
+      discount_percentage: 0,
+      unit_price: product.price,
+      remarks: '',
+      total: product.price * product.quantity,
+    }));
+    const placeOrderData = {
+      date: date,
+      quotation_status: "new",
+      address: details?.address,
+      remarks: null,
+      customer_id: details?._id,
+      warehouse_id: currentUser?.warehouse?.warehouse_id,
+      pipeline_id: null,
+      payment_terms_id: null,
+      delivery_method_id: null,
+      untaxed_total_amount: untaxedAmount,
+      total_amount: totalAmount,
+      crm_product_line_ids: orderItems,
+      sales_person_id: currentUser?.related_profile?._id ?? null,
+      sales_person_name: currentUser.related_profile.name ?? '',
+    }
+    const response = await post('/createQuotation', placeOrderData)
+    if (response.success === 'true') {
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Quotation created successfully',
+        position: 'bottom',
+      });
+      clearProducts()
+      navigation.navigate('CustomerScreen');
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'ERROR',
+        text2: response.message || 'Quotation creation failed',
+        position: 'bottom',
+      });
+    }
+  }
+
   return (
     <SafeAreaView>
       <NavigationHeader title="Order Summary" onBackPress={() => navigation.goBack()} />
@@ -136,7 +193,7 @@ const CustomerDetails = ({ navigation, route }) => {
                     <Text style={styles.totalPriceLabel}>{totalAmount.toFixed(2)} AED</Text>
                   </View>
                 </View>
-                <Button backgroundColor={COLORS.primaryThemeColor} title={'Place Order'} />
+                <Button backgroundColor={COLORS.primaryThemeColor} title={'Place Order'} onPress={placeOrder} />
               </View>
             )}
           </View>

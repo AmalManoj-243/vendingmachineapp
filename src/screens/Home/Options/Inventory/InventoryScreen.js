@@ -21,7 +21,7 @@ import {
 import { useDataFetching } from "@hooks";
 import { formatData } from "@utils/formatters";
 import { COLORS, FONT_FAMILY } from "@constants/theme";
-import useAuthStore from "@stores/auth/authStore";
+import { useAuthStore } from '@stores/auth';
 import { reasons } from "@constants/dropdownConst";
 import { fetchEmployeesDropdown } from "@api/dropdowns/dropdownApi";
 
