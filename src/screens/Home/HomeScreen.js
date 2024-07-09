@@ -142,7 +142,7 @@ const HomeScreen = ({ navigation }) => {
         <NavigationBar
           onSearchPress={() => navigation.navigate("")}
           onOptionsPress={() => navigation.navigate("OptionsScreen")}
-          onScannerPress={() =>  navigation.navigate("Scanner", {onScan: handleScan})}
+          onScannerPress={() => navigation.navigate("Scanner", { onScan: handleScan })}
         />
         {/* Carousel */}
         <CarouselPagination />
@@ -194,7 +194,7 @@ const HomeScreen = ({ navigation }) => {
             }
           />
         </BottomSheet>
-        <OverlayLoader visible={detailLoading}/>
+        <OverlayLoader visible={detailLoading} />
       </RoundedContainer>
     </SafeAreaView>
   );

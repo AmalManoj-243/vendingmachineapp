@@ -16,5 +16,4 @@ const API_BASE_URL = 'https://shansapp.danatfix.com:3004';
 // const API_BASE_URL = 'https://shansapp.danatfix.com:3032' //oman test
 
 
-
 export default API_BASE_URL;

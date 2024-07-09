@@ -4,7 +4,7 @@ import Text from '@components/Text';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import { AntDesign } from '@expo/vector-icons';
 
-const NavigationHeader = ({ title, onBackPress, color = COLORS.white, backgroundColor = COLORS.primaryThemeColor, logo = true }) => {
+const NavigationHeader = ({ title, onBackPress, color = COLORS.white, backgroundColor = COLORS.primaryThemeColor, logo = true, icon = false, iconPress = () => { }, iconName = '' }) => {
 
     const isPrimaryTheme = backgroundColor === COLORS.primaryThemeColor;
 
@@ -16,7 +16,10 @@ const NavigationHeader = ({ title, onBackPress, color = COLORS.white, background
                 <AntDesign name="left" size={20} color={color} />
             </TouchableOpacity>
             <Text style={[styles.title, { color }]}>{title}</Text>
-           {logo && <Image source={logoSource} style={styles.logoImage} />}
+            {logo && <Image source={logoSource} style={styles.logoImage} />}
+            {icon && <TouchableOpacity activeOpacity={0.8} onPress={iconPress}>
+                <AntDesign name={iconName} size={20} color={color} />
+            </TouchableOpacity>}
         </View>
     );
 };

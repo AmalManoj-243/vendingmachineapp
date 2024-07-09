@@ -37,6 +37,7 @@ const InventoryScreen = ({ navigation }) => {
     useState(false);
   const [isVisibleEmployeeListModal, setIsVisibleEmployeeListModal] =
     useState(false);
+    
   const { data, loading, fetchData, fetchMoreData } = useDataFetching(
     fetchInventoryBoxRequest
   );

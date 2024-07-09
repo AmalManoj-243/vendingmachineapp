@@ -48,7 +48,7 @@ export const fetchInventoryBoxRequest = async ({ offset, limit, searchText }) =>
       offset,
       limit,
       ...(searchText !== undefined && { name: searchText }),
-      sales_person_id: salesPersonId,
+      ...(salesPersonId !== undefined && { sales_person_id: salesPersonId})
     };
     const response = await get(API_ENDPOINTS.VIEW_INVENTORY_BOX_REQUEST, queryParams);
     return response.data;

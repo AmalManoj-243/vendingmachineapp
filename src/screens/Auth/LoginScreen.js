@@ -129,10 +129,10 @@ const LoginScreen = () => {
               <TextInput
                 onChangeText={(text) => handleOnchange(text, "password")}
                 onFocus={() => handleError(null, "password")}
+                error={errors.password}
                 iconName="lock-outline"
                 label="Password"
                 placeholder="Enter password"
-                error={errors.password}
                 password
                 column={true}
                 login={true}

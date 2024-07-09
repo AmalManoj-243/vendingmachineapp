@@ -7,7 +7,7 @@ import { formatData } from '@utils/formatters';
 import { EmptyItem } from '@components/common/empty';
 import { COLORS } from '@constants/theme';
 import { useLoader } from '@hooks';
-import { fetchProductDetailsByBarcode} from "@api/details/detailApi";
+import { fetchProductDetailsByBarcode } from "@api/details/detailApi";
 import { showToastMessage } from '@components/Toast';
 import { OverlayLoader } from '@components/Loader';
 
@@ -35,23 +35,24 @@ const OptionsScreen = ({ navigation }) => {
   const options =
     [
       { title: 'Search Products', image: require('@assets/images/Home/options/search_product.png'), onPress: () => navigation.navigate('Products') },
-      { title: 'Scan Barcode', image: require('@assets/images/Home/options/scan_barcode.png'), onPress: () =>   navigation.navigate("Scanner", {onScan: handleScan})},
+      { title: 'Scan Barcode', image: require('@assets/images/Home/options/scan_barcode.png'), onPress: () => navigation.navigate("Scanner", { onScan: handleScan }) },
       { title: 'Product Enquiry', image: require('@assets/images/Home/options/product_enquiry.png'), onPress: () => navigation.navigate('') },
       { title: 'Purchase Requisition', image: require('@assets/images/Home/options/product_purchase_requisition.png'), onPress: () => navigation.navigate('') },
       { title: 'Transaction Auditing', image: require('@assets/images/Home/options/transaction_auditing.png'), onPress: () => navigation.navigate('AuditScreen') },
       { title: 'Task Manager', image: require('@assets/images/Home/options/tasK_manager_1.png'), onPress: () => navigation.navigate('TaskManagerScreen') },
       { title: 'Market Study', image: require('@assets/images/Home/options/market_study_1.png'), onPress: () => navigation.navigate('MarketStudyScreen') },
+      { title: 'Visits Plan', image: require('@assets/images/Home/options/visits_plan.png'), onPress: () => navigation.navigate('VisitsPlanScreen') },
       { title: 'Attendance', image: require('@assets/images/Home/options/attendance.png'), onPress: () => navigation.navigate('') },
       { title: 'Inventory Management', image: require('@assets/images/Home/options/inventory_management_1.png'), onPress: () => navigation.navigate('InventoryScreen') }
     ]
 
-    const renderItem = ({ item }) => {
-      if (item.empty) {
-        return <EmptyItem />;
-      }
-      return <ListItem title={item.title} image={item.image} onPress={item.onPress} />;
-    };
-  
+  const renderItem = ({ item }) => {
+    if (item.empty) {
+      return <EmptyItem />;
+    }
+    return <ListItem title={item.title} image={item.image} onPress={item.onPress} />;
+  };
+
 
   return (
     <SafeAreaView backgroundColor={COLORS.white}>
@@ -70,7 +71,7 @@ const OptionsScreen = ({ navigation }) => {
           numColumns={2}
           keyExtractor={(item, index) => index.toString()}
         />
-        <OverlayLoader visible={loading}/>
+        <OverlayLoader visible={loading} />
       </RoundedContainer>
     </SafeAreaView>
   )

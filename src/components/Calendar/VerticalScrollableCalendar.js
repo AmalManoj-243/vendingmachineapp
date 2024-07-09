@@ -66,6 +66,7 @@ const VerticalScrollableCalendar = ({ date, onChange }) => {
                             >
                                 <Text style={sameDay ? styles.selectedDayOfWeek : styles.dayOfWeek}>{format(day, 'EEE')}</Text>
                                 <Text style={sameDay ? styles.selectedDayText : styles.dayText}>{format(day, 'dd')}</Text>
+                                <Text style={sameDay ? styles.selectedMonthText : styles.dayOfMonth}>{format(day, 'MMM')}</Text>
                             </TouchableOpacity>
                         </View>
                     );
@@ -88,15 +89,21 @@ const styles = StyleSheet.create({
     },
     dayText: {
         color: '#32274D', // Set text color for non-selected dates to black
-        marginBottom: 5,
+        // marginBottom: 5,
         fontSize: 14, // Set font size for non-selected dates to 14
         fontFamily: FONT_FAMILY.urbanistMedium,
     },
 
     selectedDayText: {
         color: 'white',
-        marginBottom: 5,
+        // marginBottom: 5,
         fontSize: 20,
+        fontFamily: FONT_FAMILY.urbanistBold,
+    },
+    selectedMonthText: {
+        color: 'white',
+        marginBottom: 0,
+        fontSize: 10,
         fontFamily: FONT_FAMILY.urbanistBold,
     },
     label: {
@@ -113,7 +120,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
         width: 55,
-        height: 50,
+        height: 53,
         padding: 5,
         backgroundColor: "#F9D7BF",
     },
@@ -121,7 +128,7 @@ const styles = StyleSheet.create({
     selectedTouchable: {
         backgroundColor: '#F37021',
         width: 65,
-        height: 60,
+        height: 63,
         paddingTop: 10,
         elevation: 5,
         shadowOffset: { width: 0, height: 5 },
@@ -131,6 +138,12 @@ const styles = StyleSheet.create({
     dayOfWeek: {
         color: '#32274D',
         marginBottom: 0,
+        fontSize: 10,
+        fontFamily: FONT_FAMILY.urbanistMedium
+    },
+    dayOfMonth: {
+        color: '#32274D',
+        marginBottom: 10,
         fontSize: 10,
         fontFamily: FONT_FAMILY.urbanistMedium
     },

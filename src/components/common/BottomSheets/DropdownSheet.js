@@ -67,6 +67,7 @@ const DropdownSheet = ({
 const styles = StyleSheet.create({
     contentContainer: {
         paddingBottom: 20,
+        marginVertical:10
     },
     item: {
         marginVertical: 3,

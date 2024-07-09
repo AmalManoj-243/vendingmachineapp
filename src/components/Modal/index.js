@@ -3,4 +3,5 @@ import LogoutModal from "./LogoutModal";
 import InputModal from "./InputModal";
 import CustomListModal from "./CustomListModal";
 import EmployeeListModal from "./EmployeeLIstModal";
-export { ActionModal, LogoutModal, InputModal, CustomListModal, EmployeeListModal }
+import RulesModal from "./RulesModal";
+export { ActionModal, LogoutModal, InputModal, CustomListModal, EmployeeListModal, RulesModal }
