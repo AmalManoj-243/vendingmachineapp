@@ -15,7 +15,7 @@ const RoundedScrollContainer = ({ children, backgroundColor = COLORS.white, bord
 
   return (
     <View style={containerStyles}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 15 }} showsVerticalScrollIndicator={false} scrollEnabled={scrollEnabled}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, padding: borderRadius ? 15 : 0 }} showsVerticalScrollIndicator={false} scrollEnabled={scrollEnabled}>
         {children}
       </ScrollView>
     </View>

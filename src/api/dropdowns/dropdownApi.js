@@ -56,5 +56,10 @@ export const fetchBrandsDropdown = async () => {
   return fetchData(DROP_DOWN_API_ENDPOINTS.BRAND_DROPDOWN);
 };
 
+export const fetchCountryDropdown = async () => {
+  return fetchData(DROP_DOWN_API_ENDPOINTS.VIEW_COUNTRY);
+}
 
-
+export const fetchStateDropdown = async (countryId) => {
+  return fetchData(`${DROP_DOWN_API_ENDPOINTS.VIEW_STATE}?country_id=${countryId}`)
+}

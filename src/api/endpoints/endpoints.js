@@ -23,7 +23,9 @@ export const DROP_DOWN_API_ENDPOINTS = {
     EMPLOYEE_DROPDOWN: '/viewEmployees/employee_list/employee_dropdown',
     CUSTOMER_DROPDOWN:'/viewCustomers/customer_list/drop_down',
     DEPARTMENT_DROPDOWN: '/viewDepartments/department_list/department_dropdown',
-    BRAND_DROPDOWN: '/viewBrands/brand_list/brand_dropdown'
+    BRAND_DROPDOWN: '/viewBrands/brand_list/brand_dropdown',
+    VIEW_COUNTRY: "/viewCountry/country_list/country_dropdown",
+    VIEW_STATE: "/viewState",
 };
 
 export const DETAIL_API_ENDPOINTS = {

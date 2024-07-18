@@ -8,6 +8,7 @@ import { fetchInvoiceDropdown } from '@api/dropdowns/dropdownApi';
 import { DropdownSheet } from '@components/common/BottomSheets';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { formatDate } from '@utils/common/date';
+
 const VisitPlanForm = ({ navigation }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVisible, setIsVisible] = useState(false);

@@ -10,6 +10,7 @@ import { fetchCustomers } from '@api/services/generalApi';
 import { TouchableOpacity, ActivityIndicator, View, Image } from 'react-native';
 import { useDataFetching, useDebouncedSearch } from '@hooks';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
+import { Button, FABButton } from '@components/common/Button';
 
 const CustomerScreen = ({ navigation }) => {
   const isFocused = useIsFocused();
@@ -85,6 +86,8 @@ const CustomerScreen = ({ navigation }) => {
       <SearchContainer placeholder="Search Customers" onChangeText={handleSearchTextChange} />
       <RoundedContainer>
         {renderCustomers()}
+        <FABButton onPress={() => navigation.navigate('CustomerTabView')} />
+
       </RoundedContainer>
     </SafeAreaView>
   );
