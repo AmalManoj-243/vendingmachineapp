@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, TouchableOpacity, Platform, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import Text from '@components/Text';
 import { BottomSheetModal, BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
@@ -12,24 +12,28 @@ const MultiSelectDropdownSheet = ({
     onValueChange,
     title,
     onClose = () => { },
+    previousSelections = []  // Prop to pass previous selections
 }) => {
-    console.log("🚀 ~ isVisible:", isVisible)
     const bottomSheetModalRef = useRef(null);
     const snapPoints = useMemo(() => ['25%', '30%', '50%', '96%'], []);
 
-    const [selectedItems, setSelectedItems] = useState([]);
+    const [selectedItems, setSelectedItems] = useState(previousSelections);  // Initialize with previous selections
 
     useEffect(() => {
         if (isVisible) {
+            setSelectedItems(previousSelections);  // Set previous selections when visible
             bottomSheetModalRef.current?.present();
         } else {
             bottomSheetModalRef.current?.dismiss();
+            setSelectedItems([]);  // Clear selections on close
         }
-    }, [isVisible]);
+    }, [isVisible, previousSelections]);
 
     const handleSheetChanges = useCallback((index) => {
-        if (index === -1) onClose()
-    }, []);
+        if (index === -1) {
+            onClose();
+        }
+    }, [onClose]);
 
     const handleSelectItem = (item) => {
         const isSelected = selectedItems.includes(item);
@@ -61,13 +65,15 @@ const MultiSelectDropdownSheet = ({
             snapPoints={snapPoints}
             onChange={handleSheetChanges}
         >
-            <NavigationHeader title={title}
+            <NavigationHeader
+                title={title}
                 logo={false}
                 refreshIcon={true}
                 refreshPress={() => setSelectedItems([])}
                 checkIcon={true}
-                checkPress={() => onClose()}
-                onBackPress={() => bottomSheetModalRef.current?.dismiss()} />
+                checkPress={onClose}
+                onBackPress={() => bottomSheetModalRef.current?.dismiss()}
+            />
             <BottomSheetFlatList
                 data={items}
                 numColumns={1}
@@ -112,6 +118,5 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
     },
 });
-
 
 export default MultiSelectDropdownSheet;

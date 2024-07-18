@@ -334,6 +334,7 @@ const AuditForm = ({ navigation }) => {
         employee_ledger_display_name: null,
         service_amount: null,
         service_product_amount: null,
+        service_product_cost:null,
         is_estimation: scannedBillDetails?.is_estimation ?? null
       };
       console.log('Entering the switch statements')
@@ -355,9 +356,9 @@ const AuditForm = ({ navigation }) => {
         case "Sales Return":
           // Handling for Sales Return 
           auditingData.register_payment_id = null,
-          auditingData.chq_type = scannedBillDetails?.chq_type ?? null;
+            auditingData.chq_type = scannedBillDetails?.chq_type ?? null;
           auditingData.register_payment_sequence_no = null,
-          auditingData.chq_no = scannedBillDetails.chq_no ?? null;
+            auditingData.chq_no = scannedBillDetails.chq_no ?? null;
           auditingData.chq_date = scannedBillDetails?.chq_date ?? null;
           auditingData.customer_id = scannedBillDetails?.customer?.customer_id;
           auditingData.customer_name = displayBillDetails?.displayName;
@@ -366,9 +367,9 @@ const AuditForm = ({ navigation }) => {
         case "Cash rec":
           auditingData.customer_id = null;
           auditingData.chq_no = scannedBillDetails?.chq_type ?? null,
-          auditingData.chq_date = scannedBillDetails?.chq_type ?? null,
-          auditingData.chq_type = scannedBillDetails?.chq_type ?? null,
-          auditingData.register_payment_sequence_no = scannedBillDetails?.register_payments[0]?.sequence_no ?? null;
+            auditingData.chq_date = scannedBillDetails?.chq_type ?? null,
+            auditingData.chq_type = scannedBillDetails?.chq_type ?? null,
+            auditingData.register_payment_sequence_no = scannedBillDetails?.register_payments[0]?.sequence_no ?? null;
           auditingData.ledger_id = ledger?.ledger_id ?? null;
           auditingData.ledger_type = ledger?.ledger_type ?? null;
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
@@ -382,7 +383,7 @@ const AuditForm = ({ navigation }) => {
           break;
         case "Bank rec": //BNKPAY
           auditingData.un_taxed_amount = displayBillDetails?.totalAmount ?? 0,
-          auditingData.ledger_id = ledger?.ledger_id ?? null;
+            auditingData.ledger_id = ledger?.ledger_id ?? null;
           auditingData.ledger_type = ledger?.ledger_type ?? null;
           auditingData.ledger_name = ledger?.ledger_name ?? null;
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
@@ -563,12 +564,13 @@ const AuditForm = ({ navigation }) => {
           auditingData.chq_type = scannedBillDetails?.register_payments[0]?.chq_type ?? null;
           auditingData.cheque_transaction_type = scannedBillDetails?.register_payments[0]?.type ?? null;
           auditingData.service_amount = scannedBillDetails?.total_service_amount;
-          auditingData.service_product_amount = scannedBillDetails?.total_product_amount;
+          auditingData.service_product_amount = scannedBillDetails?.total_product_amount; // not sure
+          auditingData.service_product_cost = scannedBillDetails?.total_product_amount
           break;
         default:
           break;
       }
-      console.log("Auditing Data:", auditingData)
+      console.log("handle Auditing DATA:", JSON.stringify(auditingData, null, 2));
       // return auditingData;
       const response = await post('/createAuditing', auditingData);
       if (response.success === 'true') {
@@ -669,7 +671,7 @@ const AuditForm = ({ navigation }) => {
           <View style={styles.rowCotainer}>
             <Text style={styles.qrCodeText}>Update from qr Code </Text>
             <View style={styles.buttonContainer}>
-              <Button backgroundColor={COLORS.primaryThemeColor} title={'Scan'} onPress={() => navigation.navigate('Scanner', { onScan: handleScan, onClose:true })} />
+              <Button backgroundColor={COLORS.primaryThemeColor} title={'Scan'} onPress={() => navigation.navigate('Scanner', { onScan: handleScan, onClose: true })} />
             </View>
           </View>
         </View>

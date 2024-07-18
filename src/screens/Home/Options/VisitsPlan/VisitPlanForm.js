@@ -1,4 +1,4 @@
-import { View, Keyboard } from 'react-native';
+import {  Keyboard } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, RoundedScrollContainer } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
@@ -25,7 +25,6 @@ const VisitPlanForm = ({ navigation }) => {
     remarks: '',
   });
 
-  console.log("🚀 ~ VisitPlanForm ~ formData:", formData)
   const [dropdown, setDropdown] = useState({
     customer: [],
     assignedTo: [],

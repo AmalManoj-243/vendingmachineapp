@@ -30,6 +30,7 @@
     "expo-constants": "~15.4.6",
     "expo-font": "~11.10.3",
     "expo-image-picker": "~14.7.1",
+    "expo-location": "~16.5.5",
     "expo-status-bar": "~1.11.1",
     "immer": "^10.0.3",
     "lodash": "^4.17.21",

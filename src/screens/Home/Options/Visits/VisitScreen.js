@@ -24,7 +24,7 @@ const VisitScreen = ({ navigation }) => {
   const [selectedType, setSelectedType] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [datePickerMode, setDatePickerMode] = useState('from'); // 'from' or 'to'
+  const [datePickerMode, setDatePickerMode] = useState('from');
 
   const [formData, setFormData] = useState({
     fromDate: '',
@@ -34,12 +34,13 @@ const VisitScreen = ({ navigation }) => {
     departments: [],
     brands: []
   });
+
   console.log("🚀 ~ VisitScreen ~ formData:", formData)
   const [dropdown, setDropdown] = useState({
     employees: [],
     departments: [],
     brands: [],
-    customer: [],
+    customers: '',
   });
 
   const { data, loading, fetchData, fetchMoreData } = useDataFetching(fetchCustomerVisitList);
@@ -76,7 +77,7 @@ const VisitScreen = ({ navigation }) => {
             id: data._id,
             label: data.brand_name,
           })),
-          customer: customersDropdown.map((data) => ({
+          customers: customersDropdown.map((data) => ({
             id: data._id,
             label: data.name,
           })),
@@ -139,15 +140,10 @@ const VisitScreen = ({ navigation }) => {
   };
 
   const handleFieldChange = (fieldName, value) => {
-    // setFormData((prevState) => ({
-    //   ...prevState,
-    //   [fieldName]: value,
-    // }));
-
-    setFormData({
-      ...formData,
-      [fieldName]: value
-    })
+    setFormData((prevState) => ({
+      ...prevState,
+      [fieldName]: value,
+    }));
   };
 
   const handleDateConfirm = (date) => {
@@ -159,9 +155,9 @@ const VisitScreen = ({ navigation }) => {
     }
     setDatePickerVisibility(false);
   };
+  
 
   const handleDateRangeSelection = (rangeType) => {
-
     let fromDate = moment();
     let toDate = moment();
 
@@ -200,23 +196,28 @@ const VisitScreen = ({ navigation }) => {
   const renderBottomSheet = () => {
     let items = [];
     let isMultiSelect = true;
+    let previousSelections = [];
 
     switch (selectedType) {
-      case "Employees":
+      case 'Employees':
         items = dropdown.employees;
+        previousSelections = formData.employees;
         break;
-      case "Departments":
+      case 'Departments':
         items = dropdown.departments;
+        previousSelections = formData.departments;
         break;
-      case "Brands":
+      case 'Brands':
         items = dropdown.brands;
+        previousSelections = formData.brands;
         break;
-      case "Customer":
-        items = dropdown.customer;
+      case 'Customer':
+        items = dropdown.customers;
+        // previousSelections = formData.customer ? [formData.customer] : [];
         isMultiSelect = false;
         break;
       case 'filterCalendar':
-        items = filterCalendar
+        items = filterCalendar;
         isMultiSelect = false;
         break;
       default:
@@ -230,6 +231,7 @@ const VisitScreen = ({ navigation }) => {
         title={selectedType}
         onClose={() => setIsVisible(false)}
         onValueChange={(value) => handleFieldChange(selectedType.toLowerCase(), value)}
+        previousSelections={previousSelections}  // Pass previous selections
       />
     ) : (
       <DropdownSheet
@@ -241,12 +243,13 @@ const VisitScreen = ({ navigation }) => {
           if (selectedType === 'filterCalendar') {
             handleDateRangeSelection(value);
           } else {
-            handleFieldChange("customer", value);
+            handleFieldChange('customer', value);
           }
         }}
       />
     );
   };
+
 
   const applyFilters = () => {
     fetchData({
@@ -359,7 +362,7 @@ const VisitScreen = ({ navigation }) => {
       <RoundedContainer>
         {renderBottomSheet()}
         {/* {renderListing()} */}
-        <FABButton onPress={() => navigation.navigate('AuditForm')} />
+        <FABButton onPress={() => navigation.navigate('VisitForm')} />
       </RoundedContainer>
       <DateTimePickerModal
         isVisible={isDatePickerVisible}

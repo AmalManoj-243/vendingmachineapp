@@ -79,6 +79,12 @@ const appJson = {
           recordAudioAndroid: true,
         },
       ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ]
     ],
     extra: {
       eas: {
