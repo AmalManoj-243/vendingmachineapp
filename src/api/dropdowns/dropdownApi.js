@@ -1,6 +1,7 @@
 import { DROP_DOWN_API_ENDPOINTS } from "@api/endpoints";
 import { get } from "@api/services/utils";
 import handleApiError from "@api/utils/handleApiError";
+import { DropdownSheet } from "@components/common/BottomSheets";
 
 const fetchData = async (endpoint) => {
   try {
@@ -69,5 +70,29 @@ export const fetchCountryDropdown = async () => {
 }
 
 export const fetchStateDropdown = async (countryId) => {
-  return fetchData(`${DROP_DOWN_API_ENDPOINTS.VIEW_STATE}?country_id=${countryId}`)
+  return fetchData(`${DROP_DOWN_API_ENDPOINTS.VIEW_STATE}?country_id=${countryId}`);
+}
+
+export const fetchAreaDropdown = async (stateId) => {
+  return fetchData(`${DROP_DOWN_API_ENDPOINTS.VIEW_AREA}?state_id=${stateId}`);
+};
+
+export const fetchsalesPersonDropdown = async () => {
+  return fetchData(DROP_DOWN_API_ENDPOINTS.VIEW_SALESPERSON);
+}
+
+export const fetchmopDropdown = async () => {
+  return fetchData(DROP_DOWN_API_ENDPOINTS.VIEW_MOP);
+}
+
+export const fetchCustomerBehaviourDropdown = async () => {
+  return fetchData(DROP_DOWN_API_ENDPOINTS.VIEW_CUSTOMERBEHAVIOUR);
+}
+
+export const fetchLanguageDropdown = async () => {
+  return fetchData(DROP_DOWN_API_ENDPOINTS.VIEW_LANGUAGE);
+}
+
+export const fetchCurrencyDropdown = async () => {
+  return fetchData(DROP_DOWN_API_ENDPOINTS.VIEW_CURRENCY);
 }

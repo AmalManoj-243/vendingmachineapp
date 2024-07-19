@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
-import { fetchCountryDropdown, fetchStateDropdown } from '@api/dropdowns/dropdownApi';
+import { fetchCountryDropdown, fetchStateDropdown, fetchAreaDropdown } from '@api/dropdowns/dropdownApi';
 import { DropdownSheet } from '@components/common/BottomSheets';
 
 const Address = () => {
@@ -63,6 +63,27 @@ const Address = () => {
     }
   }, [formData.country]);
 
+  useEffect(() => {
+    if (formData.state) {
+      const fetchAreaData = async () => {
+        try {
+          const areaData = await fetchAreaDropdown(formData.state.id);
+          setDropdown(prevDropdown => ({
+            ...prevDropdown,
+            area: areaData.map(data => ({
+              id: data._id,
+              label: data.area_name,
+            })),
+          }));
+        } catch (error) {
+          console.error('Error fetching area dropdown data:', error);
+        }
+      };
+
+      fetchAreaData();
+    }
+  }, [formData.state]);
+
   const handleFieldChange = (field, value) => {
     setFormData(prevFormData => ({
       ...prevFormData,
@@ -112,7 +133,7 @@ const Address = () => {
     );
   };
 
-  
+
   const validate = () => {
     Keyboard.dismiss();
     let isValid = true;
@@ -123,7 +144,7 @@ const Address = () => {
       Country: 'Please select a country',
       State: 'Please select a state',
       Area: 'Please select a area',
-      POBox: 'Please enter PO Box'
+      POBox: 'Please enter PO Box',
     };
 
     Object.keys(requiredFields).forEach(field => {
