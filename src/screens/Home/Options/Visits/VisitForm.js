@@ -229,26 +229,26 @@ const submit = async () => {
       longitude: formData?.longitude || null,
       latitude: formData?.latitude || null,
     };
-    console.log("🚀 ~ submit ~ visitData:", JSON.stringify(visitData, null, 5))
+    console.log("🚀 ~ submit ~ visitData:", JSON.stringify(visitData, null, 2))
     try {
       const response = await post("/createCustomerVisitList", visitData);
       if (response.success) {
         showToast({
           type: "success",
           title: "Success",
-          message: response.message || "Inventory Box Request created successfully",
+          message: response.message || "Customer Visit created successfully",
         });
-        navigation.navigate("InventoryScreen");
+        navigation.navigate("VisitScreen");
       } else {
-        console.error("Inventory Box Request:", response.message);
+        console.error("Customer Visit Failed:", response.message);
         showToast({
           type: "error",
           title: "ERROR",
-          message: response.message || "Inventory Box Request creation failed",
+          message: response.message || "Customer Visit creation failed",
         });
       }
     } catch (error) {
-      console.error("Error creating Inventory Box Request:", error);
+      console.error("Error creating Customer Visit Failed:", error);
       showToast({
         type: "error",
         title: "ERROR",

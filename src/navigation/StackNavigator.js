@@ -16,6 +16,7 @@ import { MarketStudyScreen } from "@screens/Home/Options/MarketStudy";
 import { VisitPlanForm, VisitsPlanScreen } from "@screens/Home/Options/VisitsPlan"; 
 import { VisitDetails, VisitForm, VisitScreen } from "@screens/Home/Options/Visits"; //customer visit
 import { CustomerTabView } from "@screens/Home/Sections/Customer/CustomerTabView";
+import { MapViewScreen } from "@components/MapViewScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +37,11 @@ const StackNavigator = () => {
       <Stack.Screen
         name="Barcode"
         component={Barcode}
+        options={{ headerShown: false }}
+      />
+        <Stack.Screen
+        name="MapViewScreen"
+        component={MapViewScreen}
         options={{ headerShown: false }}
       />
       {/* Login Screen */}

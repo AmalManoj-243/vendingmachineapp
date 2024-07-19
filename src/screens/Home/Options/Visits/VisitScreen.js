@@ -47,16 +47,16 @@ const VisitScreen = ({ navigation }) => {
   });
 
   const { data, loading, fetchData, fetchMoreData } = useDataFetching(fetchCustomerVisitList);
-  
+
   useFocusEffect(
     useCallback(() => {
-      fetchData({loginEmployeeId: currentUserId});
+      fetchData({ loginEmployeeId: currentUserId });
     }, [currentUserId])
   );
 
   useEffect(() => {
     if (isFocused) {
-      fetchData({loginEmployeeId: currentUserId});
+      fetchData({ loginEmployeeId: currentUserId });
     }
   }, [isFocused]);
 
@@ -94,18 +94,21 @@ const VisitScreen = ({ navigation }) => {
   }, []);
 
   const handleLoadMore = () => {
-    fetchMoreData({loginEmployeeId: currentUserId});
+    fetchMoreData({ loginEmployeeId: currentUserId });
   };
 
   const renderItem = ({ item }) => {
     if (item.empty) {
       return <EmptyItem />;
     }
-    return <VisitList item={item} />;
+
+    const { longitude, latitude, date_time, customer, site_location, customer_contact, purpose_of_visit, remarks } = item;
+    const details = { longitude, latitude, date_time, customer, site_location, customer_contact, purpose_of_visit, remarks };
+    return <VisitList item={item} onPress={() => navigation.navigate('VisitDetails', { visitDetails: details })} />;
   };
 
   const renderEmptyState = () => (
-    <EmptyState imageSource={require('@assets/images/EmptyData/transaction_empty.png')} message={'no data'} />
+    <EmptyState imageSource={require('@assets/images/EmptyData/empty_visits.png')} message={'no visits found'} />
   );
 
   const renderContent = () => (
@@ -158,7 +161,7 @@ const VisitScreen = ({ navigation }) => {
     }
     setDatePickerVisibility(false);
   };
-  
+
 
   const handleDateRangeSelection = (rangeType) => {
     let fromDate = moment();
@@ -219,7 +222,7 @@ const VisitScreen = ({ navigation }) => {
         // previousSelections = formData.customer ? [formData.customer] : [];
         isMultiSelect = false;
         break;
-      case 'filterCalendar':
+      case 'Select Durations':
         items = filterCalendar;
         isMultiSelect = false;
         break;
@@ -313,7 +316,7 @@ const VisitScreen = ({ navigation }) => {
             editable={false}
           />
           <View style={{ width: 10 }} />
-          <TouchableOpacity onPress={() => toggleBottomSheet('filterCalendar')}>
+          <TouchableOpacity onPress={() => toggleBottomSheet('Select Durations')}>
             <FontAwesome name="calendar" size={28} color="white" />
           </TouchableOpacity>
         </View>
