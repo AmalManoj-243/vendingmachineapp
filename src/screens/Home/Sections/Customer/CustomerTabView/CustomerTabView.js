@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { View, useWindowDimensions } from 'react-native';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { useWindowDimensions, KeyboardAvoidingView, Platform } from 'react-native';
+import { TabView, TabBar } from 'react-native-tab-view';
 import { useState } from 'react';
 import Details from './Details';
 import OtherDetails from './OtherDetails';
 import Address from './Address';
 import ContactPerson from './ContactPerson';
-import { RoundedContainer, RoundedScrollContainer, SafeAreaView } from '@components/containers';
+import { SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 
@@ -54,12 +54,37 @@ const CustomerTabView = ({ navigation }) => {
     currency: "",
   });
 
-  const renderScene = SceneMap({
-    first: () => <Details formData={formData} setFormData={setFormData} />,
-    second: () => <OtherDetails formData={formData} setFormData={setFormData} />,
-    third: () => <Address formData={formData} setFormData={setFormData} />,
-    fourth: () => <ContactPerson formData={formData} setFormData={setFormData} />,
-  });
+  const [errors, setErrors] = useState({});
+
+  const handleFieldChange = (field, value) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [field]: value,
+    }));
+    if (errors[field]) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [field]: null,
+      }));
+    }
+  };
+
+  console.log("🚀 ~ CustomerTabView ~ formData:", formData)
+
+  const renderScene = ({ route }) => {
+    switch (route.key) {
+      case 'first':
+        return <Details formData={formData} onFieldChange={handleFieldChange} />;
+      case 'second':
+        return <OtherDetails formData={formData} onFieldChange={handleFieldChange} />;
+      case 'third':
+        return <Address formData={formData} onFieldChange={handleFieldChange} />;
+      case 'fourth':
+        return <ContactPerson formData={formData} onFieldChange={handleFieldChange} />;
+      default:
+        return null;
+    }
+  };
 
   const [index, setIndex] = useState(0);
   const [routes] = useState([
@@ -75,13 +100,15 @@ const CustomerTabView = ({ navigation }) => {
         title="Add Customer"
         onBackPress={() => navigation.goBack()}
       />
-      <TabView
-        renderTabBar={CustomTabBar}
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        onIndexChange={setIndex}
-        initialLayout={{ width: layout.width }}
-      />
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : null} style={{ flex: 1 }}>
+        <TabView
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          renderTabBar={CustomTabBar}
+          onIndexChange={setIndex}
+          initialLayout={{ width: layout.width }}
+        />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

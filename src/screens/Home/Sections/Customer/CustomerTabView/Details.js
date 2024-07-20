@@ -4,11 +4,11 @@ import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
 import { fetchsalesPersonDropdown, fetchmopDropdown } from '@api/dropdowns/dropdownApi';
-import { customerTypes } from '@constants/customerTypes';
-import { customerTitles } from '@constants/customerTitles';
+import { customerTypes } from '@constants/dropdownConst';
+import { customerTitles } from '@constants/dropdownConst';
 import { LoadingButton } from '@components/common/Button';
 
-const Details = ({ formData, setFormData }) => {
+const Details = ({ formData, onFieldChange }) => {
   const [errors, setErrors] = useState({});
   const [isVisible, setIsVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,19 +58,6 @@ const Details = ({ formData, setFormData }) => {
     fetchDropdownData();
   }, []);
 
-  const handleFieldChange = (field, value) => {
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      [field]: value,
-    }));
-    if (errors[field]) {
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [field]: null,
-      }));
-    }
-  };
-
   const toggleBottomSheet = (type) => {
     setSelectedType(type);
     setIsVisible(!isVisible);
@@ -106,7 +93,7 @@ const Details = ({ formData, setFormData }) => {
         items={items}
         title={selectedType}
         onClose={() => setIsVisible(false)}
-        onValueChange={(value) => handleFieldChange(fieldName, value)}
+        onValueChange={(value) => onFieldChange(fieldName, value)}
       />
     );
   };
@@ -166,8 +153,9 @@ const Details = ({ formData, setFormData }) => {
         label={"Customer Name :"}
         placeholder={"Enter Customer Name"}
         editable={true}
+        value={formData.customerName}
         validate={errors.customerName}
-        onValueChange={(value) => handleFieldChange('customerName', value)}
+        onChangeText={(value) => onFieldChange('customerName', value)}
       />
       <FormInput
         label={"Customer Title :"}
@@ -179,12 +167,13 @@ const Details = ({ formData, setFormData }) => {
         value={formData.customerTitles?.label}
         onPress={() => toggleBottomSheet('Customer Title')}
       />
+
       <FormInput
         label={"Email Address :"}
         placeholder={"Enter Email Address"}
         editable={true}
         validate={errors.emailAddress}
-        onValueChange={(value) => handleFieldChange('emailAddress', value)}
+        onChangeText={(value) => onFieldChange('emailAddress', value)}
       />
       <FormInput
         label={"Sales Person :"}
@@ -200,7 +189,7 @@ const Details = ({ formData, setFormData }) => {
         placeholder={"Enter Collection Agent"}
         editable={true}
         validate={errors.collectionAgent}
-        onValueChange={(value) => handleFieldChange('collectionAgent', value)}
+        onChangeText={(value) => onFieldChange('collectionAgent', value)}
       />
       <FormInput
         label={"MOP (Mode Of Payment) :"}
@@ -217,7 +206,7 @@ const Details = ({ formData, setFormData }) => {
         editable={true}
         keyboardType="numeric"
         validate={errors.mobileNumber}
-        onValueChange={(value) => handleFieldChange('mobileNumber', value)}
+        onChangeText={(value) => onFieldChange('mobileNumber', value)}
       />
       <FormInput
         label={"Whatsapp Number :"}
@@ -225,7 +214,7 @@ const Details = ({ formData, setFormData }) => {
         editable={true}
         keyboardType="numeric"
         validate={errors.whatsappNumber}
-        onValueChange={(value) => handleFieldChange('whatsappNumber', value)}
+        onChangeText={(value) => onFieldChange('whatsappNumber', value)}
       />
       <FormInput
         label={"Landline Number :"}
@@ -233,7 +222,7 @@ const Details = ({ formData, setFormData }) => {
         editable={true}
         keyboardType="numeric"
         validate={errors.landlineNumber}
-        onValueChange={(value) => handleFieldChange('landlineNumber', value)}
+        onChangeText={(value) => onFieldChange('landlineNumber', value)}
       />
       <FormInput
         label={"Fax :"}
@@ -241,7 +230,7 @@ const Details = ({ formData, setFormData }) => {
         editable={true}
         keyboardType="numeric"
         validate={errors.fax}
-        onValueChange={(value) => handleFieldChange('fax', value)}
+        onChangeText={(value) => onFieldChange('fax', value)}
       />
       {renderBottomSheet()}
       <LoadingButton

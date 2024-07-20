@@ -20,3 +20,14 @@ export const filterCalendar = [
   { label: 'This Year', value: 'This Year' }
 ]
 
+export const customerTypes = [
+  { label: 'B2B', value: 'B2B', id: 'customerTypes' },
+  { label: 'B2C', value: 'B2C', id: 'customerTypes' },
+]
+
+export const customerTitles = [
+  { label: 'Mr.', value: 'Mr', id: 'customerTitles' },
+  { label: 'Mrs.', value: 'Mrs', id: 'customerTitles' },
+  { label: 'Ms.', value: 'Ms', id: 'customerTitles' },
+  { label: 'Miss.', value: 'Miss', id: 'customerTitles' }
+]
