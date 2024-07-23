@@ -30,11 +30,9 @@ export const DROP_DOWN_API_ENDPOINTS = {
     VIEW_STATE: "/viewState",
     VIEW_AREA: "/viewArea/area_list/drop_down",
     VIEW_SALESPERSON: "/viewEmployees/employee_list/employee_dropdown",
-    VIEW_MOP: "/viewModeOfPayment/mode_of_payment_list/mode_of_payment_dropdown",
-    VIEW_CUSTOMERBEHAVIOUR: "/viewCustomerBehaviour/customer_behaviour/customer_behaviour_dropdown",
+    VIEW_COLLECTIONAGENT: "/viewEmployees/employee_list/employee_dropdown",
     VIEW_LANGUAGE: "/viewLanguage/language_list/language_dropdown",
     VIEW_CURRENCY: "/viewCurrency/currency_list/currency_dropdown",
-
 };
 
 export const DETAIL_API_ENDPOINTS = {

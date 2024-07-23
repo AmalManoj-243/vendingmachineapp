@@ -81,8 +81,8 @@ export const fetchsalesPersonDropdown = async () => {
   return fetchData(DROP_DOWN_API_ENDPOINTS.VIEW_SALESPERSON);
 }
 
-export const fetchmopDropdown = async () => {
-  return fetchData(DROP_DOWN_API_ENDPOINTS.VIEW_MOP);
+export const fetchcollectionAgentDropdown = async () => {
+  return fetchData(DROP_DOWN_API_ENDPOINTS.VIEW_COLLECTIONAGENT);
 }
 
 export const fetchCustomerBehaviourDropdown = async () => {

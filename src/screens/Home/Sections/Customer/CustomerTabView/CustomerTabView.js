@@ -204,7 +204,7 @@ const CustomerTabView = ({ navigation }) => {
         />
       </KeyboardAvoidingView>
 
-      <View style={{ backgroundColor: 'white', paddingHorizontal: 50 }}>
+      <View style={{ backgroundColor: 'white', paddingHorizontal: 50, paddingBottom: 12 }}>
         <LoadingButton onPress={submit} title={'Submit'} loading={isSubmitting} />
       </View>
     </SafeAreaView>

@@ -33,6 +33,18 @@ export const customerTitles = [
 ]
 
 export const modeOfPayment = [
-    { label: 'Cash', value: 'Cash' },
-    { label: 'Cash and Credit', value: 'Cash and Credit' },
-  ];
+  { label: 'Cash', value: 'Cash' },
+  { label: 'Cash and Credit', value: 'Cash and Credit' },
+];
+
+export const customerBehaviour = [
+  { label:'Fast Payment', value: 'Fast Payment' },
+  { label:'Normal Payment', value: 'Normal Payment' },
+  { label:'Delayed Payment', value: 'Delayed Payment' },
+];
+
+export const customerAttitude = [
+  { label:'Option 1', value: 'Option 1' },
+  { label:'Option 2', value: 'Option 2' },
+];
+                      

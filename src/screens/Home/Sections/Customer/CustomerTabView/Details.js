@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
-import { fetchsalesPersonDropdown, fetchmopDropdown } from '@api/dropdowns/dropdownApi';
+import { fetchsalesPersonDropdown, fetchcollectionAgentDropdown } from '@api/dropdowns/dropdownApi';
 import { customerTypes } from '@constants/dropdownConst';
 import { customerTitles } from '@constants/dropdownConst';
 import { modeOfPayment } from '@constants/dropdownConst';
@@ -15,7 +15,7 @@ const Details = ({ formData, onFieldChange, errors }) => {
   const [dropdown, setDropdown] = useState({
     salesPerson: [],
     customerTypes: [],
-    mop: [],
+    collectionAgent: [],
   });
 
   useEffect(() => {
@@ -25,6 +25,25 @@ const Details = ({ formData, onFieldChange, errors }) => {
         setDropdown(prevDropdown => ({
           ...prevDropdown,
           salesPerson: salesPersonData.map(data => ({
+            id: data._id,
+            label: data.name,
+          })),
+        }));
+      } catch (error) {
+        console.error('Error fetching sales person dropdown data:', error);
+      }
+    };
+
+    fetchDropdownData();
+  }, []);
+
+  useEffect(() => {
+    const fetchDropdownData = async () => {
+      try {
+        const collectionAgentData = await fetchcollectionAgentDropdown();
+        setDropdown(prevDropdown => ({
+          ...prevDropdown,
+          collectionAgent: collectionAgentData.map(data => ({
             id: data._id,
             label: data.name,
           })),
@@ -58,6 +77,10 @@ const Details = ({ formData, onFieldChange, errors }) => {
       case 'Sales Person':
         items = dropdown.salesPerson;
         fieldName = 'salesPerson';
+        break;
+      case 'Collection Agent':
+        items = dropdown.collectionAgent;
+        fieldName = 'collectionAgent';
         break;
       case 'MOP (Mode Of Payment)':
         items = modeOfPayment;
@@ -126,9 +149,11 @@ const Details = ({ formData, onFieldChange, errors }) => {
       <FormInput
         label={"Collection Agent :"}
         placeholder={"Enter Collection Agent"}
-        editable={true}
+        dropIcon={"menu-down"}
+        editable={false}
         validate={errors.collectionAgent}
-        onChangeText={(value) => onFieldChange('collectionAgent', value)}
+        value={formData.collectionAgent?.label}
+        onPress={() => toggleBottomSheet('Collection Agent')}
       />
       <FormInput
         label={"MOP (Mode Of Payment) :"}

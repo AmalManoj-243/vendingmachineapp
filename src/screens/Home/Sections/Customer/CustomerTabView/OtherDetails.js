@@ -3,37 +3,19 @@ import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
 import { CheckBox } from '@components/common/CheckBox';
-import { fetchCustomerBehaviourDropdown, fetchLanguageDropdown, fetchCurrencyDropdown } from '@api/dropdowns/dropdownApi';
+import { fetchLanguageDropdown, fetchCurrencyDropdown } from '@api/dropdowns/dropdownApi';
+import { customerBehaviour, customerAttitude } from '@constants/dropdownConst';
 
 const OtherDetails = ({ formData, onFieldChange, errors }) => {
 
   const [isVisible, setIsVisible] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
   const [dropdown, setDropdown] = useState({
-    customerBehaviour: [],
     customerAttitude: [],
+    customerBehaviour: [],
     language: [],
     currency: [],
   });
-
-  useEffect(() => {
-    const fetchDropdownData = async () => {
-      try {
-        const customerBehaviourData = await fetchCustomerBehaviourDropdown();
-        setDropdown(prevDropdown => ({
-          ...prevDropdown,
-          customerBehaviour: customerBehaviourData.map(data => ({
-            id: data._id,
-            label: data.xxx, // xxx
-          })),
-        }));
-      } catch (error) {
-        console.error('Error fetching customer behaviour dropdown data:', error);
-      }
-    };
-
-    fetchDropdownData();
-  }, []);
 
   useEffect(() => {
     const fetchDropdownData = async () => {
@@ -84,11 +66,11 @@ const OtherDetails = ({ formData, onFieldChange, errors }) => {
 
     switch (selectedType) {
       case 'Customer Behaviour':
-        items = dropdown.customerBehaviour;
+        items = customerBehaviour;
         fieldName = 'customerBehaviour';
         break;
       case 'Customer Attitude':
-        items = dropdown.customerAttitude;
+        items = customerAttitude;
         fieldName = 'customerAttitude';
         break;
       case 'Language':
@@ -116,7 +98,7 @@ const OtherDetails = ({ formData, onFieldChange, errors }) => {
   return (
     <RoundedScrollContainer>
       <FormInput
-        label={"TRN :"}
+        label={"TRN No:"}
         placeholder={"Enter TRN"}
         editable={true}
         validate={errors.trn}
@@ -126,6 +108,7 @@ const OtherDetails = ({ formData, onFieldChange, errors }) => {
         label={"Customer Behaviour"}
         placeholder={"Select Customer Behaviour"}
         dropIcon={"menu-down"}
+        items={customerBehaviour}
         editable={false}
         validate={errors.customerBehaviour}
         value={formData.customerBehaviour?.label}
@@ -140,6 +123,7 @@ const OtherDetails = ({ formData, onFieldChange, errors }) => {
         label={"Customer Attitude :"}
         placeholder={"Enter Customer Attitude"}
         dropIcon={"menu-down"}
+        items={customerAttitude}
         editable={false}
         validate={errors.customerAttitude}
         value={formData.customerAttitude?.label}
