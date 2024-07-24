@@ -6,24 +6,28 @@ import { COLORS, FONT_FAMILY } from '@constants/theme';
 import { LoadingButton } from '@components/common/Button';
 import { showToast } from '@utils/common';
 import { post } from '@api/services/utils';
-import { formatDate } from '@utils/common/date';
 import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
 import { fetchSourceDropdown } from '@api/dropdowns/dropdownApi';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import moment from 'moment';
 
 const EnquiryRegisterView = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [datePickerMode, setDatePickerMode] = useState('date');
 
   const [formData, setFormData] = useState({
-    dateTime: new Date(),
-    source: "",
-    name: "",
-    companyName: "",
-    phoneNumber: "",
-    emailAddress: "",
-    enquiryDetails: "",
+    dateTime: '',
+    source: '',
+    name: '',
+    companyName: '',
+    phoneNumber: '',
+    emailAddress: '',
+    address: '',
+    enquiryDetails: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -54,6 +58,12 @@ const EnquiryRegisterView = ({ navigation }) => {
   const toggleBottomSheet = (type) => {
     setSelectedType(type);
     setIsVisible(!isVisible);
+  };
+
+  const handleDateConfirm = (date) => {
+    const formattedDate = moment(date).format('DD-MM-YYYY');
+    handleFieldChange('dateTime', formattedDate);
+    setDatePickerVisibility(false);
   };
 
   const renderBottomSheet = () => {
@@ -126,25 +136,27 @@ const EnquiryRegisterView = ({ navigation }) => {
   const submit = async () => {
     if (validate()) {
       const enquiryData = {
-        date_time: formData?.dateTime || null,
-        source: formData?.source?.id,
-        contact_no: formData?.phoneNumber || null,
+        image_url: null,
+        date : formData?.dateTime || null,
+        source_id: formData?.source?.id,
         name: formData?.name || null,
         company_name: formData?.companyName || null,
+        mobile_no: formData?.phoneNumber || null,
         email: formData?.emailAddress || null,
+        address: formData?.address || null,
         enquiry_details: formData?.enquiryDetails || null,
       };
 
       console.log("🚀 ~ submit ~ enquiryData:", JSON.stringify(enquiryData, null, 2))
       try {
-        const response = await post("/your-endpoint", enquiryData);
+        const response = await post("/createEnquiryRegister", enquiryData);
         if (response.success) {
           showToast({
             type: "success",
             title: "Success",
             message: response.message || "Enquiry Register created successfully",
           });
-          navigation.navigate("VisitScreen");
+          navigation.navigate("EnquiryRegisterScreen");
         } else {
           console.error("Enquiry Register Failed:", response.message);
           showToast({
@@ -173,10 +185,14 @@ const EnquiryRegisterView = ({ navigation }) => {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : null} style={{ flex: 1 }}>
         <RoundedScrollContainer>
           <FormInput
-            label={"Date & Time"}
+            label={"Date Time"}
             dropIcon={"calendar"}
             editable={false}
-            value={formatDate(formData.dateTime, 'dd-MM-yyyy hh:mm:ss')}
+            value={formData.dateTime}
+            onPress={() => {
+              setDatePickerMode('date');
+              setDatePickerVisibility(true);
+            }}
           />
           <FormInput
             label={"Source"}
@@ -219,6 +235,7 @@ const EnquiryRegisterView = ({ navigation }) => {
             label={"Address"}
             placeholder={"Enter Address"}
             editable={true}
+            validate={errors.address}
             onChangeText={(value) => handleFieldChange('address', value)}
           />
           <FormInput
@@ -227,15 +244,24 @@ const EnquiryRegisterView = ({ navigation }) => {
             editable={true}
             multiline={true}
             numberOfLines={5}
+            textAlignVertical="top"
             onChangeText={(value) => handleFieldChange('enquiryDetails', value)}
           />
           {renderBottomSheet()}
+          <View style={{ backgroundColor: 'white', paddingHorizontal: 50 }}>
+            <LoadingButton
+              title={"Save"}
+              onPress={submit}
+            />
+          </View>
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode={datePickerMode}
+            onConfirm={handleDateConfirm}
+            onCancel={() => setDatePickerVisibility(false)}
+          />
         </RoundedScrollContainer>
       </KeyboardAvoidingView>
-
-      <View style={{ backgroundColor: 'white', paddingHorizontal: 50 }}>
-        <LoadingButton onPress={submit} title={'Save'} />
-      </View>
     </SafeAreaView>
   );
 };
