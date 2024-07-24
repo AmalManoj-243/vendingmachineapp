@@ -101,7 +101,6 @@ export const fetchMarketStudy = async ({ offset, limit }) => {
   }
 };
 
-
 export const fetchCustomerVisitList = async ({ offset, limit, fromDate, toDate, customerId, customerName, employeeName, loginEmployeeId }) => {
   try {
     const queryParams = {
@@ -115,6 +114,20 @@ export const fetchCustomerVisitList = async ({ offset, limit, fromDate, toDate, 
       ...(toDate !== undefined && { to_date: toDate }),
     };
     const response = await get(API_ENDPOINTS.VIEW_CUSTOMER_VISIT_LIST, queryParams);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};
+
+export const fetchEnquiryRegister = async ({ offset, limit }) => {
+  try {
+    const queryParams = {
+      offset,
+      limit,
+    };
+    const response = await get(API_ENDPOINTS.VIEW_ENQUIRY_REGISTER, queryParams);
     return response.data;
   } catch (error) {
     handleApiError(error);

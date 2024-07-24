@@ -37,6 +37,7 @@ const EnquiryRegisterScreen = ({ navigation }) => {
   const handleLoadMore = () => {
     fetchMoreData({ searchText });
   };
+  
 
   const renderItem = ({ item }) => {
     if (item.empty) {
