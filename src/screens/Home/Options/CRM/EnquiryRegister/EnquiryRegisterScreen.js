@@ -43,7 +43,7 @@ const EnquiryRegisterScreen = ({ navigation }) => {
   };
 
   const renderEmptyState = () => (
-    <EmptyState imageSource={require('@assets/images/EmptyData/empty_data.png')} message={''} />
+    <EmptyState imageSource={require('@assets/images/EmptyData/empty.png')} message={''} />
   );
 
   const renderContent = () => (

@@ -13,6 +13,7 @@ import { fetchSourceDropdown } from '@api/dropdowns/dropdownApi';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useAuthStore } from '@stores/auth';
 import { formatDateTime } from '@utils/common/date';
+import { validateFields } from '@utils/validation';
 
 const EnquiryRegisterForm = ({ navigation }) => {
 
@@ -93,39 +94,16 @@ const EnquiryRegisterForm = ({ navigation }) => {
     }
   };
 
-  const validateForm = () => {
+  const validateForm = (fieldsToValidate) => {
     Keyboard.dismiss();
-    let isValid = true;
-    const newErrors = {};
-
-    const requiredFields = {
-      name: 'Please enter the Name',
-      phoneNumber: 'Please enter Phone Number',
-    };
-
-    Object.keys(requiredFields).forEach(field => {
-      if (!formData[field]) {
-        newErrors[field] = requiredFields[field];
-        isValid = false;
-      }
-    });
-
-    if (formData.emailAddress && !/\S+@\S+\.\S+/.test(formData.emailAddress)) {
-      newErrors.emailAddress = 'Please enter a valid email address';
-      isValid = false;
-    }
-
-    if (formData.phoneNumber && !/^\d{10}$/.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = 'Please enter a valid phone number';
-      isValid = false;
-    }
-
-    setErrors(newErrors);
+    const { isValid, errors } = validateFields(formData, fieldsToValidate);
+    setErrors(errors);
     return isValid;
   };
 
   const handleSubmit = async () => {
-    if (validateForm()) {
+    const fieldsToValidate = ['name', 'emailAddress', 'source']; 
+    if (validateForm(fieldsToValidate)) {
       setIsSubmitting(true);
       const enquiryData = {
         image_url: null,

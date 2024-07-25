@@ -13,7 +13,7 @@ const CRMScreen = ({ navigation }) => {
     const options =
         [
             { title: 'Enquiry Register', image: require('@assets/images/Home/options/crm/enquiry_register.png'), onPress: () => navigation.navigate('EnquiryRegisterScreen') },
-            { title: 'Leads', image: require('@assets/images/Home/options/crm/lead.png'), onPress: () => navigation.navigate("") },
+            { title: 'Leads', image: require('@assets/images/Home/options/crm/lead.png'), onPress: () => navigation.navigate('LeadScreen') },
             { title: 'Pipeline', image: require('@assets/images/Home/options/crm/pipeline.png'), onPress: () => navigation.navigate('') },
         ]
 

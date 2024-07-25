@@ -1,2 +1,3 @@
 import LeadScreen from "./LeadScreen";
-export { LeadScreen }
+import LeadForm from "./LeadForm";
+export { LeadScreen, LeadForm }
