@@ -163,6 +163,7 @@ const EnquiryRegisterForm = ({ navigation }) => {
         />
         <FormInput
           label="Source"
+          required
           placeholder="Select Source"
           dropIcon="menu-down"
           editable={false}
@@ -172,6 +173,7 @@ const EnquiryRegisterForm = ({ navigation }) => {
         />
         <FormInput
           label="Name"
+          required
           placeholder="Enter Name"
           editable={true}
           validate={errors.name}
@@ -185,6 +187,7 @@ const EnquiryRegisterForm = ({ navigation }) => {
         />
         <FormInput
           label="Phone"
+          required
           placeholder="Enter Phone Number"
           editable={true}
           keyboardType="numeric"

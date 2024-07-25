@@ -15,6 +15,7 @@ const TextInput = ({
     dropIcon,
     login,
     validate,
+    required = false, 
     onFocus = () => { },
     ...props
 }) => {
@@ -36,7 +37,12 @@ const TextInput = ({
 
     return (
         <View style={styles.container}>
-            <Text style={[styles.label, {color: labelColor}]}>{label}</Text>
+              <View style={styles.labelContainer}>
+                <Text style={[styles.label, { color: labelColor }]}>
+                    {label}
+                    {required && <Text style={styles.requiredAsterisk}>*</Text>} {/* Asterisk for mandatory fields */}
+                </Text>
+            </View>
             <TouchableWithoutFeedback onPress={handlePress}>
                 <View
                     style={[
@@ -125,6 +131,11 @@ const styles = StyleSheet.create({
         marginVertical:5,
         // textAlignVertical: 'center',
         // fontSize:16
+    },
+    requiredAsterisk: {
+        color: COLORS.red,
+        fontSize: 16,
+        marginLeft: 5,
     },
     errorText: {
         color: COLORS.red,
