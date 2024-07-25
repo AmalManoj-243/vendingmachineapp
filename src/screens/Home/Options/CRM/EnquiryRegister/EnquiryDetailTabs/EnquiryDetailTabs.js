@@ -15,10 +15,10 @@ const CustomTabBar = (props) => {
       // scrollEnabled={true}
       {...props}
       style={{
-        backgroundColor: COLORS.orange,
+        backgroundColor: COLORS.tabColor,
         justifyContent: 'center',
       }}
-      indicatorStyle={{ backgroundColor: COLORS.primaryThemeColor, height: 3 }}
+      indicatorStyle={{ backgroundColor: COLORS.tabIndicator, height: 3 }}
       labelStyle={{ color: COLORS.white, fontFamily: FONT_FAMILY.urbanistBold, fontSize: 13, textTransform: 'capitalize' }}
       pressColor='#2e294e'
       pressOpacity={0.5}

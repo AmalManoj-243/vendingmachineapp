@@ -27,7 +27,9 @@ const COLORS = {
   grey: '#F0F0F0',
   listText: '#FFFFFF',
   boxTheme: '#B56727',
-  lightenBoxTheme: '#e5b288'
+  lightenBoxTheme: '#e5b288',
+  tabColor: '#F37021',
+  tabIndicator:'#2E294E' 
 };
 
 
