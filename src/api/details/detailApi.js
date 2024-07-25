@@ -154,3 +154,7 @@ export const fetchCustomerDetails = async (detailId) => {
 export const fetchCustomerVisitDetails = async (detailId) => {
   return fetchDetails(API_ENDPOINTS.VIEW_CUSTOMER_VISIT_LIST, detailId);
 };
+
+export const fetchEnquiryRegisterDetails = async (detailId) => {
+  return fetchDetails(API_ENDPOINTS.VIEW_ENQUIRY_REGISTER, detailId);
+};
