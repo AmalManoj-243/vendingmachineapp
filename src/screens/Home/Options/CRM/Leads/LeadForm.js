@@ -73,7 +73,8 @@ const LeadForm = ({ navigation }) => {
   };
 
   const handleDateConfirm = (date) => {
-    handleFieldChange('dateTime', date);
+   const formatDate = formatDate(date, 'yyyy-MM-dd')
+    handleFieldChange('expectedClosingDate', formatDate);
     setIsDatePickerVisible(false);
   };
 
@@ -108,9 +109,6 @@ const LeadForm = ({ navigation }) => {
     );
   };
 
-
-
-
   const handleFieldChange = (field, value) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -136,8 +134,6 @@ const LeadForm = ({ navigation }) => {
     const fieldsToValidate = ['contactName', 'phoneNumber', 'salesPerson', 'source', 'priority']
     if (validateForm(fieldsToValidate)) {
       setIsSubmitting(true);
-      const date = new Date().toISOString();
-      console.log("🚀 ~ handleSubmit ~ date:", date)
       const leadData = {
         date: formatDate(formData.date, 'yyyy-MM-dd'),
         contact_name: formData.contactName,
@@ -153,17 +149,15 @@ const LeadForm = ({ navigation }) => {
         customer_id: null,
         source_id: formData?.source?.id ?? null,
         remarks: formData.remarks,
-        priority:formData.priority?.value,
+        priority: formData.priority?.value,
         // enquiry_register_id: enquiryDetails?._id || null,
         expected_closing_date: formData.expectedClosingDate || null,
         created_by_id: currentUser?.related_profile?._id || null,
         created_by_name: currentUser?.related_profile?.name || null
       };
-      console.log("🚀 ~ handleSubmit ~ leadData:", leadData)
-      
       try {
-        // console.log("🚀 ~ handleSubmit ~ leadData:", JSON.stringify(leadData, null, 2))
-        // const response = await post("/createLead", leadData);
+        const response = await post("/createLead", leadData);
+        console.log("🚀 ~ handleSubmit ~ response:", response)
         if (response.success) {
           showToast({
             type: "success",
@@ -293,14 +287,14 @@ const LeadForm = ({ navigation }) => {
           onChangeText={(value) => handleFieldChange('remarks', value)}
         />
         {renderBottomSheet()}
-        <LoadingButton title="SAVE" onPress={handleSubmit}  marginTop={10} />
+        <LoadingButton title="SAVE" onPress={handleSubmit} marginTop={10} />
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
           mode="date"
           onConfirm={handleDateConfirm}
           onCancel={() => setIsDatePickerVisible(false)}
         />
-        <View style={{marginBottom:10}}/>
+        <View style={{ marginBottom: 10 }} />
       </RoundedScrollContainer>
     </SafeAreaView>
   );

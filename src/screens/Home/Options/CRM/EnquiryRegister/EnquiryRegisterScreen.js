@@ -11,6 +11,7 @@ import { useDataFetching } from '@hooks';
 import EnquiryRegisterList from './EnquiryRegisterList';
 import AnimatedLoader from '@components/Loader/AnimatedLoader';
 import { useAuthStore } from '@stores/auth';
+import { OverlayLoader } from '@components/Loader';
 
 const EnquiryRegisterScreen = ({ navigation }) => {
 
@@ -56,14 +57,6 @@ const EnquiryRegisterScreen = ({ navigation }) => {
       onEndReached={handleLoadMore}
       showsVerticalScrollIndicator={false}
       onEndReachedThreshold={0.2}
-      ListFooterComponent={
-        loading && (
-          <AnimatedLoader
-            visible={loading}
-            animationSource={require('@assets/animations/loading.json')}
-          />
-        )
-      }
       estimatedItemSize={100}
     />
   );
@@ -86,6 +79,7 @@ const EnquiryRegisterScreen = ({ navigation }) => {
          {renderEnquiryRegister()}
         <FABButton onPress={() => navigation.navigate('EnquiryRegisterForm')} />
       </RoundedContainer>
+      <OverlayLoader visible={loading}  />
     </SafeAreaView>
   );
 };

@@ -6,6 +6,10 @@ export const allValidationRules = {
         message: 'Please enter the Name',
         validate: validateRequired,
     },
+    contactName: {
+        message: 'Please enter the Contact Name',
+        validate: validateRequired,
+    },
     address: {
         message: 'Please enter the Address',
         validate: validateRequired,
@@ -20,6 +24,14 @@ export const allValidationRules = {
     },
     source: {
         message: 'Please select the Source',
+        validate: validateRequired,
+    },
+    salesPerson: {
+        message: 'Please Select Sales Person',
+        validate: validateRequired,
+    },
+    priority: {
+        message: 'Please Select Priority',
         validate: validateRequired,
     },
     customerTypes: {

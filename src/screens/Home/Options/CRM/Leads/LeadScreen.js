@@ -9,8 +9,9 @@ import { FABButton } from '@components/common/Button';
 import { fetchLead } from '@api/services/generalApi';
 import { useDataFetching, useDebouncedSearch } from '@hooks';
 import LeadList from './LeadList';
-import AnimatedLoader from '@components/Loader/AnimatedLoader';
 import { useAuthStore } from '@stores/auth';
+import { OverlayLoader } from '@components/Loader';
+import { COLORS } from '@constants/theme';
 
 const LeadScreen = ({ navigation }) => {
 
@@ -57,14 +58,6 @@ const LeadScreen = ({ navigation }) => {
       onEndReached={handleLoadMore}
       showsVerticalScrollIndicator={false}
       onEndReachedThreshold={0.2}
-      ListFooterComponent={
-        loading && (
-          <AnimatedLoader
-            visible={loading}
-            animationSource={require('@assets/animations/loading.json')}
-          />
-        )
-      }
       estimatedItemSize={100}
     />
   );
@@ -87,6 +80,7 @@ const LeadScreen = ({ navigation }) => {
         {renderEnquiryRegister()}
         <FABButton onPress={() => navigation.navigate('LeadForm')} />
       </RoundedContainer>
+      <OverlayLoader visible={loading}  />
     </SafeAreaView>
   );
 };
