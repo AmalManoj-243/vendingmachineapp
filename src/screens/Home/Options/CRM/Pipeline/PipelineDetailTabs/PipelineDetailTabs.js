@@ -11,6 +11,7 @@ import EmailHistory from './EmailHistory';
 import CallHistory from './CallHistory';
 import WhatsAppHistory from './WhatsAppHistory';
 import MeetingsTab from './MeetingsTab';
+
 const PipelineDetailTabs = ({ navigation, route }) => {
 
   const { id } = route?.params || {};
