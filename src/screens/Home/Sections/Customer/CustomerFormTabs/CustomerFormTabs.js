@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useWindowDimensions, KeyboardAvoidingView, Platform, Keyboard, View } from 'react-native';
-import { TabView, TabBar } from 'react-native-tab-view';
+import { TabView } from 'react-native-tab-view';
 import { useState } from 'react';
 import Details from './Details';
 import OtherDetails from './OtherDetails';
@@ -8,32 +8,23 @@ import Address from './Address';
 import ContactPerson from './ContactPerson';
 import { SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
-import { COLORS, FONT_FAMILY } from '@constants/theme';
 import { LoadingButton } from '@components/common/Button';
 import { showToast } from '@utils/common';
 import { post } from '@api/services/utils';
 import { validateFields } from '@utils/validation';
+import { CustomTabBar } from '@components/TabBar';
 
-const CustomTabBar = (props) => {
-  return (
-    <TabBar
-      scrollEnabled={true}
-      {...props}
-      style={{
-        backgroundColor: COLORS.tabColor,
-        justifyContent: 'center',
-      }}
-      indicatorStyle={{ backgroundColor: COLORS.tabIndicator, height: 3 }}
-      labelStyle={{ color: COLORS.white, fontFamily: FONT_FAMILY.urbanistBold, fontSize: 13, textTransform: 'capitalize' }}
-      pressColor='#2e294e'
-      pressOpacity={0.5}
-    />
-  );
-};
 
 const CustomerFormTabs = ({ navigation }) => {
   const layout = useWindowDimensions();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    { key: 'first', title: 'Details' },
+    { key: 'second', title: 'Other Details' },
+    { key: 'third', title: 'Address' },
+    { key: 'fourth', title: 'Contact Person' }
+  ]);
   const [formData, setFormData] = useState({
     customerTypes: "",
     customerName: "",
@@ -86,29 +77,21 @@ const CustomerFormTabs = ({ navigation }) => {
       case 'third':
         return <Address formData={formData} onFieldChange={handleFieldChange} errors={errors} />;
       case 'fourth':
-        return <ContactPerson formData={formData} onFieldChange={handleFieldChange} errors={errors} />;  
+        return <ContactPerson formData={formData} onFieldChange={handleFieldChange} errors={errors} />;
       default:
         return null;
     }
   };
 
-  const [index, setIndex] = useState(0);
-  const [routes] = useState([
-    { key: 'first', title: 'Details' },
-    { key: 'second', title: 'Other Details' },
-    { key: 'third', title: 'Address' },
-    { key: 'fourth', title: 'Contact Person' }
-  ]);
-
   const validateForm = (fieldsToValidate) => {
     Keyboard.dismiss();
-    const { isValid, errors } = validateFields(formData, fieldsToValidate); 
+    const { isValid, errors } = validateFields(formData, fieldsToValidate);
     setErrors(errors);
     return isValid;
   };
 
   const handleSubmit = async () => {
-    const fieldsToValidate = ['customerTypes', 'customerName', 'customerTitles', 'modeOfPayment', 'mobileNumber', 'address']; 
+    const fieldsToValidate = ['customerTypes', 'customerName', 'customerTitles', 'modeOfPayment', 'mobileNumber', 'address'];
     if (validateForm(fieldsToValidate)) {
       setIsSubmitting(true);
       const customerData = {
@@ -122,7 +105,7 @@ const CustomerFormTabs = ({ navigation }) => {
         customer_mobile: formData?.mobileNumber || null,
         whatsapp_no: formData?.whatsappNumber || null,
         land_phone_no: formData?.landlineNumber || null,
-        fax: formData?.fax  || null,
+        fax: formData?.fax || null,
         is_active: formData?.isActive,
         is_supplier: formData?.isSupplier,
         trn_no: parseInt(formData?.trn, 10) || null,
@@ -179,8 +162,7 @@ const CustomerFormTabs = ({ navigation }) => {
         <TabView
           navigationState={{ index, routes }}
           renderScene={renderScene}
-          renderTabBar={CustomTabBar}
-          onIndexChange={setIndex}
+          renderTabBar={props => <CustomTabBar {...props} />} onIndexChange={setIndex}
           initialLayout={{ width: layout.width }}
         />
       </KeyboardAvoidingView>

@@ -52,9 +52,8 @@ const VisitDetails = ({ navigation, route }) => {
       <NavigationHeader
         title="Customer Visits Details"
         onBackPress={() => navigation.goBack()}
-        icon
-        iconName="edit"
-        iconPress={() => navigation.navigate('EditVisit', { details })}
+        iconOneName="edit"
+        iconOnePress={() => navigation.navigate('EditVisit', { details })}
         logo={false}
       />
       <RoundedScrollContainer>

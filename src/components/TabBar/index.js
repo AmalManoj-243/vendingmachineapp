@@ -1,2 +1,3 @@
 import TabBarIcon from "./TabBarIcon";
-export {TabBarIcon}
+import CustomTabBar from "./CustomTabBar";
+export {TabBarIcon, CustomTabBar}

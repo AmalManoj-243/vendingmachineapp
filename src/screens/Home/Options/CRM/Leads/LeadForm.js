@@ -11,7 +11,7 @@ import { DropdownSheet } from '@components/common/BottomSheets';
 import { fetchEmployeesDropdown, fetchSourceDropdown } from '@api/dropdowns/dropdownApi';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useAuthStore } from '@stores/auth';
-import { formatDate, formatDateTime } from '@utils/common/date';
+import { formatDate } from '@utils/common/date';
 import { priority } from '@constants/dropdownConst';
 import { validateFields } from '@utils/validation';
 

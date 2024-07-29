@@ -10,27 +10,20 @@ import { COLORS, FONT_FAMILY } from '@constants/theme';
 import EmailHistory from './EmailHistory';
 import CallHistory from './CallHistory';
 import WhatsAppHistory from './WhatsAppHistory';
+import { CustomTabBar } from '@components/TabBar';
 
-const CustomTabBar = (props) => {
-    return (
-        <TabBar
-            scrollEnabled={true}  // Enable horizontal scrolling
-            {...props}
-            style={{
-                backgroundColor: COLORS.tabColor,
-                justifyContent: 'center',
-            }}
-            indicatorStyle={{ backgroundColor: COLORS.tabIndicator, height: 3 }}
-            labelStyle={{ color: COLORS.white, fontFamily: FONT_FAMILY.urbanistBold, fontSize: 13, textTransform: 'capitalize' }}
-            pressColor='#2e294e'
-            pressOpacity={0.5}
-        />
-    );
-};
 
 const LeadDetailTabs = ({ navigation, route }) => {
     const { id } = route?.params || {};
     const layout = useWindowDimensions();
+    const [index, setIndex] = useState(0);
+    const [routes] = useState([
+        { key: 'first', title: 'Details' },
+        { key: 'second', title: 'Follow Up' },
+        { key: 'third', title: 'Email History' },
+        { key: 'fourth', title: 'Call History' },
+        { key: 'fifth', title: 'WhatsApp History' },  
+    ]);
 
     const renderScene = ({ route }) => {
         switch (route.key) {
@@ -49,15 +42,6 @@ const LeadDetailTabs = ({ navigation, route }) => {
         }
     };
 
-    const [index, setIndex] = useState(0);
-    const [routes] = useState([
-        { key: 'first', title: 'Details' },
-        { key: 'second', title: 'Follow Up' },
-        { key: 'third', title: 'Email History' },
-        { key: 'fourth', title: 'Call History' },
-        { key: 'fifth', title: 'WhatsApp History' },  // Corrected spelling
-    ]);
-
     return (
         <SafeAreaView>
             <NavigationHeader
@@ -67,7 +51,7 @@ const LeadDetailTabs = ({ navigation, route }) => {
             <TabView
                 navigationState={{ index, routes }}
                 renderScene={renderScene}
-                renderTabBar={CustomTabBar}
+                renderTabBar={props => <CustomTabBar {...props} />}
                 onIndexChange={setIndex}
                 initialLayout={{ width: layout.width }}
             />
