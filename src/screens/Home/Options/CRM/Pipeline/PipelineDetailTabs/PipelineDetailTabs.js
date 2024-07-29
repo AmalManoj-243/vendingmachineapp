@@ -10,7 +10,7 @@ import CustomerVisit from './CustomerVisit';
 import EmailHistory from './EmailHistory';
 import CallHistory from './CallHistory';
 import WhatsAppHistory from './WhatsAppHistory';
-import MeetingsTab from './MeetingsTab';
+import Meetings from './Meetings';
 import Details from './Details';
 const PipelineDetailTabs = ({ navigation, route }) => {
 
@@ -24,7 +24,7 @@ const PipelineDetailTabs = ({ navigation, route }) => {
     { key: 'fourth', title: 'Email History' },
     { key: 'fifth', title: 'Call History' },
     { key: 'sixth', title: 'Whatsapp History' },
-    { key: 'seventh', title: 'Meetings Tab' },
+    { key: 'seventh', title: 'Meetings' },
   ]);
 
   const renderScene = ({ route }) => {
@@ -42,7 +42,7 @@ const PipelineDetailTabs = ({ navigation, route }) => {
       case 'sixth':
         return <WhatsAppHistory pipelineId={id} />;
       case 'seventh':
-        return <MeetingsTab pipelineId={id} />;      
+        return <Meetings pipelineId={id} />;      
       default:
         return null;
     }

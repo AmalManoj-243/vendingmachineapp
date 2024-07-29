@@ -13,6 +13,7 @@ export const API_ENDPOINTS = {
     VIEW_ENQUIRY_REGISTER: '/viewEnquiryRegister',
     VIEW_LEAD: '/viewLead',
     VIEW_PIPELINE: '/viewPipeline',
+    VIEW_MEETINGS: '/viewCustomerSchedule',
 };
 
 export const DROP_DOWN_API_ENDPOINTS = {

@@ -166,3 +166,7 @@ export const fetchLeadDetails = async (detailId) => {
 export const fetchPipelineDetails = async (detailId) => {
   return fetchDetails(API_ENDPOINTS.VIEW_PIPELINE, detailId);
 };
+
+export const fetchMeetingsDetails = async (detailId) => {
+  return fetchDetails(API_ENDPOINTS.VIEW_MEETINGS, detailId);
+};
