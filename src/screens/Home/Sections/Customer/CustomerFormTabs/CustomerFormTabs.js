@@ -2,10 +2,6 @@ import * as React from 'react';
 import { useWindowDimensions, KeyboardAvoidingView, Platform, Keyboard, View } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import { useState } from 'react';
-import Details from './Details';
-import OtherDetails from './OtherDetails';
-import Address from './Address';
-import ContactPerson from './ContactPerson';
 import { SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
@@ -13,6 +9,10 @@ import { LoadingButton } from '@components/common/Button';
 import { showToast } from '@utils/common';
 import { post } from '@api/services/utils';
 import { validateFields } from '@utils/validation';
+import Details from './Details';
+import OtherDetails from './OtherDetails';
+import Address from './Address';
+import ContactPerson from './ContactPerson';
 
 const CustomTabBar = (props) => {
   return (

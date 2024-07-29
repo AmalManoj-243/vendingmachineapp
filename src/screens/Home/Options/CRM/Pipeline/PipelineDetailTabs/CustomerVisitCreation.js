@@ -5,13 +5,12 @@ import { useState } from 'react';
 import { SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
-import Details from './Details';
-import FollowUp from './FollowUp';
+
 
 const CustomTabBar = (props) => {
   return (
     <TabBar
-      // scrollEnabled={true}
+      scrollEnabled={true}
       {...props}
       style={{
         backgroundColor: COLORS.tabColor,
@@ -25,7 +24,7 @@ const CustomTabBar = (props) => {
   );
 };
 
-const EnquiryDetailTabs = ({ navigation, route }) => {
+const CustomerVisitCreation = ({ navigation, route }) => {
 
   const  { id } = route?.params || {};
   const layout = useWindowDimensions();
@@ -33,9 +32,11 @@ const EnquiryDetailTabs = ({ navigation, route }) => {
   const renderScene = ({ route }) => {
     switch (route.key) {
       case 'first':
-        return <Details enquiryId={id} />;
+        return <Customer enquiryId={id} />;
       case 'second':
-        return <FollowUp enquiryId={id} />;
+        return <VisitDetails enquiryId={id} />;
+      case 'third':
+        return <InOut enquiryId={id} />;
       default:
         return null;
     }
@@ -43,14 +44,15 @@ const EnquiryDetailTabs = ({ navigation, route }) => {
 
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'first', title: 'Details' },
-    { key: 'second', title: 'Follow Up' },
+    { key: 'first', title: 'Customer' },
+    { key: 'second', title: 'Visit Details' },
+    { key: 'third', title: 'In / Out' },
   ]);
 
   return (
     <SafeAreaView>
       <NavigationHeader
-        title="Enquiry Register Details"
+        title="Customer Visit Creation"
         onBackPress={() => navigation.goBack()}
       />
         <TabView
@@ -64,4 +66,4 @@ const EnquiryDetailTabs = ({ navigation, route }) => {
   );
 };
 
-export default EnquiryDetailTabs;
+export default CustomerVisitCreation;

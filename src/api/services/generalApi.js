@@ -151,3 +151,22 @@ export const fetchLead = async ({ offset, limit, loginEmployeeId }) => {
     throw error;
   }
 };
+
+export const fetchPipeline = async ({ offset, limit, date, source, opportunity, customer, loginEmployeeId }) => {
+  try {
+    const queryParams = {
+      offset,
+      limit,
+      ...(date !== undefined && { date: date }),
+      ...(source !== undefined && { source_name: source }),
+      ...(opportunity !== undefined && { opportunity_name: opportunity }),
+      ...(customer !== undefined && { customer_name: customer }),
+      ...(loginEmployeeId !== undefined && { login_employee_id: loginEmployeeId }),
+    };
+    const response = await get(API_ENDPOINTS.VIEW_PIPELINE, queryParams);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};

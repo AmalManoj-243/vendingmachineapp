@@ -2,16 +2,20 @@ import * as React from 'react';
 import { useWindowDimensions, KeyboardAvoidingView, Platform, Keyboard, View } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import { useState } from 'react';
-import FollowUp from './FollowUp';
 import { SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
-import { LoadingButton } from '@components/common/Button';
+import FollowUp from './FollowUp';
+import CustomerVisit from './CustomerVisit';
+import EmailHistory from './EmailHistory';
+import CallHistory from './CallHistory';
+import WhatsAppHistory from './WhatsAppHistory';
+import MeetingsTab from './MeetingsTab';
 
 const CustomTabBar = (props) => {
   return (
     <TabBar
-      // scrollEnabled={true}
+      scrollEnabled={true}
       {...props}
       style={{
         backgroundColor: COLORS.tabColor,
@@ -41,7 +45,7 @@ const PipelineDetailTabs = ({ navigation, route }) => {
       case 'fourth':
         return <CallHistory enquiryId={id} />;
       case 'fifth':
-        return <WhatsappHistory enquiryId={id} />;
+        return <WhatsAppHistory enquiryId={id} />;
       case 'sixth':
         return <MeetingsTab enquiryId={id} />;
       default:
@@ -62,7 +66,7 @@ const PipelineDetailTabs = ({ navigation, route }) => {
   return (
     <SafeAreaView>
       <NavigationHeader
-        title="Enquiry Register Details"
+        title="Pipeline Details"
         onBackPress={() => navigation.goBack()}
       />
         <TabView

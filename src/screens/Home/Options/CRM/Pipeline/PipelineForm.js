@@ -8,7 +8,13 @@ import { post } from '@api/services/utils';
 import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
-import { fetchSourceDropdown, fetchsalesPersonDropdown, fetchCustomersDropdown, fetchOpportunityDropdown } from '@api/dropdowns/dropdownApi';
+import {
+  fetchSourceDropdown,
+  fetchsalesPersonDropdown,
+  fetchCustomersDropdown,
+  fetchOpportunityDropdown,
+  fetchenquiryTypeDropdown
+} from '@api/dropdowns/dropdownApi';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useAuthStore } from '@stores/auth';
 import { formatDateTime } from '@utils/common/date';
@@ -35,6 +41,7 @@ const PipelineForm = ({ navigation }) => {
   const [errors, setErrors] = useState({});
   const [dropdownOptions, setDropdownOptions] = useState({
     source: [],
+    enquiryType: [],
     salesPerson: [],
     customer: [],
     opportunity: [],
@@ -43,8 +50,9 @@ const PipelineForm = ({ navigation }) => {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const [sourceData, salesPersonData, customerData, opportunityData] = await Promise.all([
+        const [sourceData, enquiryTypeData, salesPersonData, customerData, opportunityData] = await Promise.all([
           fetchSourceDropdown(),
+          fetchenquiryTypeDropdown(),
           fetchsalesPersonDropdown(),
           fetchCustomersDropdown(),
           fetchOpportunityDropdown(),
@@ -54,6 +62,10 @@ const PipelineForm = ({ navigation }) => {
           source: sourceData.map(data => ({
             id: data._id,
             label: data.source_name,
+          })),
+          enquiryType: enquiryTypeData.map(data => ({
+            id: data._id,
+            label: data.name,
           })),
           salesPerson: salesPersonData.map(data => ({
             id: data._id,
@@ -89,6 +101,7 @@ const PipelineForm = ({ navigation }) => {
   const renderDropdownSheet = () => {
     const dropdownMapping = {
       'Source': 'source',
+      'Enquiry Type': 'enquiryType',
       'Sales Person': 'salesPerson',
       'Customer': 'customer',
       'Opportunity': 'opportunity',
@@ -132,7 +145,7 @@ const PipelineForm = ({ navigation }) => {
       setIsSubmitting(true);
       const PipelineData = {
         date: formData?.dateTime || null,
-        source_id: formData?.source?.id ?? null,
+        source: formData?.source?.id ?? null,
         enquiry_type: formData?.enquiryType?.id ?? null,
         sales_person: formData?.salesPerson?.id ?? null,
         opportunity: formData?.opportunity?.id ?? null,
@@ -195,11 +208,12 @@ const PipelineForm = ({ navigation }) => {
         <FormInput
           label="Enquiry Type"
           placeholder="Enter Enquiry Type"
-          editable={true}
+          dropIcon="menu-down"
+          editable={false}
           required
           validate={errors.enquiryType}
           value={formData.enquiryType?.label}
-          onChangeText={(value) => handleFieldChange('opportunity', value)}
+          onPress={() => toggleDropdownSheet('Enquiry Type')}
         />
         <FormInput
           label="Sales Person"

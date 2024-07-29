@@ -11,7 +11,8 @@ export const API_ENDPOINTS = {
     VIEW_MARKET_STUDY: '/viewMarketStudy',
     VIEW_INVENTORY_BOX_REQUEST: '/viewInventoryboxrequest',
     VIEW_ENQUIRY_REGISTER: '/viewEnquiryRegister',
-    VIEW_LEAD: '/viewLead'
+    VIEW_LEAD: '/viewLead',
+    VIEW_PIPELINE: '/viewPipeline',
 };
 
 export const DROP_DOWN_API_ENDPOINTS = {
@@ -36,7 +37,8 @@ export const DROP_DOWN_API_ENDPOINTS = {
     VIEW_LANGUAGE: "/viewLanguage/language_list/language_dropdown",
     VIEW_CURRENCY: "/viewCurrency/currency_list/currency_dropdown",
     SOURCE: "/viewSource/source_list/source_dropdown",
-    OPPORTUNITY: "/viewOppertunityType/oppertunity_list/oppertunity_dropdown"
+    OPPORTUNITY: "/viewOppertunityType/oppertunity_list/oppertunity_dropdown",
+    ENQUIRY_TYPE: "/viewEnquiryType/enquiry_list/enquiry_dropdown",
 };
 
 export const DETAIL_API_ENDPOINTS = {

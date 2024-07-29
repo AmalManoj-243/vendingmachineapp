@@ -105,3 +105,7 @@ export const fetchOpportunityDropdown = async () => {
   return fetchData(DROP_DOWN_API_ENDPOINTS.OPPORTUNITY);
 }
 
+export const fetchenquiryTypeDropdown = async () => {
+  return fetchData(DROP_DOWN_API_ENDPOINTS.ENQUIRY_TYPE);
+}
+

@@ -6,14 +6,13 @@ import { RoundedContainer, SafeAreaView } from '@components/containers';
 import { EmptyItem, EmptyState } from '@components/common/empty';
 import { NavigationHeader } from '@components/Header';
 import { FABButton } from '@components/common/Button';
-import { fetchPipeline } from '@api/services/generalApi'; ///
+import { fetchPipeline } from '@api/services/generalApi';
 import { useDataFetching } from '@hooks';
 import PipelineList from './PipelineList';
 import AnimatedLoader from '@components/Loader/AnimatedLoader';
 import { useAuthStore } from '@stores/auth';
 
 const PipelineScreen = ({ navigation }) => {
-
   const isFocused = useIsFocused();
   const currentUser = useAuthStore((state) => state.user);
   const currentUserId = currentUser?.related_profile?._id || '';
@@ -39,7 +38,7 @@ const PipelineScreen = ({ navigation }) => {
     if (item.empty) {
       return <EmptyItem />;
     }
-    return <PipelineList item={item} onPress={()=> navigation.navigate('PipelineDetailTabs', {id: item._id})} />;
+    return <PipelineList item={item} onPress={() => navigation.navigate('PipelineDetailTabs', { id: item._id })} />;
   };
 
   const renderEmptyState = () => (
@@ -82,7 +81,7 @@ const PipelineScreen = ({ navigation }) => {
         onBackPress={() => navigation.goBack()}
       />
       <RoundedContainer>
-         {renderPipeline()}
+        {renderPipeline()}
         <FABButton onPress={() => navigation.navigate('PipelineForm')} />
       </RoundedContainer>
     </SafeAreaView>
