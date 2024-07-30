@@ -75,7 +75,7 @@ const LeadScreen = ({ navigation }) => {
         title="Leads"
         onBackPress={() => navigation.goBack()}
       />
-      <SearchContainer placeholder="Search Leads" onChangeText={handleSearchTextChange} />
+      <SearchContainer placeholder="Search Leads..." onChangeText={handleSearchTextChange} />
       <RoundedContainer>
         {renderEnquiryRegister()}
         <FABButton onPress={() => navigation.navigate('LeadForm')} />

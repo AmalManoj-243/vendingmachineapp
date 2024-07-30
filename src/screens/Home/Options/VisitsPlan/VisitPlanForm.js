@@ -9,6 +9,7 @@ import { DropdownSheet } from '@components/common/BottomSheets';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { formatDate } from '@utils/common/date';
 import { useAuthStore } from '@stores/auth';
+import { validateFields } from '@utils/validation';
 
 const VisitPlanForm = ({ navigation }) => {
 
@@ -142,36 +143,19 @@ const VisitPlanForm = ({ navigation }) => {
     );
   };
 
-  // Validation functions before submission
-  const validate = () => {
+  const validateForm = (fieldsToValidate) => {
     Keyboard.dismiss();
-    let isValid = true;
-    let errors = {};
-
-    const requiredFields = {
-      customer: 'Please select a customer',
-      brand: 'Please select a brand',
-      dateAndTime: 'Please select a date and time',
-      visitPurpose: 'Please select a purpose of visit',
-      remarks: 'Please enter remarks'
-    };
-
-    Object.keys(requiredFields).forEach(field => {
-      if (!formData[field]) {
-        errors[field] = requiredFields[field];
-        isValid = false;
-      }
-    });
-
+    const { isValid, errors } = validateFields(formData, fieldsToValidate);
     setErrors(errors);
     return isValid;
   };
 
-  const submit = () => {
-    if (validate()) {
+
+  const handleSubmit = () => {
+    const fieldsToValidate = ['customer', 'dateAndTime', 'visitPurpose', 'remarks'];
+    if (validateForm(fieldsToValidate)) {
       setIsSubmitting(true);
-      // Handle form submission
-      // ...
+      
       setIsSubmitting(false);
     }
   };
@@ -228,7 +212,7 @@ const VisitPlanForm = ({ navigation }) => {
         <LoadingButton
           loading={isSubmitting}
           title={'SAVE'}
-          onPress={submit}
+          onPress={handleSubmit}
         />
         <DateTimePickerModal
           isVisible={isTimePickerVisible}
