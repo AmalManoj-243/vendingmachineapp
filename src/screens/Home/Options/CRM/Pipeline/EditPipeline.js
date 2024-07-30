@@ -45,7 +45,6 @@ const EditPipeline = ({ navigation, route }) => {
         setIsLoading(true);
         try {
             const [detail] = await fetchPipelineDetails(pipelineId);
-            console.log("console.log(\"${variableName} value:\", JSON.stringify(${variableName}, null, 2)); ~ file: EditPipeline.js:50 ~ fetchDetails ~ detail, null, 2))", JSON.stringify(detail, null, 2))
             setFormData(prevFormData => ({
                 ...prevFormData,
                 dateTime: detail?.date || new Date(),
