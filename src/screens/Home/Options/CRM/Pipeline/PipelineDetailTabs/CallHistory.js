@@ -1,7 +1,6 @@
 import React from 'react'
 import { RoundedScrollContainer } from '@components/containers'
 import { TouchableOpacity, Image, Linking } from 'react-native'
-import { COLORS } from '@constants/theme';
 
 const CallHistory = () => {
 
