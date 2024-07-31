@@ -5,7 +5,7 @@ import { showToastMessage } from '@components/Toast';
 import { fetchMeetingsDetails } from '@api/details/detailApi';
 import { OverlayLoader } from '@components/Loader';
 import { post } from '@api/services/utils';
-import { MeetingsScheduleModal } from '@components/Modal';
+import MeetingsScheduleModal from '@components/Modal/MeetingsScheduleModal';
 import { FABButton } from '@components/common/Button';
 import { useAuthStore } from '@stores/auth';
 import { formatDateTime } from '@utils/common/date';
@@ -39,12 +39,12 @@ const Meetings = ({ meetingsId }) => {
         }, [meetingsId])
     );
 
-    const saveUpdates = async (updateText) => {
+    const saveUpdates = async (updateData) => {
         try {
             const formattedDate = formatDateTime(new Date(), "Pp");
             const meetingsHistoryData = {
                 date: formattedDate,
-                remarks: updateText || null,
+                remarks: updateData.title || null,
                 employee_id: currentUser._id,
                 meetings_id: meetingsId,
             };
@@ -75,11 +75,11 @@ const Meetings = ({ meetingsId }) => {
             />
             <MeetingsScheduleModal
                 isVisible={isModalVisible}
-                header='Add Meetings'
-                title={'Add Updates'}
-                placeholder='Add Meetings'
+                header='Schedule Meeting'
+                title={'Add Meeting'}
+                placeholder= 'Enter meeting'
                 onClose={() => setIsModalVisible(!isModalVisible)}
-                onSubmit={saveUpdates}
+                onSave={saveUpdates}
             />
             <OverlayLoader visible={isLoading} />
             <FABButton onPress={() => setIsModalVisible(!isModalVisible)} />

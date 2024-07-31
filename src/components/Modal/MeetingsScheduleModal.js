@@ -8,8 +8,9 @@ import { COLORS, FONT_FAMILY } from '@constants/theme';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import format from 'date-fns/format';
 import { CheckBox } from '@components/common/CheckBox';
+import { NavigationHeader } from '@components/Header';
 
-const MeetingsScheduleModal = ({ isVisible, onClose, onSave }) => {
+const MeetingsScheduleModal = ({ isVisible, onClose, onSave, title,header = '', placeholder }) => {
     const [meeting, setMeeting] = useState('');
     const [meetingDate, setMeetingDate] = useState(new Date());
     const [meetingTime, setMeetingTime] = useState(new Date());
@@ -17,16 +18,39 @@ const MeetingsScheduleModal = ({ isVisible, onClose, onSave }) => {
     const [isTimePickerVisible, setTimePickerVisible] = useState(false);
     const [isReminder, setReminder] = useState(false);
     const [reminderMinutes, setReminderMinutes] = useState(0);
+    const [errorText, setErrorText] = useState('');
 
     const handleSave = () => {
-        onSave({
-            title: meeting,
-            start: date,
-            is_Remainder: isReminder,
-            minutes: isReminder ? reminderMinutes : 0,
-            meetings_id: meeting._id,
-            type: 'CRM'
-        });
+        let hasError = false;
+
+        if (!meeting) {
+            setErrorText('Meeting title is required');
+            hasError = true;
+        } else {
+            setErrorText('');
+        }
+
+        if (!hasError) {
+            onSave({
+                title: meeting,
+                start: meetingDate,
+                time: meetingTime,
+                is_Remainder: isReminder,
+                minutes: isReminder ? reminderMinutes : 0,
+                type: 'CRM',
+            });
+            resetForm();
+            onClose();
+        }
+    };
+
+    const resetForm = () => {
+        setMeeting('');
+        setMeetingDate(new Date());
+        setMeetingTime(new Date());
+        setReminder(false);
+        setReminderMinutes(0);
+        setErrorText('');
     };
 
     return (
@@ -41,14 +65,24 @@ const MeetingsScheduleModal = ({ isVisible, onClose, onSave }) => {
             backdropTransitionOutTiming={300}
         >
             <View style={styles.modalContainer}>
+                <NavigationHeader onBackPress={onClose} title={header} />
                 <View style={styles.modalContent}>
-                    <Text style={styles.modalHeader}>Schedule Meeting</Text>
+                    <Text style={styles.label}>{title}</Text>
                     <TextInput
-                        placeholder="Enter Meeting"
+                        placeholder={placeholder}
                         value={meeting}
-                        onChangeText={setMeeting}
-                        style={styles.textInput}
+                        onChangeText={(text) => {
+                            setMeeting(text);
+                            setErrorText('');
+                        }}
+                        style={[styles.textInput, errorText && styles.textInputError]}
                     />
+                    {errorText ? (
+                        <View style={styles.errorContainer}>
+                            <Icon name="error" size={20} color="red" />
+                            <Text style={styles.errorText}>{errorText}</Text>
+                        </View>
+                    ) : null}
                     <View style={styles.inputRow}>
                         <Text style={styles.label}>Enter Date:</Text>
                         <View style={[styles.textInput, { flexDirection: "row", justifyContent: 'space-between' }]}>
@@ -119,7 +153,6 @@ const MeetingsScheduleModal = ({ isVisible, onClose, onSave }) => {
     );
 };
 
-
 const styles = StyleSheet.create({
     modalContainer: {
         flex: 1,
@@ -132,11 +165,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         width: '100%',
     },
-    modalHeader: {
-        fontSize: 18,
-        fontFamily: FONT_FAMILY.urbanistMedium,
-        marginBottom: 10,
-    },
     textInput: {
         borderWidth: 1,
         borderColor: 'gray',
@@ -144,6 +172,18 @@ const styles = StyleSheet.create({
         padding: 10,
         fontFamily: FONT_FAMILY.urbanistSemiBold,
         borderRadius: 5,
+    },
+    textInputError: {
+        borderColor: 'red',
+    },
+    errorContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    errorText: {
+        color: 'red',
+        marginLeft: 10,
     },
     inputRow: {
         flexDirection: 'row',
@@ -159,6 +199,7 @@ const styles = StyleSheet.create({
     buttonRow: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
+        marginTop: 10,
     },
     checkboxContainer: {
         flexDirection: 'row',
