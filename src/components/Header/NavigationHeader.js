@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
     logoImage: {
         width: '30%',
         height: '150%',
+        alignSelf:'flex-end' //last
     },
     refreshImage: {
         width: 30,

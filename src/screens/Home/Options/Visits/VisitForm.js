@@ -1,5 +1,5 @@
 import { Keyboard } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { NavigationHeader } from '@components/Header'
 import { RoundedScrollContainer, SafeAreaView } from '@components/containers'
 import { TextInput as FormInput } from '@components/common/TextInput'
@@ -8,20 +8,24 @@ import { LoadingButton } from '@components/common/Button'
 import { DropdownSheet } from '@components/common/BottomSheets'
 import * as Location from 'expo-location';
 import { fetchCustomersDropdown, fetchPurposeofVisitDropdown, fetchSiteLocationDropdown } from '@api/dropdowns/dropdownApi'
-import { fetchCustomerDetails } from '@api/details/detailApi'
+import { fetchCustomerDetails, fetchVisitPlanDetails } from '@api/details/detailApi'
 import { showToastMessage } from '@components/Toast'
 import { useAuthStore } from '@stores/auth'
 import { showToast } from '@utils/common'
 import { post } from '@api/services/utils'
+import { useFocusEffect } from '@react-navigation/native'
+import { OverlayLoader } from '@components/Loader'
+import { validateFields } from '@utils/validation'
 
-const VisitForm = ({ navigation }) => {
+const VisitForm = ({ navigation, route }) => {
 
+  const { visitPlanId, pipelineId } = route?.params || {};
   const currentUser = useAuthStore((state) => state.user);
   const [selectedType, setSelectedType] = useState(null);
   const [errors, setErrors] = useState({});
   const [isVisible, setIsVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     customer: '',
     siteLocation: '',
@@ -39,12 +43,35 @@ const VisitForm = ({ navigation }) => {
     setIsCustomerSelected(!!formData.customer);
   }, [formData.customer]);
 
-  const [dropdowns, setDropdowns] = useState({
-    customers: [],
-    siteLocation: [],
-    visitPurpose: [],
-    contactPerson: []
-  })
+  const [dropdowns, setDropdowns] = useState({ customers: [], siteLocation: [], visitPurpose: [], contactPerson: [] })
+
+
+  const fetchDetails = async (visitPlanId) => {
+    setIsLoading(true);
+    try {
+      const [detail] = await fetchVisitPlanDetails(visitPlanId);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        customer: { id: detail?.customer_id || '', label: detail?.customer_name?.trim() || '' },
+        dateAndTime: detail?.visit_date || '',
+        visitPurpose: { id: detail?.purpose_of_visit_id || '', label: detail?.purpose_of_visit_name },
+        remarks: detail?.remarks || '',
+      }));
+    } catch (error) {
+      console.error('Error fetching enquiry details:', error);
+      showToast({ type: 'error', title: 'Error', message: 'Failed to fetch enquiry details. Please try again.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (visitPlanId) {
+        fetchDetails(visitPlanId);
+      }
+    }, [visitPlanId])
+  );
 
   useEffect(() => {
     (async () => {
@@ -185,80 +212,60 @@ const VisitForm = ({ navigation }) => {
     );
   };
 
-
-
-  // Validation functions before submission
-  const validate = () => {
+  const validateForm = (fieldsToValidate) => {
     Keyboard.dismiss();
-    let isValid = true;
-    let errors = {};
-    const requiredFields = {
-      customer: 'Please select a customer',
-      siteLocation: 'Please select a brand',
-      dateAndTime: 'Please select a date and time',
-      contactPerson: 'Please select a purpose of visit',
-      remarks: 'Please enter remarks',
-      visitPurpose: 'Please enter a purpose of visit',
-    };
-
-    Object.keys(requiredFields).forEach(field => {
-      if (!formData[field]) {
-        errors[field] = requiredFields[field];
-        isValid = false;
-      }
-    });
-
+    const { isValid, errors } = validateFields(formData, fieldsToValidate);
     setErrors(errors);
     return isValid;
   };
 
-  
-const submit = async () => {
-  if (validate()) {
-    setIsSubmitting(true);
-    const visitData = {
-      employee_id: currentUser?.related_profile?._id,
-      date_time: formData?.dateAndTime || null,
-      customer_id: formData?.customer?.id,
-      contact_no: formData?.contactPerson?.contactNo || null,
-      // images: imageUrl || null,
-      purpose_of_visit_id: formData?.visitPurpose?.id || null,
-      remarks: formData?.remarks || null,
-      site_location_id: formData?.siteLocation?.id || null,
-      contact_person_id: formData?.contactPerson?.id || null,
-      longitude: formData?.longitude || null,
-      latitude: formData?.latitude || null,
-    };
-    console.log("🚀 ~ submit ~ visitData:", JSON.stringify(visitData, null, 2))
-    try {
-      const response = await post("/createCustomerVisitList", visitData);
-      if (response.success) {
-        showToast({
-          type: "success",
-          title: "Success",
-          message: response.message || "Customer Visit created successfully",
-        });
-        navigation.navigate("VisitScreen");
-      } else {
-        console.error("Customer Visit Failed:", response.message);
+  const submit = async () => {
+    const fieldsToValidate = ['customer', 'siteLocation', 'dateAndTime', 'contactPerson', 'remarks', 'visitPurpose'];
+    if (validateForm(fieldsToValidate)) {
+      setIsSubmitting(true);
+      const visitData = {
+        employee_id: currentUser?.related_profile?._id,
+        date_time: formData?.dateAndTime || null,
+        customer_id: formData?.customer?.id,
+        contact_no: formData?.contactPerson?.contactNo || null,
+        // images: imageUrl || null,
+        purpose_of_visit_id: formData?.visitPurpose?.id || null,
+        remarks: formData?.remarks || null,
+        site_location_id: formData?.siteLocation?.id || null,
+        contact_person_id: formData?.contactPerson?.id || null,
+        longitude: formData?.longitude || null,
+        latitude: formData?.latitude || null,
+      };
+      console.log("🚀 ~ submit ~ visitData:", JSON.stringify(visitData, null, 2))
+      try {
+        const response = await post("/createCustomerVisitList", visitData);
+        if (response.success) {
+          showToast({
+            type: "success",
+            title: "Success",
+            message: response.message || "Customer Visit created successfully",
+          });
+          navigation.navigate("VisitScreen");
+        } else {
+          console.error("Customer Visit Failed:", response.message);
+          showToast({
+            type: "error",
+            title: "ERROR",
+            message: response.message || "Customer Visit creation failed",
+          });
+        }
+      } catch (error) {
+        console.error("Error creating Customer Visit Failed:", error);
         showToast({
           type: "error",
           title: "ERROR",
-          message: response.message || "Customer Visit creation failed",
+          message: "An unexpected error occurred. Please try again later.",
         });
+      } finally {
+        setIsSubmitting(false);
       }
-    } catch (error) {
-      console.error("Error creating Customer Visit Failed:", error);
-      showToast({
-        type: "error",
-        title: "ERROR",
-        message: "An unexpected error occurred. Please try again later.",
-      });
-    } finally {
-      setIsSubmitting(false);
     }
-  }
-};
+  };
 
   return (
     <SafeAreaView>
@@ -323,6 +330,7 @@ const submit = async () => {
           label={"Remarks"}
           placeholder={"Enter Remarks"}
           multiline={true}
+          textAlignVertical='top'
           numberOfLines={5}
           value={formData.remarks}
           validate={errors.remarks}
@@ -332,6 +340,7 @@ const submit = async () => {
 
         <LoadingButton title='SUBMIT' onPress={submit} loading={isSubmitting} />
       </RoundedScrollContainer>
+      <OverlayLoader visible={isLoading} />
     </SafeAreaView>
   )
 }

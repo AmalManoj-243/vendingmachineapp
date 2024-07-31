@@ -10,6 +10,10 @@ export const allValidationRules = {
         message: 'Please enter the Contact Name',
         validate: validateRequired,
     },
+    contactPerson: {
+        message: 'Please enter select Contact Person',
+        validate: validateRequired,
+    },
     address: {
         message: 'Please enter the Address',
         validate: validateRequired,
@@ -66,12 +70,16 @@ export const allValidationRules = {
         message: 'Please select Date and Time',
         validate: validateRequired,
     },
+    siteLocation: {
+        message: 'Please select Site Location',
+        validate: validateRequired
+    },
     visitPurpose: {
         message: 'Please select Purpose of Visit',
         validate: validateRequired
     },
     remarks: {
-        message: 'Please select remarks',
+        message: 'Please enter remarks',
         validate: validateRequired,
     }
     // Add other fields as needed

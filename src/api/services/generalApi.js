@@ -170,3 +170,17 @@ export const fetchPipeline = async ({ offset, limit, date, source, opportunity, 
     throw error;
   }
 };
+
+export const fetchVisitPlan = async ({ offset, limit }) => {
+  try {
+    const queryParams = {
+      offset,
+      limit,
+    };
+    const response = await get(API_ENDPOINTS.VIEW_VISIT_PLAN, queryParams);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};

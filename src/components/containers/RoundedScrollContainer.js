@@ -13,13 +13,13 @@ const RoundedScrollContainer = ({ children, backgroundColor = COLORS.white, bord
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+    // <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
       <View style={containerStyles}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, padding: borderRadius ? 15 : 0 }} showsVerticalScrollIndicator={false} scrollEnabled={scrollEnabled}>
           {children}
         </ScrollView>
       </View>
-    </KeyboardAvoidingView>
+    // </KeyboardAvoidingView>
   );
 };
 

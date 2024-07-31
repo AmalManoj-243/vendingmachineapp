@@ -50,8 +50,7 @@ const LeadForm = ({ navigation, route }) => {
   const fetchDetails = async (enquiryId) => {
     setIsLoading(true);
     try {
-      const enquiryDetails = await fetchEnquiryRegisterDetails(enquiryId);
-      const detail = enquiryDetails[0];
+      const [detail] = await fetchEnquiryRegisterDetails(enquiryId);
       setFormData((prevFormData) => ({
         ...prevFormData,
         source: { id: detail?.source?.source_id || '', label: detail?.source?.source_name || '' },

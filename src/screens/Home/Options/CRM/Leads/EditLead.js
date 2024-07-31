@@ -43,7 +43,7 @@ const EditLead = ({ navigation, route }) => {
                 companyName: detail?.company_name || '',
                 jobPosition: detail?.job_position || '',
                 phoneNumber: detail?.phone_no || '',
-                watsappNumber: detail?.watsapp_no || '',
+                watsappNumber: detail?.whatsapp_no || '',
                 emailAddress: detail?.email || '',
                 address: detail?.address || '',
                 remarks: detail?.remarks || '',

@@ -13,7 +13,7 @@ import { InventoryDetails, InventoryForm, InventoryScreen } from "@screens/Home/
 import { ProductDetail } from "@components/common/Detail";
 import { CustomerDetails, CustomerScreen } from "@screens/Home/Sections/Customer";
 import { MarketStudyScreen } from "@screens/Home/Options/MarketStudy";
-import { VisitPlanForm, VisitsPlanScreen } from "@screens/Home/Options/VisitsPlan";
+import { EditVisitPlan, VisitPlanForm, VisitsPlanScreen } from "@screens/Home/Options/VisitsPlan";
 import { EditVisit, VisitDetails, VisitForm, VisitScreen } from "@screens/Home/Options/Visits"; //customer visit
 import { MapViewScreen } from "@components/MapViewScreen";
 import { CRMScreen } from "@screens/Home/Options/CRM";
@@ -24,6 +24,7 @@ import { EnquiryDetailTabs } from "@screens/Home/Options/CRM/EnquiryRegister/Enq
 import { LeadDetailTabs } from "@screens/Home/Options/CRM/Leads/LeadDetailTabs";
 import { EditPipeline, PipelineForm, PipelineScreen } from "@screens/Home/Options/CRM/Pipeline";
 import { PipelineDetailTabs } from "@screens/Home/Options/CRM/Pipeline/PipelineDetailTabs";
+import { VisitPlanDetailTabs } from "@screens/Home/Options/VisitsPlan/VisitPlanDetailTabs";
 
 const Stack = createNativeStackNavigator();
 
@@ -134,6 +135,11 @@ const StackNavigator = () => {
         component={CustomerDetails}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="CustomerFormTabs"
+        component={CustomerFormTabs}
+        options={{ headerShown: false }}
+      />
 
       {/* Market Study */}
       <Stack.Screen
@@ -154,8 +160,13 @@ const StackNavigator = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="CustomerFormTabs"
-        component={CustomerFormTabs}
+        name="VisitPlanDetails"
+        component={VisitPlanDetailTabs}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EditVisitPlan"
+        component={EditVisitPlan}
         options={{ headerShown: false }}
       />
 
