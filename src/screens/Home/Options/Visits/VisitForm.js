@@ -8,18 +8,19 @@ import { LoadingButton } from '@components/common/Button'
 import { DropdownSheet } from '@components/common/BottomSheets'
 import * as Location from 'expo-location';
 import { fetchCustomersDropdown, fetchPurposeofVisitDropdown, fetchSiteLocationDropdown } from '@api/dropdowns/dropdownApi'
-import { fetchCustomerDetails, fetchVisitPlanDetails } from '@api/details/detailApi'
+import { fetchCustomerDetails, fetchPipelineDetails, fetchVisitPlanDetails } from '@api/details/detailApi'
 import { showToastMessage } from '@components/Toast'
 import { useAuthStore } from '@stores/auth'
 import { showToast } from '@utils/common'
 import { post } from '@api/services/utils'
-import { useFocusEffect } from '@react-navigation/native'
 import { OverlayLoader } from '@components/Loader'
 import { validateFields } from '@utils/validation'
+import { useFocusEffect } from '@react-navigation/native'
 
 const VisitForm = ({ navigation, route }) => {
 
-  const { visitPlanId, pipelineId } = route?.params || {};
+  const { visitPlanId = '', pipelineId = '' } = route?.params || {};
+  console.log("🚀 ~ file: VisitForm.js:22 ~ VisitForm ~ pipelineId:", pipelineId)
   const currentUser = useAuthStore((state) => state.user);
   const [selectedType, setSelectedType] = useState(null);
   const [errors, setErrors] = useState({});
@@ -45,21 +46,38 @@ const VisitForm = ({ navigation, route }) => {
 
   const [dropdowns, setDropdowns] = useState({ customers: [], siteLocation: [], visitPurpose: [], contactPerson: [] })
 
-
-  const fetchDetails = async (visitPlanId) => {
+  const fetchVisitPlan = async () => {
     setIsLoading(true);
     try {
       const [detail] = await fetchVisitPlanDetails(visitPlanId);
-      setFormData((prevFormData) => ({
-        ...prevFormData,
+      setFormData((prev) => ({
+        ...prev,
         customer: { id: detail?.customer_id || '', label: detail?.customer_name?.trim() || '' },
         dateAndTime: detail?.visit_date || '',
         visitPurpose: { id: detail?.purpose_of_visit_id || '', label: detail?.purpose_of_visit_name },
         remarks: detail?.remarks || '',
       }));
     } catch (error) {
-      console.error('Error fetching enquiry details:', error);
-      showToast({ type: 'error', title: 'Error', message: 'Failed to fetch enquiry details. Please try again.' });
+      console.error('Error fetching visit plan details:', error);
+      showToast({ type: 'error', title: 'Error', message: 'Failed to fetch visit plan details. Please try again.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchPipeline = async () => {
+    setIsLoading(true);
+    try {
+      const [detail] = await fetchPipelineDetails(pipelineId);
+      setFormData((prev) => ({
+        ...prev,
+        customer: { id: detail?.customer?.customer_id || '', label: detail?.customer?.name?.trim() || '' },
+        dateAndTime: detail?.date || new Date(),
+        remarks: detail?.remarks || '',
+      }));
+    } catch (error) {
+      console.error('Error fetching pipeline details:', error);
+      showToast({ type: 'error', title: 'Error', message: 'Failed to fetch pipeline details. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -68,9 +86,11 @@ const VisitForm = ({ navigation, route }) => {
   useFocusEffect(
     useCallback(() => {
       if (visitPlanId) {
-        fetchDetails(visitPlanId);
-      }
-    }, [visitPlanId])
+        fetchVisitPlan(visitPlanId);
+      } else if (pipelineId) {
+        fetchPipeline(pipelineId)
+      } else return null;
+    }, [visitPlanId, pipelineId])
   );
 
   useEffect(() => {
@@ -235,6 +255,7 @@ const VisitForm = ({ navigation, route }) => {
         contact_person_id: formData?.contactPerson?.id || null,
         longitude: formData?.longitude || null,
         latitude: formData?.latitude || null,
+        pipeline_id: pipelineId || null,
       };
       console.log("🚀 ~ submit ~ visitData:", JSON.stringify(visitData, null, 2))
       try {
@@ -337,12 +358,11 @@ const VisitForm = ({ navigation, route }) => {
           onChangeText={(value) => handleFieldChange('remarks', value)}
         />
         {renderBottomSheet()}
-
         <LoadingButton title='SUBMIT' onPress={submit} loading={isSubmitting} />
       </RoundedScrollContainer>
       <OverlayLoader visible={isLoading} />
     </SafeAreaView>
   )
 }
-
 export default VisitForm
+

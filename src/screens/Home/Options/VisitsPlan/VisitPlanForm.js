@@ -4,7 +4,7 @@ import { SafeAreaView, RoundedScrollContainer } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
 import { LoadingButton } from '@components/common/Button';
 import { TextInput as FormInput } from '@components/common/TextInput';
-import { fetchCustomersDropdown, fetchEmployeesDropdown, fetchInvoiceDropdown, fetchPurposeofVisitDropdown } from '@api/dropdowns/dropdownApi';
+import { fetchCustomersDropdown, fetchEmployeesDropdown, fetchPurposeofVisitDropdown } from '@api/dropdowns/dropdownApi';
 import { DropdownSheet } from '@components/common/BottomSheets';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { formatDate } from '@utils/common/date';

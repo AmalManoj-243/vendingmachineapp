@@ -4,14 +4,14 @@ import { FABButton } from '@components/common/Button';
 import { RoundedContainer } from '@components/containers';
 import { useNavigation } from '@react-navigation/native';
 
-const CustomerVisit = () => {
+const CustomerVisit = ({ pipelineId }) => {
     const navigation = useNavigation();
 
     return (
         <SafeAreaView style={styles.safeArea}>
             <RoundedContainer style={styles.container}>
-                <FABButton 
-                    onPress={() => navigation.navigate('VisitForm')}
+                <FABButton
+                    onPress={() => navigation.navigate('VisitForm', { pipelineId: pipelineId })}
                     style={styles.fabButton}
                 />
             </RoundedContainer>

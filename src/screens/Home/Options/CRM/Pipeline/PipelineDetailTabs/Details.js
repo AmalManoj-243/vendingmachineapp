@@ -17,6 +17,7 @@ const Details = ({ pipelineId }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [isVisibleModal, setIsVisibleModal] = useState(false)
 
+  console.log("🚀 ~ file: VisitForm.js:82 ~ fetchPipelineDetails ~ detail:", JSON.stringify(details, null, 2))
   const fetchDetails = async (pipelineId) => {
     setIsLoading(true);
     try {
