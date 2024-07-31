@@ -1,12 +1,38 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import React from 'react';
+import { SafeAreaView, StyleSheet } from 'react-native';
+import { FABButton } from '@components/common/Button';
+import { RoundedContainer } from '@components/containers';
+import { useNavigation } from '@react-navigation/native';
 
 const CustomerVisit = () => {
-  return (
-    <View>
-      <Text>CustomerVisit</Text>
-    </View>
-  )
-}
+    const navigation = useNavigation();
 
-export default CustomerVisit
+    return (
+        <SafeAreaView style={styles.safeArea}>
+            <RoundedContainer style={styles.container}>
+                <FABButton 
+                    onPress={() => navigation.navigate('VisitForm')}
+                    style={styles.fabButton}
+                />
+            </RoundedContainer>
+        </SafeAreaView>
+    );
+};
+
+const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    fabButton: {
+        position: 'absolute',
+        bottom: 16,
+        right: 16,
+    },
+});
+
+export default CustomerVisit;
