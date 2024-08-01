@@ -1,38 +1,57 @@
-import React from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import React, { useCallback, useState } from 'react';
 import { FABButton } from '@components/common/Button';
 import { RoundedContainer } from '@components/containers';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
+import { OverlayLoader } from '@components/Loader';
+import { FlatList } from 'react-native';
+import { fetchPipelineDetails } from '@api/details/detailApi';
+import { VisitList } from '@components/CRM';
+import { showToastMessage } from '@components/Toast';
 
-const CustomerVisit = ({ pipelineId }) => {
-    const navigation = useNavigation();
+const CustomerVisit = ({ pipelineId, navigation }) => {
+    const [customerVisits, setCustomerVisits] = useState([]);
+    const [isLoading, setIsLoading] = useState(false)
+
+    const fetchDetails = async (pipelineId) => {
+        setIsLoading(true);
+        try {
+            const [pipelineDetails] = await fetchPipelineDetails(pipelineId);
+            setCustomerVisits(pipelineDetails?.customer_visit || []);
+        } catch (error) {
+            console.error('Error fetching pipeline details:', error);
+            showToastMessage('Failed to fetch pipeline details. Please try again.');
+        } finally {
+            setIsLoading(false)
+        }
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            if (pipelineId) {
+                fetchDetails(pipelineId);
+            }
+        }, [pipelineId])
+    );
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <RoundedContainer style={styles.container}>
-                <FABButton
-                    onPress={() => navigation.navigate('VisitForm', { pipelineId: pipelineId })}
-                    style={styles.fabButton}
-                />
-            </RoundedContainer>
-        </SafeAreaView>
+        <RoundedContainer>
+            <FlatList
+                data={customerVisits}
+                keyExtractor={(item) => item._id}
+                contentContainerStyle={{ padding: 10, paddingBottom: 50 }}
+                renderItem={({ item }) => (
+                    <VisitList
+                        item={item}
+                        onPress={() => navigation.navigate('VisitDetails', { visitDetails: { _id: item._id } })}
+                    />
+                )}
+                showsVerticalScrollIndicator={false}
+            />
+            <FABButton
+                onPress={() => navigation.navigate('VisitForm', { pipelineId: pipelineId })} />
+            <OverlayLoader visible={isLoading} />
+        </RoundedContainer>
     );
 };
-
-const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    fabButton: {
-        position: 'absolute',
-        bottom: 16,
-        right: 16,
-    },
-});
 
 export default CustomerVisit;

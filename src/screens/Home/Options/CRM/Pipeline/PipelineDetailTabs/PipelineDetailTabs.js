@@ -34,7 +34,7 @@ const PipelineDetailTabs = ({ navigation, route }) => {
       case 'second':
         return <FollowUp pipelineId={id} />;
       case 'third':
-        return <CustomerVisit pipelineId={id} />;
+        return <CustomerVisit pipelineId={id} navigation={navigation}/>;
       case 'fourth':
         return <EmailHistory pipelineId={id} />;
       case 'fifth':

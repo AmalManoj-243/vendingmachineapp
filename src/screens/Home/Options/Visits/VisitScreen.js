@@ -19,7 +19,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import { filterCalendar } from '@constants/dropdownConst';
 import { useAuthStore } from '@stores/auth';
-import VisitList from './VisitList';
+import { VisitList } from '@components/CRM';
 
 const VisitScreen = ({ navigation }) => {
   const isFocused = useIsFocused();
