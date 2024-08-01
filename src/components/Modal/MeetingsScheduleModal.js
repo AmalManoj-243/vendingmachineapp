@@ -128,7 +128,7 @@ const MeetingsScheduleModal = ({ isVisible, onClose, onSave, title, header = '',
                         onCancel={() => setTimePickerVisible(false)}
                     />
                     <View style={styles.checkboxContainer}>
-                        <CheckBox value={isReminder} onPressonValueChange={setReminder} />
+                        <CheckBox value={isReminder} onPress={setReminder} />
                         <Text style={styles.checkboxLabel}>Set Reminder</Text>
                     </View>
                     {isReminder && (
