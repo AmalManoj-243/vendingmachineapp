@@ -4,7 +4,7 @@ import { RoundedScrollContainer, SafeAreaView } from '@components/containers'
 import { NavigationHeader } from '@components/Header'
 import { TextInput as FormInput } from '@components/common/TextInput'
 import { COLORS, FONT_FAMILY } from '@constants/theme'
-import { Button } from '@components/common/Button'
+import { Button, LoadingButton } from '@components/common/Button'
 import SignaturePad from '@components/SignaturePad'
 import Text from '@components/Text'
 import { fetchBills } from '@api/details/detailApi'
@@ -19,6 +19,7 @@ import Toast from 'react-native-toast-message'
 const AuditForm = ({ navigation }) => {
 
   const [scrollEnabled, setScrollEnabled] = useState(true);
+  const [isSubmiting, setIsSubmiting] = useState(false);
   const [url, setUrl] = useState('')
   const [imageUrls, setImageUrls] = useState([])
   const [displayBillDetails, setDisplayBillDetails] = useState({})
@@ -555,7 +556,8 @@ const AuditForm = ({ navigation }) => {
         default:
           break;
       }
-      console.log("handle Auditing DATA:", JSON.stringify(auditingData, null, 2));
+      setIsSubmiting(true);
+      // console.log("handle Auditing DATA:", JSON.stringify(auditingData, null, 2));
       // return auditingData;
       const response = await post('/createAuditing', auditingData);
       if (response.success === 'true') {
@@ -576,6 +578,8 @@ const AuditForm = ({ navigation }) => {
         });
       }
     } catch (err) {
+    } finally {
+      setIsSubmiting(false)
     }
   }
   const handleDeleteImage = (index) => {
@@ -677,7 +681,7 @@ const AuditForm = ({ navigation }) => {
         )}
         <SignaturePad setScrollEnabled={setScrollEnabled} setUrl={setUrl} title={'Customer/Vendor Signature'} />
         <FormInput label={'Remarks'} multiline={true} numberOfLines={5} onChangeText={(text) => setRemarks(text)} />
-        <Button backgroundColor={COLORS.primaryThemeColor} title={'SUBMIT'} onPress={validate} />
+        <LoadingButton backgroundColor={COLORS.primaryThemeColor} title={'SUBMIT'} onPress={validate} loading={isSubmiting} />
       </RoundedScrollContainer>
     </SafeAreaView>
   )
