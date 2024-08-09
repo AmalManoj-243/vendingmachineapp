@@ -17,7 +17,6 @@ import { COLORS, FONT_FAMILY } from '@constants/theme';
 
 const BoxInspectionForm = ({ navigation }) => {
   const currentUser = useAuthStore(state => state.user);
-  console.log("🚀 ~ file: BoxInspectionForm.js:19 ~ BoxInspectionForm ~ currentUser:", currentUser)
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDropdownType, setSelectedDropdownType] = useState(null);
