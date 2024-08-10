@@ -19,7 +19,7 @@ const FollowUp = ({ pipelineId }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [followUpHistory, setFollowUpHistory] = useState([]);
 
-    const fetchDetails = async () => {  
+    const fetchDetails = async () => {
         setIsLoading(true);
         try {
             const updatedDetails = await fetchPipelineDetails(pipelineId);
@@ -66,9 +66,9 @@ const FollowUp = ({ pipelineId }) => {
     return (
         <RoundedContainer>
             <FlatList
-                  data={followUpHistory}
-                  keyExtractor={(item) => item._id}
-                  contentContainerStyle={{ padding: 10, paddingBottom: 50 }}
+                data={followUpHistory}
+                keyExtractor={(item) => item._id}
+                contentContainerStyle={{ padding: 10, paddingBottom: 50 }}
                 renderItem={({ item }) => (
                     <FollowUpList
                         item={item}

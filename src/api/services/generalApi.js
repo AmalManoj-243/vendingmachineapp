@@ -186,3 +186,18 @@ export const fetchVisitPlan = async ({ offset, limit, date, employeeId }) => {
     throw error;
   }
 };
+
+export const fetchBoxInspectionReport = async ({ offset, limit }) => {
+  try {
+    const queryParams = {
+      offset,
+      limit,
+    };
+    const response = await get(API_ENDPOINTS.VIEW_BOX_INSPECTION_REPORT, queryParams);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};
+

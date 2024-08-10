@@ -272,7 +272,7 @@ const VisitForm = ({ navigation, route }) => {
             title: "Success",
             message: response.message || "Customer Visit created successfully",
           });
-          navigation.navigate("VisitScreen");
+          navigation.goBack();
         } else {
           console.error("Customer Visit Failed:", response.message);
           showToast({

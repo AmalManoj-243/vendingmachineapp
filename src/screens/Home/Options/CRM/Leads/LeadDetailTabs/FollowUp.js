@@ -68,6 +68,7 @@ const FollowUp = ({ leadId }) => {
             <FlatList
                 data={followUpHistory}
                 keyExtractor={(item) => item._id}
+                contentContainerStyle={{ padding: 10, paddingBottom: 50 }}
                 renderItem={({ item }) => (
                     <FollowUpList
                         item={item}

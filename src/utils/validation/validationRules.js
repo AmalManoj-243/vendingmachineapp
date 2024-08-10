@@ -81,6 +81,10 @@ export const allValidationRules = {
     remarks: {
         message: 'Please enter remarks',
         validate: validateRequired,
+    },
+    box: {
+        message: 'Please select box name',
+        validate: validateRequired,
     }
     // Add other fields as needed
 };

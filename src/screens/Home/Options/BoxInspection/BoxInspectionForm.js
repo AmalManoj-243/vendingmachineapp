@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Keyboard, View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { Keyboard, View, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
 import { LoadingButton } from '@components/common/Button';
@@ -11,15 +11,15 @@ import { DropdownSheet } from '@components/common/BottomSheets';
 import { fetchNonInspectedBox } from '@api/dropdowns/dropdownApi';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useAuthStore } from '@stores/auth';
-import { formatDateTime } from '@utils/common/date';
+import { formatDate } from '@utils/common/date';
 import { validateFields } from '@utils/validation';
 import { fetchInventoryDetails } from '@api/details/detailApi';
 import NonInspectedBoxItems from './NonInspectedBoxItems';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
-import { ActivityIndicator } from 'react-native-paper';
 import { OverlayLoader } from '@components/Loader';
 import { EmptyState } from '@components/common/empty';
 import { showToastMessage } from '@components/Toast';
+import Text from '@components/Text';
 
 const BoxInspectionForm = ({ navigation }) => {
   const currentUser = useAuthStore(state => state.user);
@@ -29,10 +29,9 @@ const BoxInspectionForm = ({ navigation }) => {
   const [selectedDropdownType, setSelectedDropdownType] = useState(null);
   const [isDropdownSheetVisible, setIsDropdownSheetVisible] = useState(false);
   const [boxItems, setBoxItems] = useState([])
-  console.log("🚀 ~ file: BoxInspectionForm.js:27 ~ BoxInspectionForm ~ boxItems:", boxItems)
 
   const [formData, setFormData] = useState({
-    dateTime: new Date(),
+    date: new Date(),
     box: '',
     salesPerson: { id: currentUser?.related_profile?._id || '', label: currentUser?.related_profile?.name },
     warehouse: { id: currentUser?.warehouse?.warehouse_id || '', label: currentUser?.warehouse?.warehouse_name },
@@ -107,7 +106,7 @@ const BoxInspectionForm = ({ navigation }) => {
   };
 
   const handleDateConfirm = (date) => {
-    handleFieldChange('dateTime', date);
+    handleFieldChange('date', date);
     setIsDatePickerVisible(false);
   };
 
@@ -126,23 +125,12 @@ const BoxInspectionForm = ({ navigation }) => {
     return null;
   };
   const renderEmptyState = () => (
-    <EmptyState imageSource={require('@assets/images/EmptyData/empty_inventory_box.png')} message="Inspected items is empty" />
+    <EmptyState imageSource={require('@assets/images/EmptyData/empty_inventory_box.png')} message="Inspected items are empty" />
   );
-
-  // const handleQuantityChange = useCallback((id, text) => {
-  //   const newQuantity = parseInt(text) || 0;
-  //   setBoxItems((prevItems) =>
-  //     prevItems.map((item) =>
-  //       item._id === id
-  //         ? { ...item, inspectedQuantity: newQuantity }
-  //         : item
-  //     )
-  //   );
-  // }, []);
 
   const handleQuantityChange = useCallback((id, text) => {
     const newQuantity = parseInt(text) || 0;
-  
+
     setBoxItems((prevItems) =>
       prevItems.map((item) => {
         if (item._id === id) {
@@ -156,7 +144,7 @@ const BoxInspectionForm = ({ navigation }) => {
       })
     );
   }, []);
-  
+
 
   const renderContent = () => (
     <FlatList
@@ -166,8 +154,7 @@ const BoxInspectionForm = ({ navigation }) => {
       renderItem={({ item }) => (
         <NonInspectedBoxItems
           item={item}
-        // onChoose={() => handleChooseItem(item)}
-        onQuantityChange={(id, text) => handleQuantityChange(id, text)}
+          onQuantityChange={(id, text) => handleQuantityChange(id, text)}
         />
       )}
       keyExtractor={(item, index) => index.toString()}
@@ -185,16 +172,23 @@ const BoxInspectionForm = ({ navigation }) => {
   };
 
   const handleSubmit = async () => {
-    const fieldsToValidate = ['boxName', 'salesPerson'];
+    const fieldsToValidate = ['box', 'salesPerson'];
     if (validateForm(fieldsToValidate)) {
       setIsSubmitting(true);
       const boxInspectionData = {
-        date: formData.dateTime || null,
-        boxName_id: formData.boxName?.id ?? null,
+        date: formData.date || null,
+        box_id: formData.box?.id ?? null,
         sales_person_id: formData.salesPerson?.id || null,
-        inspectedItems: formData.inspectedItems || null,
+        inspected_items: boxItems.map(item => ({
+          product_id: item.product_id,
+          product_name: item?.product_name,
+          box_quantity: item?.quantity,
+          inspected_quantity: item?.inspectedQuantity,
+          uom_id: item?.uom_id || null,
+          uom_name: item?.uom_name || ''
+        })),
+        warehouse_id: formData.warehouse?.id || null
       };
-
       try {
         const response = await post("/createBoxInspection", boxInspectionData);
         if (response.success) {
@@ -203,7 +197,7 @@ const BoxInspectionForm = ({ navigation }) => {
             title: 'Success',
             message: response.message || 'Box Inspection created successfully',
           });
-          navigation.navigate("BoxInspectionScreen");
+          navigation.goBack();
         } else {
           showToast({
             type: 'error',
@@ -231,10 +225,10 @@ const BoxInspectionForm = ({ navigation }) => {
       />
       <RoundedScrollContainer>
         <FormInput
-          label="Date Time"
+          label="Date"
           dropIcon="calendar"
           editable={false}
-          value={formatDateTime(formData.dateTime)}
+          value={formatDate(formData.date)}
           onPress={() => setIsDatePickerVisible(true)}
         />
         <FormInput
@@ -261,7 +255,7 @@ const BoxInspectionForm = ({ navigation }) => {
           placeholder="Select Box Name"
           dropIcon="menu-down"
           editable={false}
-          validate={errors.boxName}
+          validate={errors.box}
           value={formData.box?.label || ''}
           onPress={() => toggleDropdownSheet('Box Name')}
         />

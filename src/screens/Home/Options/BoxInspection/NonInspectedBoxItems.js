@@ -3,7 +3,6 @@ import { View, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-n
 import Text from '@components/Text';
 import { AntDesign } from '@expo/vector-icons';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
-import { Button } from '@components/common/Button';
 
 const NonInspectedBoxItems = ({ item, onPress, onQuantityChange }) => {
     return (
@@ -62,7 +61,6 @@ const styles = StyleSheet.create({
         fontFamily: FONT_FAMILY.urbanistBold,
         fontSize: 16,
         marginBottom: 5,
-        // padding: 10,
         color: COLORS.black
     },
     label: {

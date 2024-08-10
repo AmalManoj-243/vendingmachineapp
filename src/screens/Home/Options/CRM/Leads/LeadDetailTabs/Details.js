@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { RoundedScrollContainer } from '@components/containers';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { DetailField } from '@components/common/Detail';
-import { formatDateTime } from '@utils/common/date';
+import { formatDate } from '@utils/common/date';
 import { showToastMessage } from '@components/Toast';
 import { fetchLeadDetails } from '@api/details/detailApi';
 import { OverlayLoader } from '@components/Loader';
@@ -75,7 +75,7 @@ const Details = ({ leadId }) => {
 
     return (
         <RoundedScrollContainer>
-            <DetailField label="Date & Time" value={formatDateTime(details.date)} />
+            <DetailField label="Date" value={formatDate(details.date)} />
             <DetailField label="Status" value={details?.status || '-'} />
             <DetailField label="Priority" value={details?.priority || '-'} />
             <DetailField label="Source" value={details?.source?.source_name || '-'} />

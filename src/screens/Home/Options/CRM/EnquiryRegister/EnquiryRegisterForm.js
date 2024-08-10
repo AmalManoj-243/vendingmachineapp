@@ -221,7 +221,7 @@ const EnquiryRegisterForm = ({ navigation }) => {
         <LoadingButton title="SAVE" onPress={handleSubmit} loading={isSubmitting} marginTop={10} />
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
-          mode="date"
+          mode="datetime"
           onConfirm={handleDateConfirm}
           onCancel={() => setIsDatePickerVisible(false)}
         />

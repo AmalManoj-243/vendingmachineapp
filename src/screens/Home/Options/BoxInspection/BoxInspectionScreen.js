@@ -6,7 +6,7 @@ import { RoundedContainer, SafeAreaView, SearchContainer } from '@components/con
 import { EmptyItem, EmptyState } from '@components/common/empty';
 import { NavigationHeader } from '@components/Header';
 import { FABButton } from '@components/common/Button';
-import { fetchBoxInspection } from '@api/services/generalApi';
+import { fetchBoxInspectionReport } from '@api/services/generalApi';
 import { useDataFetching } from '@hooks';
 import { useAuthStore } from '@stores/auth';
 import { OverlayLoader } from '@components/Loader';
@@ -17,7 +17,7 @@ const BoxInspectionScreen = ({ navigation }) => {
   const isFocused = useIsFocused();
   const currentUser = useAuthStore((state) => state.user);
   const currentUserId = currentUser?.related_profile?._id || '';
-  const { data, loading, fetchData, fetchMoreData } = useDataFetching(fetchBoxInspection);
+  const { data, loading, fetchData, fetchMoreData } = useDataFetching(fetchBoxInspectionReport);
 
   useFocusEffect(
     useCallback(() => {
@@ -39,11 +39,14 @@ const BoxInspectionScreen = ({ navigation }) => {
     if (item.empty) {
       return <EmptyItem />;
     }
-    return <BoxInspectionList item={item} onPress={() => navigation.navigate('EnquiryDetailTabs', { id: item._id })} />;
+    return <BoxInspectionList item={item} />;
   };
 
   const renderEmptyState = () => (
-    <EmptyState imageSource={require('@assets/images/EmptyData/empty.png')} message={'No Boxes Found'} />
+    <EmptyState
+      imageSource={require("@assets/images/EmptyData/empty_inventory_box.png")}
+    // message={"Inspected boxes are empty."}
+    />
   );
 
   const renderContent = () => (
