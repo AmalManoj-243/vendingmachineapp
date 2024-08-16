@@ -33,7 +33,7 @@ const AuditForm = ({ navigation }) => {
   const [splittedBillName, setSplittedBillName] = useState('')
   const loginUser = useAuthStore(state => state.user)
   const warehouseId = loginUser?.warehouse?.warehouse_id
-  console.log("🚀 ~ file: AuditForm.js:36 ~ AuditForm ~ warehouseId:", warehouseId)
+  // console.log("🚀 ~ file: AuditForm.js:36 ~ AuditForm ~ warehouseId:", warehouseId)
 
   useEffect(() => {
     resetFormState();
@@ -275,7 +275,7 @@ const AuditForm = ({ navigation }) => {
         isValid = false;
       }
 
-      if (scannedBillDetails) {
+      if (scannedBillDetails && scannedBillDetails.warehouse) {
         if (warehouseId !== scannedBillDetails?.warehouse?.warehouses_id) {
           showToast({ type: 'error', title: 'Error', message: "Warehouse doesn't match the logged-in user's warehouse." });
           isValid = false;
