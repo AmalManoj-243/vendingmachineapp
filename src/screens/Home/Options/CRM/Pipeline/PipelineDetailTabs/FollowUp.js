@@ -15,7 +15,7 @@ import { FollowUpList } from '@components/CRM';
 const FollowUp = ({ pipelineId }) => {
 
     const currentUser = useAuthStore((state) => state.user);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); //
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [followUpHistory, setFollowUpHistory] = useState([]);
 
