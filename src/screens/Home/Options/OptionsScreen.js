@@ -88,10 +88,10 @@ const OptionsScreen = ({ navigation }) => {
         onCancel={() => setIsConfirmationModalVisible(!isConfirmationModalVisible)}
         isVisible={isConfirmationModalVisible}
         onConfirm={() => { navigation.navigate('BoxInspectionScreen'), setIsConfirmationModalVisible(!isConfirmationModalVisible) }}
-        headerMessage='Are you sure want to Start Box Inspection ?. '
+        headerMessage='Are you sure that you want to Start Box Inspection ?. '
       />
     </SafeAreaView>
   )
 }
 
-export default OptionsScreen
+export default OptionsScreen;

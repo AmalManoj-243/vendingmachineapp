@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { BackHandler } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { RoundedContainer, SafeAreaView, SearchContainer } from '@components/containers';
@@ -111,7 +112,15 @@ const BoxInspectionScreen = ({ navigation }) => {
 
   const handleBackPress = () => {
     setIsConfirmationModalVisible(true);
+    return true;
   };
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackPress);
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <SafeAreaView>
