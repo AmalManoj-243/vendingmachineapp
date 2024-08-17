@@ -4,7 +4,6 @@ import { FlashList } from '@shopify/flash-list';
 import { RoundedContainer, SafeAreaView, SearchContainer } from '@components/containers';
 import { EmptyItem, EmptyState } from '@components/common/empty';
 import { NavigationHeader } from '@components/Header';
-import { FABButton } from '@components/common/Button';
 import { useAuthStore } from '@stores/auth';
 import { OverlayLoader } from '@components/Loader';
 import BoxInspectionList from './BoxInspectionList';
@@ -62,7 +61,7 @@ const BoxInspectionScreen = ({ navigation, route }) => {
       fetchNonInspectedBoxList();
     }, [fetchNonInspectedBoxList])
   );
-
+  // navigate only after open inventory request create successfully
   const handleNavigateToForm = useCallback(
     async (item) => {
       if (!item?.boxId) return;
@@ -110,7 +109,7 @@ const BoxInspectionScreen = ({ navigation, route }) => {
       const response = await put('/updateBoxInspectionGrouping', requestPayload);
       if (response.success) {
         showToast({ type: 'success', title: 'Success', message: 'Box inspection grouping updated successfully.' });
-        navigation.goBack(); 
+        navigation.goBack();
       } else {
         showToast({ type: 'error', title: 'Error', message: 'Failed to update box inspection grouping.' });
       }
