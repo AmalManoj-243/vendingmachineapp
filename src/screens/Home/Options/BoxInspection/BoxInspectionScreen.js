@@ -23,7 +23,6 @@ const BoxInspectionScreen = ({ navigation, route }) => {
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
 
   const { groupId } = route?.params || {};
-  console.log("🚀 ~ file: BoxInspectionScreen.js:27 ~ BoxInspectionScreen ~ groupId:", groupId)
 
   useEffect(() => {
     const onBackPress = () => {

@@ -1,2 +1,3 @@
 import VerticalScrollableCalendar from "./VerticalScrollableCalendar";
-export { VerticalScrollableCalendar }
+import CalendarScreen from "./CalendarScreen";
+export { VerticalScrollableCalendar, CalendarScreen }
