@@ -130,7 +130,7 @@ export const fetchUomDropdown = async () => {
   return fetchData(DROP_DOWN_API_ENDPOINTS.UOM);
 }
 
-export const fetchcustomerNameDropdown = async () => {
+export const fetchCustomerNameDropdown = async () => {
   return fetchData(DROP_DOWN_API_ENDPOINTS.CUSTOMER_NAME);
 }
 
@@ -146,7 +146,7 @@ export const fetchBrandDropdown = async (deviceId) => {
   return fetchData(`${DROP_DOWN_API_ENDPOINTS.BRAND}?job_device_id=${deviceId}`);
 }
 
-export const fetchconsumerModelDropdown = async (deviceId) => {
+export const fetchConsumerModelDropdown = async (deviceId) => {
   return fetchData(`${DROP_DOWN_API_ENDPOINTS.CONSUMER_MODEL}?job_device_id=${deviceId}`);
 }
 
@@ -162,6 +162,6 @@ export const fetchComplaintsDropdown = async () => {
   return fetchData(DROP_DOWN_API_ENDPOINTS.COMPLAINTS);
 } 
 
-export const fetchsubComplaintsDropdown = async (complaintsId) => {
+export const fetchSubComplaintsDropdown = async (complaintsId) => {
   return fetchData(`${DROP_DOWN_API_ENDPOINTS.SUB_COMPLAINTS}?master_problem_id=${complaintsId}`);
 } 

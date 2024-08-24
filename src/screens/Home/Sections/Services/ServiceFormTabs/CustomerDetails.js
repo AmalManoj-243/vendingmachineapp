@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
-import { fetchcustomerNameDropdown, fetchWarehouseDropdown } from '@api/dropdowns/dropdownApi';
+import { fetchCustomerNameDropdown, fetchWarehouseDropdown } from '@api/dropdowns/dropdownApi';
 import { DropdownSheet } from '@components/common/BottomSheets';
 
 const CustomerDetails = ({ formData, onFieldChange, errors }) => {
@@ -17,7 +17,7 @@ const CustomerDetails = ({ formData, onFieldChange, errors }) => {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const customerNameData = await fetchcustomerNameDropdown();
+        const customerNameData = await fetchCustomerNameDropdown();
         setDropdown(prevDropdown => ({
           ...prevDropdown,
           customerName: customerNameData.map(data => ({
