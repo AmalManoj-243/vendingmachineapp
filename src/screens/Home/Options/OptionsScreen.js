@@ -13,7 +13,6 @@ import { OverlayLoader } from '@components/Loader';
 import { ConfirmationModal } from '@components/Modal';
 import { useAuthStore } from '@stores/auth';
 import { post } from '@api/services/utils';
-import { BackHandler } from 'react-native';
 
 const OptionsScreen = ({ navigation }) => {
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);

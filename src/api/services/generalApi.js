@@ -217,8 +217,6 @@ export const fetchBoxInspectionReport = async ({ offset, limit }) => {
 };
 
 export const fetchAttendance = async ({ userId, date }) => {
-  console.log("🚀 ~ file: generalApi.js:220 ~ fetchAttendance ~ date:", date)
-  console.log("🚀 ~ file: generalApi.js:220 ~ fetchAttendance ~ userId:", userId)
   try {
     const queryParams = {
       user_id: userId,

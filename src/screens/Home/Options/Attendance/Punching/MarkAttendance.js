@@ -15,7 +15,7 @@ import { fetchAttendance } from '@api/services/generalApi';
 import { OverlayLoader } from '@components/Loader';
 
 const MarkAttendanceScreen = ({ navigation, route }) => {
-    const { date } = route?.params;
+    const { date } = route?.params || {};
     const formattedDate = formatDate(date, 'yyyy-MM-dd');
     const currentUser = useAuthStore((state) => state.user);
     const [locationData, setLocationData] = useState({
@@ -106,7 +106,6 @@ const MarkAttendanceScreen = ({ navigation, route }) => {
     useEffect(() => {
         (async () => {
             const { status } = await Location.requestForegroundPermissionsAsync();
-            console.log("🚀 ~ file: MarkAttendance.js:110 ~ status:", status);
             if (status !== 'granted') {
                 console.log('Permission to access location was denied');
                 setLoading(false);

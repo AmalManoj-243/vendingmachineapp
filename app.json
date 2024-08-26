@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "369aiUAETEST",
-    "slug": "369aiuaetest",
+    "name": "369aiAlphalize",
+    "slug": "369aialphalize",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/android/icon.png",
@@ -32,9 +32,11 @@
       "icon": "./assets/android/icon.png",
       "permissions": [
         "android.permission.RECORD_AUDIO",
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ],
-      "package": "com.danat.test"
+      "package": "com.danat.alphalize"
     },
     "plugins": [
       [
@@ -69,7 +71,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "3087ffba-c4a1-4793-ad48-e4a0bbbe5cda"
+        "projectId": "032682a8-bbb8-403b-8f59-5acc19405566"
       }
     }
   }
