@@ -1,3 +1,3 @@
-import UpdateDetailTabs from "./UpdateDetailTabs";
+import UpdateDetails from "./UpdateDetailTabs";
 
-export {UpdateDetailTabs}
+export {UpdateDetails}

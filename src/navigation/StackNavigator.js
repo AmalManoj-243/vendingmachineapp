@@ -37,6 +37,7 @@ import { ServiceScreen } from "@screens/Home/Sections/Services";
 import { SparePartsRequestScreen } from "@screens/Home/Sections/Services/SparePartsRequest";
 import SparePartsRequestList from "@screens/Home/Sections/Services/SparePartsRequest/SparePartsRequestList";
 import SparePartsRequestDetails from "@screens/Home/Sections/Services/SparePartsRequest/SparePartsRequestDetails";
+import ServiceDetails from "@screens/Home/Sections/Services/QuickService/QuickServiceDetailTabs/ServiceDetails";
 
 const Stack = createNativeStackNavigator();
 
@@ -175,13 +176,13 @@ const StackNavigator = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="UpdateDetailTabs"
-        component={UpdateDetailTabs}
+        name="UpdateDetail"
+        component={UpdateDetail}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="UpdateDetail"
-        component={UpdateDetail}
+        name="ServiceDetails"
+        component={ServiceDetails}
         options={{ headerShown: false }}
       />
 

@@ -39,7 +39,7 @@ const QuickServiceScreen = ({ navigation }) => {
     if (item.empty) {
       return <EmptyItem />;
     }
-    return <QuickServiceList item={item} onPress={() => navigation.navigate('QuickServiceDetailTabs', { id: item._id })} />;
+    return <QuickServiceList item={item} onPress={() => navigation.navigate('ServiceDetails', { id: item._id })} />;
   };
 
   const renderEmptyState = () => (

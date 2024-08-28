@@ -1,3 +1,3 @@
-import ServiceDetailTabs from "./QuickServiceDetailTabs";
+import ServiceDetails from "./QuickServiceDetailTabs";
 
-export {ServiceDetailTabs}
+export {ServiceDetails}
