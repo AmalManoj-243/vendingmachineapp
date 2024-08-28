@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, FlatList, View, Text, TouchableOpacity } from 'react-native';
-import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from '@components/containers';
 import NavigationHeader from '@components/Header/NavigationHeader';
 import { RoundedScrollContainer } from '@components/containers';
@@ -13,20 +13,16 @@ import { fetchServiceDetails } from '@api/details/detailApi';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-const UpdateDetails = () => {
-    const route = useRoute();
-    const navigation = useNavigation();
-    const { id, updatedItem } = route.params || {};
-
+const UpdateDetails = ({ route, navigation }) => {
+    const { id } = route.params || {};
     const [details, setDetails] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [savedItems, setSavedItems] = useState([]);
+    const [sparePartsItems, setSparePartsItems] = useState([]);
 
-    useEffect(() => {
-        if (updatedItem) {
-            setSavedItems(prevItems => [...prevItems, updatedItem]);
-        }
-    }, [updatedItem]);
+    // adding spare parts list items
+    const addSpareParts = (addedItems) => {
+        setSparePartsItems(prevItems => [...prevItems, addedItems])
+    }
 
     const fetchDetails = async () => {
         setIsLoading(true);
@@ -73,12 +69,12 @@ const UpdateDetails = () => {
                 <DetailField label="Consumer Model" value={details?.consumer_model_name || '-'} />
                 <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: 10 }}>
                     <Text style={styles.label}>Add an Item</Text>
-                    <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('AddSpareParts')}>
+                    <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('AddSpareParts', { id, addSpareParts })}>
                         <AntDesign name="pluscircle" size={26} color={COLORS.orange} />
                     </TouchableOpacity>
                 </View>
                 <FlatList
-                    data={savedItems}
+                    data={sparePartsItems}
                     renderItem={({ item }) => (
                         <SparePartsList item={item} />
                     )}

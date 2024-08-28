@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { RoundedScrollContainer, SafeAreaView } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { fetchProductsDropdown, fetchUnitOfMeasureDropdown } from '@api/dropdowns/dropdownApi';
-import { useFocusEffect, useRoute } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { DropdownSheet } from '@components/common/BottomSheets';
 import { NavigationHeader } from '@components/Header';
 import { Button } from '@components/common/Button';
@@ -10,9 +10,9 @@ import { COLORS } from '@constants/theme';
 import { Keyboard } from 'react-native';
 import { validateFields } from '@utils/validation';
 
-const AddSpareParts = ({ navigation }) => {
-    const route = useRoute();
-    const { id } = route.params || {};
+const AddSpareParts = ({ navigation, route }) => {
+
+    const { id, addSpareParts } = route?.params || {};
 
     const [selectedType, setSelectedType] = useState(null);
     const [isVisible, setIsVisible] = useState(false);
@@ -34,14 +34,12 @@ const AddSpareParts = ({ navigation }) => {
     });
 
     const [errors, setErrors] = useState({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [savedItems, setSavedItems] = useState([]);
 
     const calculateSubTotal = (unitPrice, quantity) => {
         return unitPrice && quantity ? (parseFloat(unitPrice) * parseFloat(quantity)).toFixed(2) : '';
     };
 
-    const onFieldChange = (field, value) => {
+    const handleFieldChange = (field, value) => {
         setFormData((prevFormData) => ({
             ...prevFormData,
             [field]: value,
@@ -121,13 +119,6 @@ const AddSpareParts = ({ navigation }) => {
         fetchUnitOfMeasure();
     }, []);
 
-    useFocusEffect(
-        useCallback(() => {
-            if (id) {
-                fetchDetails(id);
-            }
-        }, [id])
-    );
 
     const toggleBottomSheet = (type) => {
         setSelectedType(isVisible ? null : type);
@@ -144,7 +135,6 @@ const AddSpareParts = ({ navigation }) => {
     const handleSubmit = () => {
         const fieldsToValidate = ['spareParts', 'tax'];
         if (validateForm(fieldsToValidate)) {
-            setIsSubmitting(true);
             const spareItem = {
                 spareParts: formData.spareParts?.label || '',
                 description: formData.description || '',
@@ -154,7 +144,7 @@ const AddSpareParts = ({ navigation }) => {
                 tax: formData.tax || '',
                 subTotal: formData.subTotal || '',
             };
-            setSavedItems(prevItems => [...prevItems, spareItem]);
+            addSpareParts(spareItem);
             navigation.navigate('UpdateDetail', { updatedItem: spareItem });
         }
     };
@@ -175,8 +165,6 @@ const AddSpareParts = ({ navigation }) => {
             default:
                 return null;
         }
-
-
         return (
             <DropdownSheet
                 isVisible={isVisible}
@@ -187,7 +175,7 @@ const AddSpareParts = ({ navigation }) => {
                     if (selectedType === 'Spare Name') {
                         handleProductSelection(value);
                     } else {
-                        onFieldChange(fieldName, value);
+                        handleFieldChange(fieldName, value);
                     }
                 }}
             />
@@ -217,7 +205,7 @@ const AddSpareParts = ({ navigation }) => {
                     placeholder="Enter Description"
                     editable={true}
                     value={formData.description}
-                    onChangeText={(value) => onFieldChange('description', value)}
+                    onChangeText={(value) => handleFieldChange('description', value)}
                 />
                 <FormInput
                     label="Quantity"
@@ -249,7 +237,7 @@ const AddSpareParts = ({ navigation }) => {
                     required
                     keyboardType="numeric"
                     value={formData.tax}
-                    onChangeText={(value) => onFieldChange('tax', value)}
+                    onChangeText={(value) => handleFieldChange('tax', value)}
                 />
                 <FormInput
                     label="Sub Total"
