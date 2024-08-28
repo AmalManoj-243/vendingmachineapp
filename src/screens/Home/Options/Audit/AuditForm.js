@@ -154,7 +154,6 @@ const AuditForm = ({ navigation }) => {
         case "JobInvoice":
           response = await fetchBills.jobInvoiceDetails(billSequence);
           billDetails = response[0];
-          console.log("🚀 ~ file: AuditForm.js:154 ~ handleScan ~ billDetails:", JSON.stringify(billDetails, null, 2))
           break;
 
         case "PETTYALLOT":
@@ -179,13 +178,24 @@ const AuditForm = ({ navigation }) => {
 
         case "Spare Issue":
           response = await fetchBills.sparePartsIssueDetails(billSequence);
-          // console.log("🚀 ~ file: AuditForm.js:178 ~ handleScan ~ response:", JSON.stringify(response, null, 2))
           if (response[0]) {
             const spareAuditDetail = await fetchBills.sparePartsIssueAuditDetails(response[0]?._id)
             billDetails = spareAuditDetail[0];
           }
-          // console.log("Bill data Spare Issue", JSON.stringify(billDetails, null, 2));
           break;
+
+          case "Stock rec":
+            response = await fetchBills.stockTransferDetails(billSequence);
+            billDetails = response[0];
+            console.log("Bill data Stock  Transfer", JSON.stringify(billDetails, null, 2));
+            break;
+            
+          case "Fund rec":
+            response = await fetchBills.fundTransferDetails(billSequence);
+            billDetails = response[0];
+            console.log("Bill data fund  Transfer", JSON.stringify(billDetails, null, 2));
+            break;
+
         default:
           console.log("Unknown bill type");
       }

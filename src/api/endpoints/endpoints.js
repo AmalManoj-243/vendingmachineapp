@@ -89,6 +89,8 @@ export const DETAIL_API_ENDPOINTS = {
     GET_SALARY_ADVANCE_PAYMENT_DETAILS: '/viewSalaryAdvance',
     GET_COLLECTION_TYPE_DETAILS: '/viewCollectionType',
     GET_CHEQUE_LEDGER: '/viewChequeLedger',
+    GET_STOCK_TRANSFER_DETAILS: '/viewStockTransfer',
+    GET_FUND_TRANSFER_DETAILS: '/viewFundTransfer',
     // OTHERS DETAILS
     GET_INVENTORY_DETAILS: '/viewInventoryBox',
     GET_PRODUCT_DETAILS: '/viewProducts',

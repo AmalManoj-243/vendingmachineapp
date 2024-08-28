@@ -30,7 +30,8 @@ const {
   GET_CHEQUE_LEDGER,
   GET_INVENTORY_DETAILS,
   GET_PRODUCT_DETAILS,
-
+  GET_STOCK_TRANSFER_DETAILS,
+  GET_FUND_TRANSFER_DETAILS
 } = DETAIL_API_ENDPOINTS;
 
 
@@ -108,6 +109,8 @@ export const fetchBills = {
   purchaseReturnDetails: async (sequenceNo) => fetchAuditDetails(GET_PURCHASE_RETURN_DETAILS, sequenceNo),
   capitalPaymentDetails: async (sequenceNo) => fetchAuditDetails(GET_CAPITAL_PAYMENT_DETAILS, sequenceNo),
   jobInvoiceDetails: async (sequenceNo) => fetchAuditDetails(GET_JOB_INVOICE_DETAILS, sequenceNo),
+  stockTransferDetails: async (sequenceNo) => fetchAuditDetails(GET_STOCK_TRANSFER_DETAILS, sequenceNo),
+  fundTransferDetails: async (sequenceNo) => fetchAuditDetails(GET_FUND_TRANSFER_DETAILS, sequenceNo),
   sparePartsIssueDetails: async (sequenceNo) => fetchAuditDetails(GET_SPARE_PARTS_ISSUE_DETAILS, sequenceNo),
   sparePartsIssueAuditDetails: async (issueId) => fetchDetails(GET_SPARE_PARTS_ISSUE_AUDIT_DETAILS, issueId),
   pettyCashAllotmentDetails: async (sequenceNo) => fetchAuditDetails(GET_PETTY_CASH_ALLOTMENT_DETAILS, sequenceNo),
