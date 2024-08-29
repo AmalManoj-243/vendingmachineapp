@@ -25,6 +25,8 @@ const COLORS = {
   red: '#FF3333',
   lightGrey: '#D3D3D3',
   grey: '#F0F0F0',
+  green: '#008000',
+  lightRed: '#FF0000',
   listText: '#FFFFFF',
   boxTheme: '#B56727',
   lightenBoxTheme: '#e5b288',
