@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { View } from 'react-native';
 import { SafeAreaView } from '@components/containers';
 import NavigationHeader from '@components/Header/NavigationHeader';
@@ -52,7 +52,7 @@ const ServiceDetails = ({ navigation, route }) => {
                 service_id: serviceId,
                 reason: closingReason,
             };
-            const response = await post('/updateJobRegistration', closeJobData);
+            const response = await post('/closeJob', closeJobData);   ///
             if (response.success === "true") {
                 showToastMessage('Job successfully closed!');
             } else {

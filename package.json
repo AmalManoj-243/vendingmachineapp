@@ -57,6 +57,7 @@
     "react-native-signature-canvas": "^4.7.2",
     "react-native-snap-carousel": "^3.9.1",
     "react-native-svg": "^15.6.0",
+    "react-native-svg-charts": "^5.4.0",
     "react-native-tab-view": "^3.5.2",
     "react-native-toast-message": "^2.2.0",
     "react-native-web": "~0.19.6",

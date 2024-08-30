@@ -54,7 +54,7 @@ const KPIListingScreen = ({ navigation }) => {
 
     const getDataForCategory = () => {
         switch(kpiCategory) {
-            case 'Completed':
+            case 'Complete':
                 return dashBoardDetails.completedKpi;
             case 'In Progress':
                 return dashBoardDetails.inProgressKpi;
@@ -64,7 +64,7 @@ const KPIListingScreen = ({ navigation }) => {
                 return dashBoardDetails.urgentKpiData;
             case 'Important':
                 return dashBoardDetails.importantKpiData;
-            case 'Service':
+            case 'Regular Task':
                 return dashBoardDetails.serviceKpiData;
             default:
                 return [];

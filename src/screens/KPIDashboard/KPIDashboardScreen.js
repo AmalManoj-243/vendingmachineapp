@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Text, Platform } from 'react-native';
-import { PieChart } from 'react-native-chart-kit';
+// import { PieChart } from 'react-native-chart-kit';
+import { PieChart } from 'react-native-svg-charts';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationHeader } from '@components/Header';
-import { COLORS } from '@constants/theme';
-import { RoundedScrollContainer } from '@components/containers';
+import { COLORS, FONT_FAMILY } from '@constants/theme';
+import { RoundedContainer, RoundedScrollContainer } from '@components/containers';
 import { useIsFocused } from '@react-navigation/native';
 import { useAuthStore } from '@stores/auth';
 import { useDataFetching } from '@hooks';
@@ -14,7 +15,7 @@ import { fetchKPIDashboardData } from '@api/services/generalApi';
 const KPIDashboardScreen = ({ navigation }) => {
     const screenWidth = Dimensions.get('window').width;
     const isFocused = useIsFocused();
-    const currentUser = useAuthStore((state)=> state.user);
+    const currentUser = useAuthStore((state) => state.user);
     const currentUserId = currentUser?.related_profile?._id || '';
     const [dashBoardDetails, setDashBoardDetails] = useState({
         assignedKpiData: [],
@@ -28,7 +29,6 @@ const KPIDashboardScreen = ({ navigation }) => {
 
     const fetchKPIDetails = async () => {
         try {
-
             const data = await fetchKPIDashboardData({ userId: currentUserId });
             setDashBoardDetails({
                 assignedKpiData: data.assigned_kpi_data || [],
@@ -38,96 +38,125 @@ const KPIDashboardScreen = ({ navigation }) => {
                 taskManagements: data.task_managments || [],
                 inProgressKpi: data.in_progress_kpi || [],
                 completedKpi: data.completed_kpi || []
-        });
-        // console.log("Updated dashBoardDetails State:", {
-        //     assigned_kpi_data: data.assigned_kpi_data || [],
-        //     important_kpi_data: data.important_kpi_data || [],
-        //     urgent_kpi_data: data.urgent_kpi_data || [],
-        //     service_kpi_data: data.service_kpi_data || [],
-        //     task_managments: data.task_managments || [],
-        //     in_progress_kpi: data.in_progress_kpi || [],
-        //     completedKpi: data.completed_kpi || []
-        // });
-        } catch(error){
+            });
+        } catch (error) {
             console.error('Error fetching visit details:', error);
             showToastMessage('Failed to fetch visit details');
         }
-    }
+    };
+
     useEffect(() => {
         if (isFocused) {
             fetchKPIDetails();
         }
     }, [isFocused]);
 
-    const chartConfig = {
-        backgroundGradientFrom: '#1E2923',
-        backgroundGradientFromOpacity: 0,
-        backgroundGradientTo: '#08130D',
-        backgroundGradientToOpacity: 0.5,
-        color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-        strokeWidth: 2,
-        barPercentage: 0.5,
-        useShadowColorFromDataset: false,
+
+    // const chartData = [
+    //     { name: 'Assigned', value: dashBoardDetails.assignedKpiData.length || 0, color: '#FF6384' },
+    //     { name: 'Urgent', value: dashBoardDetails.urgentKpiData.length || 0, color: '#d802db' },
+    //     { name: 'Important', value: dashBoardDetails.importantKpiData.length || 0, color: '#36A2EB' },
+    //     { name: 'Regular Task', value: dashBoardDetails.serviceKpiData.length || 0, color: '#FFCE56' },
+    //     { name: 'In Progress', value: dashBoardDetails.inProgressKpi.length || 0, color: '#4BB543' },
+    //     { name: 'Complete', value: dashBoardDetails.completedKpi.length || 0, color: '#4BC0C0' },
+    // ];
+
+
+    const randomColor = () => (
+        '#' + ((Math.random() * 0xffffff) << 0).toString(16) + '000000'
+    ).slice(0, 7);
+
+     // Define fixed colors for each KPI category
+     const colorMapping = {
+        'Assigned': '#d802db',
+        'Urgent': '#FFDE43',
+        'Important': '#36A2EB',
+        'Regular Task': '#4BB543',
+        'In Progress': '#FF6384',
+        'Complete': '#4BC0C0',
     };
 
-    const DotLegend = ({ color, label, value, onPress }) => (
-        <TouchableOpacity onPress={() => onPress(label)}  style={styles.itemContainer}>
-            <View style={[styles.legendDot, { backgroundColor: color }]} />
-            <Text style={styles.legendLabel}>{`${label}: ${value}`}</Text>
-        </TouchableOpacity>
-    );
+    const pieData = [
+        { name: 'Assigned', value: dashBoardDetails.assignedKpiData.length || 0 },
+        { name: 'Urgent', value: dashBoardDetails.urgentKpiData.length || 0 },
+        { name: 'Important', value: dashBoardDetails.importantKpiData.length || 0 },
+        { name: 'Regular Task', value: dashBoardDetails.serviceKpiData.length || 0 },
+        { name: 'In Progress', value: dashBoardDetails.inProgressKpi.length || 0 },
+        { name: 'Complete', value: dashBoardDetails.completedKpi.length || 0 },
+    ]
+        .map((item, index) => ({
+            name: item.name, // Name to be used in the legend
+            value: item.value,
+            svg: {
+                fill: colorMapping[item.name], // Use color mapping based on the name
+                onPress: () => navigation.navigate('KPIListingScreen', { kpiCategory: item.name }),
+            },
+            key: `pie-${index}`,
+        }));
 
-    const chartData = [
-        { name: 'Assigned', value: dashBoardDetails.assignedKpiData.length || 0, color: '#FF6384' },
-        { name: 'Urgent', value: dashBoardDetails.urgentKpiData.length || 0, color: '#d802db' },
-        { name: 'Important', value: dashBoardDetails.importantKpiData.length || 0, color: '#36A2EB' },
-        { name: 'Service', value: dashBoardDetails.serviceKpiData.length || 0, color: '#FFCE56' },
-        { name: 'In Progress', value: dashBoardDetails.inProgressKpi.length || 0, color: '#bddb02' },
-        { name: 'Completed', value: dashBoardDetails.completedKpi.length || 0, color: '#4BC0C0' },
-    ];
+    // const PieSection = ({ data, title }) => (
+    //     <View style={styles.chartContainer}>
+    //         <Text style={styles.title}>{title}</Text>
+    //         <View style={styles.divider} />
+    //         <View style={styles.chartLegendContainer}>
+    //             <PieChart
+    //                 data={data}
+    //                 width={screenWidth * 0.45}
+    //                 chartConfig={chartConfig}
+    //                 accessor={'value'}
+    //                 backgroundColor={'transparent'}
+    //                 center={[35, -10]}
+    //                 height={175.24}
+    //                 absolute
+    //                 hasLegend={false}
+    //                 onPress={(index) => handlePieChartPress(index)}
+    //             />
+    //             <View style={styles.legendContainer}>
+    //                 {data.map((item, index) => (
+    //                     <TouchableOpacity key={index} onPress={() => handlePieChartPress(index)} style={styles.itemContainer}>
+    //                         <View style={[styles.legendDot, { backgroundColor: item.color }]} />
+    //                         <Text style={styles.legendLabel}>{`${item.name}: ${item.value}`}</Text>
+    //                     </TouchableOpacity>
+    //                 ))}
+    //             </View>
+    //         </View>
+    //     </View>
+    // );
 
-    const PieSection = ({ data, title, count }) => (
+    const PieSection = ({ data, title }) => (
         <View style={styles.chartContainer}>
             <Text style={styles.title}>{title}</Text>
             <View style={styles.divider} />
             <View style={styles.chartLegendContainer}>
-                <PieChart
-                    data={data}
-                    width={screenWidth * 0.45} 
-                    chartConfig={chartConfig}
-                    accessor={'value'}
-                    backgroundColor={'transparent'}
-                    center={[35, -10]}  
-                    height={175.24}
-                    absolute
-                    hasLegend={false}
-                />
+                <View style={styles.chartWrapper}>
+                    <PieChart
+                        style={styles.pieChart}
+                        data={data}
+                        padAngle={0}
+                        
+                    />
+                </View>
                 <View style={styles.legendContainer}>
-                    {data.map((item, index) => (
-                        <DotLegend
-                            key={index}
-                            color={item.color}
-                            label={item.name}
-                            value={item.value}
-                            onPress={(category) => navigation.navigate('KPIListingScreen', { kpiCategory: category })}
-                        />
-                    ))}
+                {pieData.map((item, index) => (
+                <View key={index} style={styles.legendItem}>
+                    <View style={[styles.legendDot, { backgroundColor: item.svg.fill }]} />
+                        <Text style={styles.legendLabel}>{`${item.name}: ${item.value}`}</Text>
+                </View>
+    ))}
                 </View>
             </View>
         </View>
     );
-    
-    
 
     return (
         <SafeAreaView style={styles.container}>
             <NavigationHeader title="KPI Dashboard" onBackPress={() => navigation.goBack()} />
             <RoundedScrollContainer contentContainerStyle={styles.scrollViewContent}>
-                <PieSection data={chartData} title="Action Screens" count={chartData.length} />
+                <PieSection data={pieData} title="Action Screens" />
             </RoundedScrollContainer>
         </SafeAreaView>
     );
-}
+};
 
 const styles = StyleSheet.create({
     itemContainer: {
@@ -137,33 +166,45 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         padding: 15,
         ...Platform.select({
-          android: {
-            elevation: 4,
-          },
-          ios: {
-            shadowColor: 'black',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-          },
+            android: {
+                elevation: 4,
+            },
+            ios: {
+                shadowColor: 'black',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.2,
+            },
         }),
-      },
+    },
     container: {
         flex: 1,
         backgroundColor: COLORS.themeapp,
     },
     scrollViewContent: {
-        paddingVertical: 10, 
+        paddingVertical: 10,
     },
     chartContainer: {
         margin: 20,
         borderRadius: 10,
         padding: 10,
         backgroundColor: '#FFFFFF',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
     },
     chartLegendContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+    },
+    chartWrapper: {
+        flex: 1,
+    },
+    pieChart: {
+        height: 200,
+        width: '100%',
     },
     title: {
         fontSize: 16,
@@ -197,11 +238,13 @@ const styles = StyleSheet.create({
         height: 10,
         borderRadius: 5,
         marginRight: 10,
+        marginLeft: 10,
     },
     legendLabel: {
         fontSize: 14,
         color: 'black',
         flexShrink: 1,
+        text:FONT_FAMILY.urbanistExtraBold
     },
 });
 
