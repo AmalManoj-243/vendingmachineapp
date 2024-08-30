@@ -139,6 +139,7 @@ const KPIDashboardScreen = ({ navigation }) => {
                         <View key={index} style={styles.legendItem}>
                             <View style={[styles.legendDot, { backgroundColor: item.svg.fill }]} />
                             <Text style={styles.legendLabel}>{`${item.name}: ${item.value}`}</Text>
+                            {/* <Text style={styles.legendLabel}>{`${item.value}`}</Text> */}
                         </View>
                     ))}
                 </View>
@@ -209,7 +210,7 @@ const styles = StyleSheet.create({
         marginVertical: 8,
         backgroundColor: 'white',
         borderRadius: 8,
-        padding: 10,
+        padding: 15,
         ...Platform.select({
             android: {
                 elevation: 4,
