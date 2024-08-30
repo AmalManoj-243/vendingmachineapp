@@ -13,7 +13,7 @@ import { showToastMessage } from '@components/Toast';
 import { fetchServiceDetails } from '@api/details/detailApi';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { put } from '@api/services/utils';
+import { post } from '@api/services/utils';
 import { useAuthStore } from '@stores/auth';
 import { showToast } from '@utils/common';
 
@@ -22,15 +22,14 @@ const UpdateDetails = ({ route, navigation }) => {
   console.log("🚀 ~ file: UpdateDetail.js:22 ~ UpdateDetails ~ id:", id)
   const currentUser = useAuthStore((state) => state.user);
   const [details, setDetails] = useState({});
-
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sparePartsItems, setSparePartsItems] = useState([]);
   console.log("🚀 ~ file: UpdateDetail.js:25 ~ UpdateDetails ~ sparePartsItems:", JSON.stringify(sparePartsItems, null, 2))
 
   const addSpareParts = (addedItems) => {
-    setSparePartsItems(prevItems => [...prevItems, addedItems])
-  }
+    setSparePartsItems(prevItems => [...prevItems, addedItems]);
+  };
 
   const fetchDetails = async () => {
     setIsLoading(true);
@@ -55,40 +54,44 @@ const UpdateDetails = ({ route, navigation }) => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    console.log('hiiii')
+    console.log(hii);
+    
     const requestPayload = {
-      _id: id,
-      job_stage: 'Waiting for spare',
-      create_job_diagnosis: [
-        {
-          job_registration_id: id,
-          proposed_action_id: null,
-          proposed_action_name: null,
-          done_by_id: currentUser?.related_profile?._id || null,
-          // untaxed_total_amount: 12,
-          done_by_name: currentUser?.related_profile?.name || '',
-          parts_or_service_required: null,
-          service_type: null,
-          // service_charge: 100,
-          // total_amount: 112.6,
-          parts: sparePartsItems.map((items) => ({
-            product_id: items?.product.id,
-            product_name: items?.product.label,
-            description: items?.description,
-            uom_id: items?.uom?.id,
-            uom: items?.uom.label,
-            unit_price: items.unitPrice,
-            unit_cost: '',
-            tax_type_name: "vat 5%",
-            tax_type_id: "648d9b54ef9cd868dfbfa37b"
-          }))
-        }
-      ]
-
+      job_registration_id: id,
+      proposed_action_id: null,
+      proposed_action_name: null,
+      status: "waiting for parts",
+      created_by: null,
+      created_by_name: "",
+      assigned_to: "6650704c2e5cf73d84470013",
+      assigned_to_name: "Abhijith Danat",
+      warehouse_id: "66307fc0ceb8eb834bb25509",
+      warehouse_name: "Danat Hub",
+      sales_person_id: null,
+      sales_person_name: "",
+      done_by_id: currentUser?.related_profile?._id || null,
+      done_by_name: currentUser?.related_profile?.name || '',
+      parts_or_service_required: null,
+      service_type: null,
+      untaxed_total_amount: 12,  //
+      service_charge: 100,  //
+      total_amount: 112.6,  //
+      parts: sparePartsItems.map((items) => ({
+        product_id: items?.product.id,
+        product_name: items?.product.label,
+        description: items?.description,
+        uom_id: items?.uom?.id,
+        uom: items?.uom.label,
+        unit_price: items.unitPrice,
+        unit_cost: '',
+        tax_type_name: "vat 5%",
+        tax_type_id: "648d9b54ef9cd868dfbfa37b"
+      }))
     }
+
     console.log("🚀 ~ file: UpdateDetail.js:86 ~ handleSubmit ~ requestPayload:", JSON.stringify(requestPayload, null, 2))
     try {
-      const response = await put("/updateJobRegistration", requestPayload);
+      const response = await post("/createJobApproveQuote", requestPayload);
       console.log("🚀 ~ submit ~ response:", response);
       if (response.success === 'true') {
         showToast({
@@ -153,7 +156,7 @@ const UpdateDetails = ({ route, navigation }) => {
           keyExtractor={(item, index) => index.toString()}
         />
         <Button
-          title={'SAVE'}
+          title={'SUBMIT'}
           width={'50%'}
           alignSelf={'center'}
           backgroundColor={COLORS.primaryThemeColor}

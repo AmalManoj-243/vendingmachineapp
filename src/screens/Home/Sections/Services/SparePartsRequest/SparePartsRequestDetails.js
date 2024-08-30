@@ -7,14 +7,14 @@ import { RoundedScrollContainer } from '@components/containers';
 import { DetailField } from '@components/common/Detail';
 import { formatDateTime } from '@utils/common/date';
 import { showToastMessage } from '@components/Toast';
-import { fetchServiceDetails } from '@api/details/detailApi';
+import { fetchSparePartsDetails } from '@api/details/detailApi';
 import { OverlayLoader } from '@components/Loader';
 import { LoadingButton } from '@components/common/Button';
 import { COLORS } from '@constants/theme';
 import { post } from '@api/services/utils';
 import { ConfirmationModal } from '@components/Modal';
 
-const ServiceDetails = ({ navigation, route }) => {
+const SparePartsRequestDetails = ({ navigation, route }) => {
     const { id: serviceId } = route?.params || {};
     const [details, setDetails] = useState({});
     const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +27,7 @@ const ServiceDetails = ({ navigation, route }) => {
     const fetchDetails = async () => {
         setIsLoading(true);
         try {
-            const updatedDetails = await fetchServiceDetails(serviceId);
+            const updatedDetails = await fetchSparePartsDetails(serviceId);
             setDetails(updatedDetails[0] || {});
         } catch (error) {
             console.error('Error fetching service details:', error);
@@ -52,7 +52,7 @@ const ServiceDetails = ({ navigation, route }) => {
                 service_id: serviceId,
                 reason: closingReason,
             };
-            const response = await post('/updateJobRegistration', deleteJobData);
+            const response = await post('/deleteJobData', deleteJobData);  //
             if (response.success === "true") {
                 showToastMessage('Job successfully deleted!');
             } else {
@@ -75,7 +75,7 @@ const ServiceDetails = ({ navigation, route }) => {
             const issueJobData = {
                 service_id: serviceId,
             };
-            const response = await post('/createJobApproveQuote', issueJobData);
+            const response = await post('/issueJObDAta', issueJobData);  ///
             if (response.success === "true") {
                 navigation.navigate('SparePartsIssue', {
                     id: serviceId,
@@ -110,7 +110,7 @@ const ServiceDetails = ({ navigation, route }) => {
                 <DetailField label="Date" value={formatDateTime(details.date)} />
                 <DetailField label="Status" value={details?.status || '-'} />
                 <DetailField label="Assigned To" value={details?.assigned_to_name || '-'} />
-                <DetailField label="Created By" value={details?.created_by_name || '-'} />
+                <DetailField label="Created By" value={details?.assignee_name || '-'} />
                 <DetailField label="Job Registration No" value={details?.job_registration_id || '-'} />
 
                 <View style={{ flexDirection: 'row', marginVertical: 20 }}>
@@ -159,4 +159,4 @@ const ServiceDetails = ({ navigation, route }) => {
     );
 };
 
-export default ServiceDetails;
+export default SparePartsRequestDetails;

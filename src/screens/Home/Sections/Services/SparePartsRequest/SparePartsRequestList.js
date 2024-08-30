@@ -2,20 +2,21 @@ import React from 'react';
 import { View, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import Text from '@components/Text';
 import { FONT_FAMILY } from '@constants/theme';
-import { formatDate, formatDateTime } from '@utils/common/date';
+import { formatDate } from '@utils/common/date';
 
 const SparePartsRequestList = ({ item, onPress }) => {
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.itemContainer}>
       <View style={styles.leftColumn}>
         <Text style={styles.head}>{item?.sequence_no || '-'}</Text>
+        <Text style={styles.content}>{item?.created_by_name || '-'}</Text>
       </View>
       <View style={styles.rightColumn}>
         <Text style={[styles.contentRight]}>{formatDate(item?.date_time, 'dd MMM yyyy') || '-'}</Text>
       </View>
       <View style={styles.rightColumn}>
-        <Text style={styles.content}>{item?.assignee_name?.trim() || '-'}</Text>
-        <Text style={[styles.contentRight, { color: 'red' }]}>{item?.job_stage || '-'}</Text>
+        <Text style={styles.content}>{item?.assigned_to_name || '-'}</Text>
+        <Text style={[styles.contentRight, { color: 'red' }]}>{item?.status || '-'}</Text>
       </View>
     </TouchableOpacity>
   );
