@@ -8,7 +8,6 @@ import { Button } from '@components/common/Button';
 import { COLORS } from '@constants/theme';
 import { Keyboard } from 'react-native';
 import { validateFields } from '@utils/validation';
-import { put } from '@api/services/utils';
 
 const AddSpareParts = ({ navigation, route }) => {
     const { id, addSpareParts } = route?.params || {};
@@ -162,42 +161,10 @@ const AddSpareParts = ({ navigation, route }) => {
                 tax: formData.tax || '',
                 serviceCharge: formData.serviceCharge || '',
                 subTotal: formData.subTotal || '',
-                totalAmount: formData.totalAmount || '',
+                // totalAmount: formData.totalAmount || '',
             };
-
-            console.log("Spare Item:", spareItem);
-
-            try {
-                const response = await put("/updateJobRegistration", {
-                    _id: id,
-                    job_stage: "Approved",
-                    create_job_diagnosis: [
-                        {
-                            job_registration_id: id,
-                            product_id: spareItem.product.id,
-                            quantity: spareItem.quantity,
-                            uom_id: spareItem.uom.id,
-                            unit_price: spareItem.unitPrice,
-                            tax_type_id: "VAT 5%", 
-                            done_by_id: "656d819777cc3ec2ab51a4c0", 
-                            done_by_name: "ABHIJITH DANAT", 
-                            parts_or_service_required: null,
-                            service_type: null,
-                            service_charge: spareItem.serviceCharge,
-                            total_amount: spareItem.totalAmount
-                        }
-                    ]
-                });
-
-                if (response.success === 'true') {
-                    addSpareParts(spareItem);
-                    navigation.navigate('UpdateDetail', { updatedItem: spareItem, id });
-                } else {
-                    console.error("Failed to update job registration:", response.message);
-                }
-            } catch (error) {
-                console.error("Error updating job registration:", error);
-            }
+            addSpareParts(spareItem)
+            navigation.navigate('UpdateDetail', {id})
         }
     };
 
@@ -288,27 +255,6 @@ const AddSpareParts = ({ navigation, route }) => {
                     keyboardType="numeric"
                     value={formData.tax}
                     onChangeText={(value) => handleFieldChange('tax', value)}
-                />
-                <FormInput
-                    label="Service Charge"
-                    placeholder="Enter Service Charge"
-                    keyboardType="numeric"
-                    value={formData.serviceCharge}
-                    onChangeText={(value) => handleFieldChange('serviceCharge', value)}
-                />
-                <FormInput
-                    label="Sub Total"
-                    placeholder="Sub Total"
-                    editable={false}
-                    keyboardType="numeric"
-                    value={formData.subTotal}
-                />
-                <FormInput
-                    label="Total Amount"
-                    placeholder="Total Amount"
-                    editable={false}
-                    keyboardType="numeric"
-                    value={formData.totalAmount}
                 />
                 <Button
                     title={'SAVE'}

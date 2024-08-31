@@ -110,7 +110,7 @@ const ServiceDetails = ({ navigation, route }) => {
     return (
         <SafeAreaView>
             <NavigationHeader
-                title="Service Details"
+                title={details?.sequence_no || 'Service Details'}
                 onBackPress={() => navigation.goBack()}
                 logo={false}
                 iconTwoName="plus"

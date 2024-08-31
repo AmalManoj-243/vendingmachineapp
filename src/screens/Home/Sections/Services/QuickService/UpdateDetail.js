@@ -13,19 +13,23 @@ import { showToastMessage } from '@components/Toast';
 import { fetchServiceDetails } from '@api/details/detailApi';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { post } from '@api/services/utils';
+import { post, put } from '@api/services/utils';
 import { useAuthStore } from '@stores/auth';
 import { showToast } from '@utils/common';
+import { TextInput as FormInput } from '@components/common/TextInput';
+
 
 const UpdateDetails = ({ route, navigation }) => {
   const { id } = route.params || {};
-  console.log("🚀 ~ file: UpdateDetail.js:22 ~ UpdateDetails ~ id:", id)
   const currentUser = useAuthStore((state) => state.user);
   const [details, setDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sparePartsItems, setSparePartsItems] = useState([]);
-  console.log("🚀 ~ file: UpdateDetail.js:25 ~ UpdateDetails ~ sparePartsItems:", JSON.stringify(sparePartsItems, null, 2))
+  const [formData, setFormData] = useState({
+    subTotal: null,
+    serviceCharge: null,
+  })
 
   const addSpareParts = (addedItems) => {
     setSparePartsItems(prevItems => [...prevItems, addedItems]);
@@ -52,48 +56,97 @@ const UpdateDetails = ({ route, navigation }) => {
     }, [id])
   );
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    console.log(hii);
-    
+  const handleJobApproveQuate = async (approveJobs) => {
     const requestPayload = {
       job_registration_id: id,
-      proposed_action_id: null,
-      proposed_action_name: null,
-      status: "waiting for parts",
-      created_by: null,
-      created_by_name: "",
-      assigned_to: "6650704c2e5cf73d84470013",
-      assigned_to_name: "Abhijith Danat",
-      warehouse_id: "66307fc0ceb8eb834bb25509",
-      warehouse_name: "Danat Hub",
-      sales_person_id: null,
-      sales_person_name: "",
-      done_by_id: currentUser?.related_profile?._id || null,
-      done_by_name: currentUser?.related_profile?.name || '',
-      parts_or_service_required: null,
-      service_type: null,
-      untaxed_total_amount: 12,  //
-      service_charge: 100,  //
-      total_amount: 112.6,  //
-      parts: sparePartsItems.map((items) => ({
-        product_id: items?.product.id,
-        product_name: items?.product.label,
-        description: items?.description,
-        uom_id: items?.uom?.id,
-        uom: items?.uom.label,
-        unit_price: items.unitPrice,
-        unit_cost: '',
-        tax_type_name: "vat 5%",
-        tax_type_id: "648d9b54ef9cd868dfbfa37b"
-      }))
+      date: new Date(),
+      status: 'waiting for parts',
+      created_by: currentUser?.related_profile?._id,
+      created_by_name: currentUser?.related_profile?.name ?? '',
+      assigned_to: details?.assignee_id ?? '',
+      assigned_to_name: details?.assignee_name ?? null,
+      warehouse_id: currentUser?.warehouse?.warehouse_id,
+      warehouse_name: currentUser?.warehouse?.warehouse_name,
+      job_diagnosis_ids: [{
+        job_diagnosis_id: approveJobs.job_diagnosis_parts_result?.[0]?.job_diagnosis_id,
+        job_diagnosis_parts: approveJobs.job_diagnosis_parts_result
+      }],
+      sales_person_id: currentUser?.related_profile?._id,
+      sales_person_name: currentUser?.related_profile?.name,
     }
-
-    console.log("🚀 ~ file: UpdateDetail.js:86 ~ handleSubmit ~ requestPayload:", JSON.stringify(requestPayload, null, 2))
+    console.log("🚀 ~ file: UpdateDetail.js:78 ~ handleJobApproveQuate ~ requestPayload:", JSON.stringify(requestPayload, null, 2))
     try {
       const response = await post("/createJobApproveQuote", requestPayload);
-      console.log("🚀 ~ submit ~ response:", response);
+      console.log("🚀 ~ submit ~ response:", JSON.stringify(response, null, 2));
       if (response.success === 'true') {
+        showToast({
+          type: "success",
+          title: "Success",
+          message: response.message,
+        });
+        navigation.navigate("QuickServiceScreen");
+      } else {
+        showToast({
+          type: "error",
+          title: "ERROR",
+          message: response.message,
+        });
+      }
+    } catch (error) {
+      console.error("Error job approvilng is failed:", error);
+      showToast({
+        type: "error",
+        title: "ERROR",
+        message: "An unexpected error occurred. Please try again later.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+
+  }
+
+  // sub total = unitprice * quantity 
+  // spareitems.map(items => items.unitprice items.quant)
+  // sub total + service charge + tax 0.05 = total amount
+
+
+  const handleSubmit = async () => {
+
+    setIsSubmitting(true);
+    const requestPayload = {
+      _id: id,
+      job_stage: 'Waiting for spare',
+      create_job_diagnosis: [
+        {
+          job_registration_id: id,
+          proposed_action_id: null,
+          proposed_action_name: null,
+          done_by_id: currentUser?.related_profile?._id || null,
+          untaxed_total_amount: 120,
+          done_by_name: currentUser?.related_profile?.name || '',
+          parts_or_service_required: null,
+          service_type: null,
+          service_charge: parseInt(formData.serviceCharge, 0),
+          total_amount: 100,
+          parts: sparePartsItems.map((items) => ({
+            product_id: items?.product.id,
+            product_name: items?.product.label,
+            description: items?.description,
+            quantity: items?.quantity,
+            uom_id: items?.uom?.id,
+            uom: items?.uom.label,
+            unit_price: items.unitPrice,
+            unit_cost: '',
+            tax_type_name: "vat 5%",
+            tax_type_id: "648d9b54ef9cd868dfbfa37b"
+          }))
+        }
+      ]
+    }
+    try {
+      const response = await put("/updateJobRegistration", requestPayload);
+      if (response.success === 'true') {
+        handleJobApproveQuate(response);
         showToast({
           type: "success",
           title: "Success",
@@ -142,6 +195,13 @@ const UpdateDetails = ({ route, navigation }) => {
         <DetailField label="Brand Name" value={details?.brand_name || '-'} />
         <DetailField label="Device Name" value={details?.device_name || '-'} />
         <DetailField label="Consumer Model" value={details?.consumer_model_name || '-'} />
+        <FormInput
+          label="Service Charge"
+          placeholder="Enter Service Charge"
+          keyboardType="numeric"
+          value={formData.serviceCharge}
+          onChangeText={(value) => setFormData({ ...formData, serviceCharge: value })}
+        />
         <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: 10 }}>
           <Text style={styles.label}>Add an Item</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('AddSpareParts', { id, addSpareParts })}>
