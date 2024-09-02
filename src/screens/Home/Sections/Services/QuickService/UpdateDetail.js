@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { StyleSheet, FlatList, View, Text, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from '@components/containers';
@@ -18,15 +18,15 @@ import { useAuthStore } from '@stores/auth';
 import { showToast } from '@utils/common';
 import { TextInput as FormInput } from '@components/common/TextInput';
 
-
 const UpdateDetails = ({ route, navigation }) => {
   const { id } = route.params || {};
   const currentUser = useAuthStore((state) => state.user);
   const [details, setDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSaving, setIsSaving] = useState(false); 
   const [sparePartsItems, setSparePartsItems] = useState([]);
+  const [subTotal, setSubTotal] = useState(0);
+  const [total, setTotal] = useState(0);
   const [formData, setFormData] = useState({
     subTotal: null,
     serviceCharge: null,
@@ -35,6 +35,21 @@ const UpdateDetails = ({ route, navigation }) => {
   const addSpareParts = (addedItems) => {
     setSparePartsItems(prevItems => [...prevItems, addedItems]);
   };
+
+  const calculateTotals = () => {
+    let calculatedSubTotal = sparePartsItems.reduce(
+      (sum, item) => sum + item.unitPrice * item.quantity,
+      0
+    );
+    setSubTotal(calculatedSubTotal);
+
+    let calculatedTotal = calculatedSubTotal + parseFloat(formData.serviceCharge || 0);
+    setTotal(calculatedTotal);
+  };
+
+  useEffect(() => {
+    calculateTotals();
+  }, [sparePartsItems, formData.serviceCharge]);
 
   const fetchDetails = async () => {
     setIsLoading(true);
@@ -106,13 +121,7 @@ const UpdateDetails = ({ route, navigation }) => {
 
   }
 
-  // sub total = unitprice * quantity 
-  // spareitems.map(items => items.unitprice items.quant)
-  // sub total + service charge + tax 0.05 = total amount
-
-
   const handleSubmit = async () => {
-
     setIsSubmitting(true);
     const requestPayload = {
       _id: id,
@@ -177,7 +186,7 @@ const UpdateDetails = ({ route, navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <NavigationHeader
-        title="Update Details"
+        title="Update Service Details"
         onBackPress={() => navigation.goBack()}
       />
       <RoundedScrollContainer>
@@ -216,6 +225,18 @@ const UpdateDetails = ({ route, navigation }) => {
           )}
           keyExtractor={(item, index) => index.toString()}
         />
+        <View style={styles.totalSection}>
+          <Text style={styles.totalLabel}>Subtotal: </Text>
+          <Text style={styles.totalValue}>{subTotal.toFixed(2)}</Text>
+        </View>
+        <View style={styles.totalSection}>
+          <Text style={styles.totalLabel}>Service Charge: </Text>
+          <Text style={styles.totalValue}>{formData.serviceCharge}</Text>
+        </View>
+        <View style={styles.totalSection}>
+          <Text style={styles.totalLabel}>Total: </Text>
+          <Text style={styles.totalValue}>{total.toFixed(2)}</Text>
+        </View>
         <Button
           title={'SUBMIT'}
           width={'50%'}
@@ -236,6 +257,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.primaryThemeColor,
     fontFamily: FONT_FAMILY.urbanistSemiBold,
+  },
+  totalSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 5,  //padding: 10, 
+    margin: 10,
+  },
+  totalLabel: {
+    fontSize: 17,
+    fontFamily: FONT_FAMILY.urbanistBold,
+  },
+  totalValue: {
+    fontSize: 14,
+    fontFamily: FONT_FAMILY.urbanistBold,
+    color: '#666666',
   },
 });
 
