@@ -8,6 +8,7 @@ import { Button } from '@components/common/Button';
 import { COLORS } from '@constants/theme';
 import { Keyboard } from 'react-native';
 import { validateFields } from '@utils/validation';
+import { CheckBox } from '@components/common/CheckBox';
 
 const AddSpareParts = ({ navigation, route }) => {
     const { id, addSpareParts } = route?.params || {};
@@ -27,9 +28,9 @@ const AddSpareParts = ({ navigation, route }) => {
         uom: '',
         unitPrice: '',
         serviceCharge: '100', // Initial service charge value
+        isInclusive: false,
         tax: 'VAT 5%',
         subTotal: '',
-        totalAmount: '',
     });
 
     const [errors, setErrors] = useState({});
@@ -38,28 +39,22 @@ const AddSpareParts = ({ navigation, route }) => {
         return unitPrice && quantity ? (parseFloat(unitPrice) * parseFloat(quantity)).toFixed(2) : '';
     };
 
-    const calculateTotalAmount = (subTotal, serviceCharge) => {
-        return subTotal && serviceCharge ? (parseFloat(subTotal) + parseFloat(serviceCharge)).toFixed(2) : '';
+    const calculateTotalAmount = (subTotal, serviceCharge, isInclusive) => {
+        if (isInclusive) {
+            return subTotal ? subTotal : '';
+        } else {
+            return subTotal && serviceCharge ? (parseFloat(subTotal) + parseFloat(serviceCharge)).toFixed(2) : '';
+        }
     };
 
     const handleFieldChange = (field, value) => {
-        setFormData((prevFormData) => ({
+        setFormData(prevFormData => ({
             ...prevFormData,
             [field]: value,
         }));
 
-        if (field === 'serviceCharge' || field === 'quantity') {
-            const calculatedSubTotal = calculateSubTotal(formData.unitPrice, field === 'quantity' ? value : formData.quantity);
-            const totalAmount = calculateTotalAmount(calculatedSubTotal, field === 'serviceCharge' ? value : formData.serviceCharge);
-            setFormData((prevFormData) => ({
-                ...prevFormData,
-                subTotal: calculatedSubTotal,
-                totalAmount: totalAmount,
-            }));
-        }
-
         if (errors[field]) {
-            setErrors((prevErrors) => ({
+            setErrors(prevErrors => ({
                 ...prevErrors,
                 [field]: null,
             }));
@@ -71,7 +66,6 @@ const AddSpareParts = ({ navigation, route }) => {
         const description = selectedProduct.productDescription || '';
         const defaultQuantity = '1';
         const calculatedSubTotal = calculateSubTotal(unitPrice, defaultQuantity);
-        const totalAmount = calculateTotalAmount(calculatedSubTotal, formData.serviceCharge);
 
         setFormData(prevFormData => ({
             ...prevFormData,
@@ -80,21 +74,11 @@ const AddSpareParts = ({ navigation, route }) => {
             unitPrice,
             quantity: defaultQuantity,
             subTotal: calculatedSubTotal,
-            totalAmount: totalAmount,
         }));
     };
 
     const handleQuantityChange = (value) => {
-        const unitPrice = formData.unitPrice;
-        const calculatedSubTotal = calculateSubTotal(unitPrice, value);
-        const totalAmount = calculateTotalAmount(calculatedSubTotal, formData.serviceCharge);
-
-        setFormData(prevFormData => ({
-            ...prevFormData,
-            quantity: value,
-            subTotal: calculatedSubTotal,
-            totalAmount: totalAmount,
-        }));
+        handleFieldChange('quantity', value);
     };
 
     useEffect(() => {
@@ -161,10 +145,9 @@ const AddSpareParts = ({ navigation, route }) => {
                 tax: formData.tax || '',
                 serviceCharge: formData.serviceCharge || '',
                 subTotal: formData.subTotal || '',
-                // totalAmount: formData.totalAmount || '',
             };
-            addSpareParts(spareItem)
-            navigation.navigate('UpdateDetail', {id})
+            addSpareParts(spareItem);
+            navigation.navigate('UpdateDetail', { id });
         }
     };
 
@@ -247,6 +230,11 @@ const AddSpareParts = ({ navigation, route }) => {
                     keyboardType="numeric"
                     value={formData.unitPrice}
                 />
+                <CheckBox
+                    checked={formData.isInclusive}
+                    onPress={() => handleFieldChange('isInclusive', !formData.isInclusive)}
+                    label="Set Inclusive"
+                />
                 <FormInput
                     label="Taxes"
                     placeholder="Enter Tax"
@@ -255,6 +243,11 @@ const AddSpareParts = ({ navigation, route }) => {
                     keyboardType="numeric"
                     value={formData.tax}
                     onChangeText={(value) => handleFieldChange('tax', value)}
+                />
+                <FormInput
+                    label="Subtotal"
+                    editable={false}
+                    value={formData.subTotal}
                 />
                 <Button
                     title={'SAVE'}

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { StyleSheet, FlatList, View, Text, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from '@components/containers';
@@ -18,7 +18,6 @@ import { useAuthStore } from '@stores/auth';
 import { showToast } from '@utils/common';
 import { TextInput as FormInput } from '@components/common/TextInput';
 
-
 const UpdateDetails = ({ route, navigation }) => {
   const { id } = route.params || {};
   const currentUser = useAuthStore((state) => state.user);
@@ -26,20 +25,71 @@ const UpdateDetails = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sparePartsItems, setSparePartsItems] = useState([]);
+  const [subTotal, setSubTotal] = useState(0);
+  const [total, setTotal] = useState(0);
   const [formData, setFormData] = useState({
     subTotal: null,
     serviceCharge: null,
   })
 
   const addSpareParts = (addedItems) => {
-    setSparePartsItems(prevItems => [...prevItems, addedItems]);
+    const structureSpareItems = {
+      product_id: addedItems?.product.id,
+      product_name: addedItems?.product.label,
+      description: addedItems?.description,
+      quantity: addedItems?.quantity,
+      uom_id: addedItems?.uom?.id,
+      uom: addedItems?.uom.label,
+      unit_price: addedItems.unitPrice,
+      unit_cost: null,
+      tax_type_id: addedItems?.tax?.id,
+      tax_type_name: addedItems?.tax.label,
+    }
+    setSparePartsItems(prevItems => [...prevItems, structureSpareItems]);
   };
+
+
+  //check the quanity sting or not ** important
+  const calculateTotals = () => {
+    let calculatedSubTotal = sparePartsItems.reduce(
+      (sum, item) => sum + item.unit_price * item.quantity,
+      0
+    );
+    setSubTotal(calculatedSubTotal);
+
+    let calculatedTotal = calculatedSubTotal + parseFloat(formData.serviceCharge || 0);
+    setTotal(calculatedTotal);
+  };
+
+  useEffect(() => {
+    calculateTotals();
+  }, [sparePartsItems, formData.serviceCharge]);
+  
 
   const fetchDetails = async () => {
     setIsLoading(true);
     try {
-      const updatedDetails = await fetchServiceDetails(id);
-      setDetails(updatedDetails[0] || {});
+      const [updatedDetails] = await fetchServiceDetails(id);
+      setDetails(updatedDetails || {});
+      const jobIds = updatedDetails?.job_diagnoses?.map(extractJobIds => extractJobIds?._id)
+      const extractJobProducts = updatedDetails?.job_diagnoses?.job_diagnosis_parts?.map((extractProducts) => ({
+        // _id: extractProducts._id,
+        // product_id: extractProducts?.product_id,
+        // product_name: extractProducts?.product_name,
+        // description: extractProducts?.description,
+        // quantity: extractProducts?.quantity,
+        // unit_price: extractProducts?.unit_price,
+        // unit_cost: null,
+        // tax_type_id: extractProducts?.tax_type_id,
+        // tax_type_name: extractProducts?.tax_type_name,
+        // job_diagnosis_id: extractProducts?.job_diagnosis_id,
+        // status: 'Requested',
+      }))
+      // console.log("🚀 ~ file: UpdateDetail.js:76 ~ extractJobProducts ~ extractJobProducts:", JSON.stringify(extractJobProducts, null, 3))
+    //  setSparePartsItems(prevItems => ({
+    //   ...prevItems,
+    //   extractJobProducts
+    //  }))
     } catch (error) {
       console.error('Error fetching service details:', error);
       showToastMessage('Failed to fetch service details. Please try again.');
@@ -105,13 +155,7 @@ const UpdateDetails = ({ route, navigation }) => {
 
   }
 
-  // sub total = unitprice * quantity 
-  // spareitems.map(items => items.unitprice items.quant)
-  // sub total + service charge + tax 0.05 = total amount
-
-
   const handleSubmit = async () => {
-
     setIsSubmitting(true);
     const requestPayload = {
       _id: id,
@@ -137,8 +181,8 @@ const UpdateDetails = ({ route, navigation }) => {
             uom: items?.uom.label,
             unit_price: items.unitPrice,
             unit_cost: '',
-            tax_type_name: "vat 5%",
-            tax_type_id: "648d9b54ef9cd868dfbfa37b"
+            tax_type_id: items?.tax?.id,
+            tax_type_name: items?.tax.label,
           }))
         }
       ]
@@ -176,7 +220,7 @@ const UpdateDetails = ({ route, navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <NavigationHeader
-        title="Update Details"
+        title="Update Service Details"
         onBackPress={() => navigation.goBack()}
       />
       <RoundedScrollContainer>
@@ -215,6 +259,18 @@ const UpdateDetails = ({ route, navigation }) => {
           )}
           keyExtractor={(item, index) => index.toString()}
         />
+        <View style={styles.totalSection}>
+          <Text style={styles.totalLabel}>Subtotal: </Text>
+          <Text style={styles.totalValue}>{subTotal.toFixed(2)}</Text>
+        </View>
+        <View style={styles.totalSection}>
+          <Text style={styles.totalLabel}>Service Charge: </Text>
+          <Text style={styles.totalValue}>{formData.serviceCharge}</Text>
+        </View>
+        <View style={styles.totalSection}>
+          <Text style={styles.totalLabel}>Total: </Text>
+          <Text style={styles.totalValue}>{total.toFixed(2)}</Text>
+        </View>
         <Button
           title={'SUBMIT'}
           width={'50%'}
@@ -224,7 +280,7 @@ const UpdateDetails = ({ route, navigation }) => {
         />
 
       </RoundedScrollContainer>
-      {isLoading && <OverlayLoader />}
+      <OverlayLoader visible={isLoading || isSubmitting} />
     </SafeAreaView>
   );
 };
@@ -235,6 +291,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.primaryThemeColor,
     fontFamily: FONT_FAMILY.urbanistSemiBold,
+  },
+  totalSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 5,  //padding: 10, 
+    margin: 10,
+  },
+  totalLabel: {
+    fontSize: 16,
+    fontFamily: FONT_FAMILY.urbanistBold,
+  },
+  totalValue: {
+    fontSize: 14,
+    fontFamily: FONT_FAMILY.urbanistBold,
+    color: '#666666',
   },
 });
 

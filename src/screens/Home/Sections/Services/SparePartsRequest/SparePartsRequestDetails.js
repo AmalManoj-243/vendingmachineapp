@@ -103,7 +103,7 @@ const SparePartsRequestDetails = ({ navigation, route }) => {
     return (
         <SafeAreaView>
             <NavigationHeader
-                title="Service Details"  // sequence no as title
+                title="Service Details"
                 onBackPress={() => navigation.goBack()}
             />
             <RoundedScrollContainer>
