@@ -103,7 +103,7 @@ const SparePartsRequestDetails = ({ navigation, route }) => {
     return (
         <SafeAreaView>
             <NavigationHeader
-                title="Service Details"
+                title={details?.sequence_no || 'Spare Request Details'}
                 onBackPress={() => navigation.goBack()}
             />
             <RoundedScrollContainer>
@@ -111,7 +111,7 @@ const SparePartsRequestDetails = ({ navigation, route }) => {
                 <DetailField label="Status" value={details?.status || '-'} />
                 <DetailField label="Assigned To" value={details?.assigned_to_name || '-'} />
                 <DetailField label="Created By" value={details?.assignee_name || '-'} />
-                <DetailField label="Job Registration No" value={details?.job_registration_id || '-'} />
+                <DetailField label="Job Registration No" value={details?.sequence_no || '-'} />
 
                 <View style={{ flexDirection: 'row', marginVertical: 20 }}>
                     <LoadingButton

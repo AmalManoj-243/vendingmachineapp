@@ -31,7 +31,6 @@ const UpdateDetails = ({ route, navigation }) => {
   const [formData, setFormData] = useState({
     subTotal: null,
     serviceCharge: 100,
-    total: null,
   })
 
   const addSpareParts = (addedItems) => {
@@ -48,21 +47,18 @@ const UpdateDetails = ({ route, navigation }) => {
       tax_type_name: addedItems?.tax?.label,
     }
     setSparePartsItems(prevItems => [...prevItems, structureSpareItems]);
-    console.log(structureSpareItems, "Success")
   };
 
+  //check the quanity sting or not ** important
   const calculateTotals = () => {
-    // // here we want to display the addspareParts total amount + service charge
-    let calculatedSparePartsTotal = sparePartsItems.reduce(
-    (sum, item) => sum + item.unit_price * item.quantity,0);
-
-    const serviceCharge = parseFloat(formData.serviceCharge) || 0;
-    const calculatedSubTotal = calculatedSparePartsTotal + serviceCharge;
+    let calculatedSubTotal = sparePartsItems.reduce(
+      (sum, item) => sum + item.unit_price * item.quantity,
+      0
+    );
     setSubTotal(calculatedSubTotal);
 
-    const tax = serviceCharge * 0.05;
-    const total = calculatedSubTotal + tax;
-    setTotal(total);
+    let calculatedTotal = calculatedSubTotal + parseFloat(formData.serviceCharge || 0);
+    setTotal(calculatedTotal);
   };
 
   useEffect(() => {
@@ -76,11 +72,11 @@ const UpdateDetails = ({ route, navigation }) => {
       setDetails(updatedDetails || {});
       const jobDiagnosisParts = updatedDetails?.job_diagnoses?.flatMap(diagnosis =>
         diagnosis.job_diagnosis_parts?.map(part => {
+          // Destructure the part object to exclude spare_parts_line_lists and product_lists
           const { spare_parts_line_lists, product_lists, ...cleanPart } = part;
           return cleanPart;
         }) || []
       ) || [];
-
       setSparePartsItems(prevItems => {
         const existingPartIds = new Set(prevItems.map(item => item._id));
         const newItems = jobDiagnosisParts.filter(item => !existingPartIds.has(item._id));
@@ -180,6 +176,7 @@ const UpdateDetails = ({ route, navigation }) => {
             tax_type_id: items?.tax_type_id,
             tax_type_name: items?.tax_type_name,
           }))
+          // parts: sparePartsItems
         }
       ]
     }
@@ -261,7 +258,7 @@ const UpdateDetails = ({ route, navigation }) => {
         </View>
           <View style={styles.totalSection}>
             <Text style={styles.totalLabel}>Tax : </Text>
-            <Text style={styles.totalValue}>{(parseFloat(formData.serviceCharge) * 0.05).toFixed(2)}</Text>
+            <Text style={styles.totalValue}>{formData.serviceCharge}</Text>
           </View>
           <View style={styles.totalSection}>
             <Text style={styles.totalLabel}>Total : </Text>
@@ -292,16 +289,16 @@ const styles = StyleSheet.create({
   },
   totalSection: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     marginVertical: 5,
     margin: 10,
-    alignSelf: "center",
   },
   totalLabel: {
     fontSize: 16,
     fontFamily: FONT_FAMILY.urbanistBold,
   },
   totalValue: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: FONT_FAMILY.urbanistBold,
     color: '#666666',
   },
