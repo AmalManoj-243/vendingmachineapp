@@ -18,14 +18,13 @@
    3.2 [Component Index](#32-component-index) 
 
 4. [Store Documentation](#4-store-documentation)  
-   4.1 [auth](#41-auth)
-   4.2 [box](#42-box)
-   4.3 [currency](#43-currency)
-   4.4 [product](#43-product)
+   4.1 [auth](#41-auth)  
+   4.2 [box](#42-box)  
+   4.3 [currency](#43-currency)  
+   4.4 [product](#44-product)  
 
-5. [API Documentation](#5-api-documentation)
-    5.1 [Folder Structure](#51-folder-structure)
-
+5. [API Documentation](#5-api-documentation)  
+   5.1 [Folder Structure & Explanation](#51-folder-structure)  
    
 ## 1. Introduction
 

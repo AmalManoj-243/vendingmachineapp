@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import useLoader from './useLoader';
-import debounce from 'lodash/debounce';
 
 const useDataFetching = (fetchDataCallback) => {
   const [data, setData] = useState([]);
@@ -41,11 +40,7 @@ const useDataFetching = (fetchDataCallback) => {
     }
   };
 
-  const handleSearchTextChange = debounce((text) => {
-    fetchData(text);
-  }, 1000);
-
-  return { data, loading, fetchData, fetchMoreData, handleSearchTextChange };
+  return { data, loading, fetchData, fetchMoreData };
 };
 
 export default useDataFetching;
