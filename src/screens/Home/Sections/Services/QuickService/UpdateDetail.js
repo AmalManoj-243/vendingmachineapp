@@ -179,11 +179,11 @@ const UpdateDetails = ({ route, navigation }) => {
           proposed_action_name: null,
           done_by_id: currentUser?.related_profile?._id || null, 
           done_by_name: currentUser?.related_profile?.name || '',
-          untaxed_total_amount: parseInt(formData.spareTotalPrice, 0),  // NAN
+          untaxed_total_amount: parseInt(formData.spareTotalPrice, 0),
           parts_or_service_required: null,
           service_type: null,
           service_charge: parseInt(formData.serviceCharge, 0),
-          total_amount: parseInt(formData.total, 0),    // // NAN
+          total_amount: parseInt(formData.total, 0),
           parts: sparePartsItems.map((items) => ({
             product_id: items?.product_id,
             product_name: items?.product_name,

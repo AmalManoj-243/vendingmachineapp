@@ -12,6 +12,7 @@ import { OverlayLoader } from '@components/Loader';
 import { LoadingButton } from '@components/common/Button';
 import { COLORS } from '@constants/theme';
 import { post } from '@api/services/utils';
+import { useAuthStore } from '@stores/auth';
 import { Checkbox } from 'react-native-paper';
 import { FONT_FAMILY } from '@constants/theme';
 
@@ -20,6 +21,7 @@ const SparePartsIssueCreation = ({ navigation, route }) => {
     const [details, setDetails] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const currentUser = useAuthStore((state) => state.user);
     const [sparePartsItems, setSparePartsItems] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
 
@@ -49,21 +51,20 @@ const SparePartsIssueCreation = ({ navigation, route }) => {
         const isSelected = selectedItems.includes(item._id);
         return (
             <TouchableOpacity onPress={() => handleSelectItem(item)} activeOpacity={0.8} style={styles.itemContainer}>
+            <View style={styles.leftColumn}>
+                <Text style={styles.head}>{item?.name?.trim() || '-'}</Text>
+                <Text style={styles.contentRight}>{item?.quantity}</Text>
+                <Text style={styles.content}>{item?.uom || '-'}</Text>
+            </View>
+            <View style={styles.rightColumn}>
                 <Checkbox
                     status={isSelected ? 'checked' : 'unchecked'}
                     onPress={() => handleSelectItem(item)}
                     color={COLORS.primaryThemeColor}
+                    style={styles.checkbox}
                 />
-                <View style={styles.leftColumn}>
-                    <Text style={styles.head}>{item?.name?.trim() || '-'}</Text>
-                    <View style={styles.rightColumn}>
-                        <Text style={[styles.contentRight]}>{item?.quantity}</Text>
-                    </View>
-                </View>
-                <View style={styles.rightColumn}>
-                    <Text style={styles.content}>{item?.uom || '-'}</Text>
-                </View>
-            </TouchableOpacity>
+            </View>
+        </TouchableOpacity>
         );
     };
 
@@ -76,30 +77,38 @@ const SparePartsIssueCreation = ({ navigation, route }) => {
     );
 
     const handleSubmit = async () => {
+        if (selectedItems.length === 0) {
+            showToastMessage('Please select Spare Parts before submitting.');
+            return;
+        }
+
         setIsSubmitting(true);
         try {
             const issueSpareData = {
-                date: details.date,
-                created_by: details.created_by,
-                assigned_to: details.assigned_to,
-                status: "",
+                date: new Date(),
+                created_by: currentUser?.related_profile?._id,   
+                assigned_to: currentUser?.related_profile?._id,
                 assigned_to_name: details.assigned_to_name,
-                warehouse_id: details.warehouse_id,
+                status: "Closed",
+                warehouse_id: details.warehouse_id, 
                 warehouse_name: details.warehouse_name,
-                job_registration_id: details.job_registration_id,
-                issue_type: "",
-                spare_parts_request_id: "",
-                job_diagnosis_parts_ids: "",
-                spare_parts_line_id: spareId,
-                selected_spare_parts: selectedItems,
+                job_registration_id: details._id,
+                issue_type: "job_registration",
+                spare_parts_request_id: details.raw_material_line_ids[0]?.spare_parts_request_id,
+                job_diagnosis_parts_ids: details.spare_parts_line.map(item => item?.job_diagnosis_parts_id),
+                spare_parts_line_id: details.spare_parts_line.map(item => item?._id),
             };
-
+    
+            console.log("🚀 ~ issueSpareData:", issueSpareData);
+    
             const response = await post('/createSparePartsIssue', issueSpareData);
             console.log("🚀 ~ handleSubmit ~ response:", response);
+    
             if (response.success === "true") {
+                showToastMessage('Spare parts issue successfully created.');
                 navigation.navigate('SparePartsRequestScreen');
             } else {
-                showToastMessage('Failed to Submit Spare. Please try again.');
+                showToastMessage('Failed to submit spare parts issue. Please try again.');
             }
         } catch (error) {
             console.error('API error:', error);
@@ -109,7 +118,8 @@ const SparePartsIssueCreation = ({ navigation, route }) => {
             setIsSubmitting(false);
         }
     };
-
+    
+    
     return (
         <SafeAreaView>
             <NavigationHeader
@@ -142,6 +152,8 @@ const SparePartsIssueCreation = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
     itemContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         marginHorizontal: 5,
         marginVertical: 5,
         backgroundColor: 'white',
@@ -158,25 +170,34 @@ const styles = StyleSheet.create({
         }),
         padding: 20,
     },
-    leftColumn: {
-        flex: 1,
-    },
-    head: { //
+    head: {
         fontFamily: FONT_FAMILY.urbanistBold,
         fontSize: 17,
         marginBottom: 5,
+        flexDirection: "row",
+    },
+    contentRight: {
+        color: '#666666',
+        fontFamily: FONT_FAMILY.urbanistSemiBold,
+        fontSize: 15,
     },
     content: {
         color: '#666666',
         marginBottom: 5,
         fontSize: 15,
         fontFamily: FONT_FAMILY.urbanistSemiBold,
-        textTransform: 'capitalize'
+        textTransform: 'capitalize',
     },
-    contentRight: {
-        color: '#666666',
-        fontFamily: FONT_FAMILY.urbanistSemiBold,
-        fontSize: 15,
+    rightColumn: {
+        flexDirection: 'row',  
+        alignItems: 'center',  
+        justifyContent: 'flex-end',
+        flex: 1,
+    },
+    checkbox: {
+        marginLeft: 15,
+        alignSelf: 'center',
+        position: "fixed",
     },
 });
 
