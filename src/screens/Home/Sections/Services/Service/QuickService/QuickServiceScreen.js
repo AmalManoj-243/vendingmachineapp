@@ -74,8 +74,8 @@ const QuickServiceScreen = ({ navigation }) => {
         onBackPress={() => navigation.goBack()}
       />
       <RoundedContainer>
-        {renderService()}
-        <FABButton onPress={() => navigation.navigate('QuickServiceFormTabs')} />
+      {renderService()}
+      <FABButton onPress={() => navigation.navigate('QuickServiceFormTabs')} />
       </RoundedContainer>
       <OverlayLoader visible={loading} />
     </SafeAreaView>

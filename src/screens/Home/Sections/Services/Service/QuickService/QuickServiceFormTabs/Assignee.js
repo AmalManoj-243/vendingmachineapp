@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
-import { fetchAssignedDropdown } from '@api/dropdowns/dropdownApi';
+import { fetchAssigneeDropdown } from '@api/dropdowns/dropdownApi';
 
 const Assignee = ({ formData, onFieldChange, errors }) => {
 
@@ -16,10 +16,10 @@ const Assignee = ({ formData, onFieldChange, errors }) => {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const AssignedData = await fetchAssignedDropdown();
+        const AssigneeData = await fetchAssigneeDropdown();
         setDropdown(prevDropdown => ({
           ...prevDropdown,
-          assignedTo: AssignedData.map(data => ({
+          assignedTo: AssigneeData.map(data => ({
             id: data._id,
             label: data.name,
           })),

@@ -24,16 +24,17 @@ import { EnquiryDetailTabs } from "@screens/Home/Options/CRM/EnquiryRegister/Enq
 import { LeadDetailTabs } from "@screens/Home/Options/CRM/Leads/LeadDetailTabs";
 import { EditPipeline, PipelineForm, PipelineScreen } from "@screens/Home/Options/CRM/Pipeline";
 import { PipelineDetailTabs } from "@screens/Home/Options/CRM/Pipeline/PipelineDetailTabs";
-import { PickupScreen } from "@screens/Home/Options/Pickup";
+import { EditPickup, PickupDetails, PickupScreen } from "@screens/Home/Options/Pickup";
 import { BoxInspectionForm, BoxInspectionScreen } from "@screens/Home/Options/BoxInspection";
 import { AttendanceScreen } from "@screens/Home/Options/Attendance";
 import { MarkAttendance, PunchingScreen } from "@screens/Home/Options/Attendance/Punching";
 import { KPIListingScreen } from "@screens/KPIDashboard";
 import { SparePartsIssueCreation, SparePartsRequestDetails, SparePartsRequestScreen } from "@screens/Home/Sections/Services/SpareManagements/SparePartsRequest";
-import { AddSpareParts, QuickServiceScreen, ServiceDetails, UpdateDetails } from "@screens/Home/Sections/Services/Service/QuickService";
+import { AddSpareParts, QuickServiceDetails, QuickServiceScreen, QuickServiceUpdateDetails } from "@screens/Home/Sections/Services/Service/QuickService";
 import { ServiceScreens } from "@screens/Home/Sections/Services/Service";
 import { ServicesScreen } from "@screens/Home/Sections/Services";
 import { SpareManagementsScreen } from "@screens/Home/Sections/Services/SpareManagements";
+import { QuickServiceFormTabs } from "@screens/Home/Sections/Services/Service/QuickService/QuickServiceFormTabs";
 
 const Stack = createNativeStackNavigator();
 
@@ -150,15 +151,15 @@ const StackNavigator = () => {
         options={{ headerShown: false }}
       />
 
-      {/* Service */}
+      {/* Service          Service          Service*/}
       <Stack.Screen
         name="ServiceScreens"
         component={ServiceScreens}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="UpdateDetails"
-        component={UpdateDetails}
+        name="QuickServiceUpdateDetails"
+        component={QuickServiceUpdateDetails}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -167,8 +168,8 @@ const StackNavigator = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="ServiceDetails"
-        component={ServiceDetails}
+        name="QuickServiceDetails"
+        component={QuickServiceDetails}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -326,12 +327,23 @@ const StackNavigator = () => {
         options={{ headerShown: false }}
       />
 
-      {/* pickup */}
+      {/* Pickup */}
       <Stack.Screen
         name="Pickup"
         component={PickupScreen}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="PickupDetails"
+        component={PickupDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EditPickup"
+        component={EditPickup}
+        options={{ headerShown: false }}
+      />
+      
 
       {/* BoxInspection */}
       <Stack.Screen

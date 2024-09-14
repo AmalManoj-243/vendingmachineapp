@@ -8,15 +8,17 @@ const PickupList = ({ item, onPress }) => {
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.itemContainer}>
       <View style={styles.leftColumn}>
-        <Text style={styles.head}></Text>
-        <View style={styles.rightColumn}>
-          <Text style={styles.content}></Text>
-          <Text style={[styles.contentRight, {color: 'red'}]}></Text>
-        </View>
+        <Text style={styles.head}>{item?.sequence_no || '-'}</Text>
+        <Text style={styles.content}>{item?.customer_name?.trim() || '-'}</Text>
       </View>
       <View style={styles.rightColumn}>
-        <Text style={styles.content}></Text>
-        <Text style={styles.contentRight}></Text>
+        <Text style={styles.content}>{item?.device_name}</Text>
+        <Text style={styles.content}>Salesperson</Text>
+        <Text style={[styles.contentRight]}>{formatDate(item?.date_time, 'dd MMM yyyy') || '-'}</Text>
+      </View>
+      <View style={styles.rightColumn}>
+        <Text style={styles.content}>Warehouse</Text>
+        <Text style={[styles.contentRight, { color: 'red' }]}>{item?.job_stage || '-'}</Text>
       </View>
     </TouchableOpacity>
   );

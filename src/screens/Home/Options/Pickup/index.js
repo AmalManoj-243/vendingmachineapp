@@ -1,2 +1,5 @@
 import PickupScreen from "./PickupScreen";
-export { PickupScreen }
+import PickupDetails from "./PickupDetails";
+import EditPickup from "./EditPickup";
+
+export { PickupScreen, PickupDetails, EditPickup }

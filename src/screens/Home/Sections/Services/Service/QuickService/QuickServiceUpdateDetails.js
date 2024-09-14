@@ -18,7 +18,7 @@ import { useAuthStore } from '@stores/auth';
 import { showToast } from '@utils/common';
 import { TextInput as FormInput } from '@components/common/TextInput';
 
-const UpdateDetails = ({ route, navigation }) => {
+const QuickServiceUpdateDetails = ({ route, navigation }) => {
   const { id } = route.params || {};
   const currentUser = useAuthStore((state) => state.user);
   const [details, setDetails] = useState({});
@@ -324,4 +324,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UpdateDetails;
+export default QuickServiceUpdateDetails;

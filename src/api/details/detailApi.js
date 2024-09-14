@@ -169,6 +169,10 @@ export const fetchSparePartsDetails = async (detailId) => {
   return fetchDetails(API_ENDPOINTS.VIEW_SPARE_PARTS, detailId);
 };
 
+export const fetchPickupDetails = async (detailId) => {
+  return fetchDetails(API_ENDPOINTS.VIEW_PICKUP, detailId);
+};
+
 export const fetchLeadDetails = async (detailId) => {
   return fetchDetails(API_ENDPOINTS.VIEW_LEAD, detailId);
 };

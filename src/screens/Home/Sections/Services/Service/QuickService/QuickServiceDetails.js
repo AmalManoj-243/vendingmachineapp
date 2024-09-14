@@ -14,7 +14,7 @@ import { COLORS } from '@constants/theme';
 import { post, put } from '@api/services/utils';
 import { ConfirmationModal } from '@components/Modal';
 
-const ServiceDetails = ({ navigation, route }) => {
+const QuickServiceDetails = ({ navigation, route }) => {
     const { id: serviceId } = route?.params || {};
     const [details, setDetails] = useState({});
     const [isLoading, setIsLoading] = useState(false);
@@ -200,4 +200,4 @@ const ServiceDetails = ({ navigation, route }) => {
     );
 };
 
-export default ServiceDetails;
+export default QuickServiceDetails;

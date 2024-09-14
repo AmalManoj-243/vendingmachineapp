@@ -10,7 +10,7 @@ import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
 import {
   fetchSourceDropdown,
-  fetchsalesPersonDropdown,
+  fetchSalesPersonDropdown,
   fetchCustomersDropdown,
   fetchOpportunityDropdown,
   fetchenquiryTypeDropdown
@@ -53,7 +53,7 @@ const PipelineForm = ({ navigation }) => {
         const [sourceData, enquiryTypeData, salesPersonData, customerData, opportunityData] = await Promise.all([
           fetchSourceDropdown(),
           fetchenquiryTypeDropdown(),
-          fetchsalesPersonDropdown(),
+          fetchSalesPersonDropdown(),
           fetchCustomersDropdown(),
           fetchOpportunityDropdown(),
         ]);

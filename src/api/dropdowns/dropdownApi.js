@@ -86,7 +86,7 @@ export const fetchAreaDropdown = async (stateId) => {
   return fetchData(`${DROP_DOWN_API_ENDPOINTS.VIEW_AREA}?state_id=${stateId}`);
 };
 
-export const fetchsalesPersonDropdown = async () => {
+export const fetchSalesPersonDropdown = async () => {
   return fetchData(DROP_DOWN_API_ENDPOINTS.VIEW_SALESPERSON);
 }
 
@@ -150,7 +150,7 @@ export const fetchConsumerModelDropdown = async (deviceId, brandId) => {
   return fetchData(`${DROP_DOWN_API_ENDPOINTS.CONSUMER_MODEL}?job_device_id=${deviceId}&job_brand_id=${brandId}`);
 }
 
-export const fetchAssignedDropdown = async () => {
+export const fetchAssigneeDropdown = async () => {
   return fetchData(DROP_DOWN_API_ENDPOINTS.ASSIGNED_TO);
 }
 

@@ -87,6 +87,21 @@ export const fetchCustomers = async ({ offset, limit, searchText }) => {
   }
 };
 
+export const fetchPickup = async ({ offset, limit, loginEmployeeId }) => {
+  try {
+    const queryParams = {
+      offset,
+      limit,
+      ...(loginEmployeeId !== undefined && { login_employee_id: loginEmployeeId }),
+    };
+    const response = await get(API_ENDPOINTS.VIEW_PICKUP, queryParams);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+}; 
+
 export const fetchService = async ({ offset, limit, loginEmployeeId }) => {
   try {
     const queryParams = {

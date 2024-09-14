@@ -11,7 +11,6 @@ import EmailHistory from './EmailHistory';
 import CallHistory from './CallHistory';
 import WhatsAppHistory from './WhatsAppHistory';
 
-
 const LeadDetailTabs = ({ navigation, route }) => {
     const { id } = route?.params || {};
     const layout = useWindowDimensions();

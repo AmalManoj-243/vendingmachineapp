@@ -39,7 +39,7 @@ const PickupScreen = ({ navigation }) => {
     if (item.empty) {
       return <EmptyItem />;
     }
-    return <PickupList item={item} onPress={()=> navigation.navigate('PickupDetailTabs', {id : item._id})} />;
+    return <PickupList item={item} onPress={()=> navigation.navigate('PickupDetails', {id : item._id})} />;
   };
 
   const renderEmptyState = () => (
@@ -60,7 +60,7 @@ const PickupScreen = ({ navigation }) => {
     />
   );
 
-  const renderEnquiryRegister = () => {
+  const renderPickup = () => {
     if (data.length === 0 && !loading) {
       return renderEmptyState();
     }
@@ -73,9 +73,8 @@ const PickupScreen = ({ navigation }) => {
         title="Pick Up"
         onBackPress={() => navigation.goBack()}
       />
-      <SearchContainer placeholder="Search Pick Ups..." onChangeText={handleSearchTextChange} />
       <RoundedContainer>
-        {renderEnquiryRegister()}
+      {renderPickup()}
       </RoundedContainer>
       <OverlayLoader visible={loading}  />
     </SafeAreaView>

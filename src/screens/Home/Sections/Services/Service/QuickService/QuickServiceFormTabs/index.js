@@ -1,3 +1,3 @@
-import ServiceFormTabs from "./QuickServiceFormTabs";
+import QuickServiceFormTabs from "./QuickServiceFormTabs";
 
-export {ServiceFormTabs}
+export {QuickServiceFormTabs}

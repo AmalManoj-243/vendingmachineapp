@@ -5,7 +5,7 @@ import { NavigationHeader } from '@components/Header'
 import { TextInput as FormInput } from '@components/common/TextInput'
 import { COLORS, FONT_FAMILY } from '@constants/theme'
 import { Button, LoadingButton } from '@components/common/Button'
-import SignaturePad from '@components/SignaturePad'
+import SignaturePad from '@components/SignaturePad' //
 import Text from '@components/Text'
 import { fetchBills } from '@api/details/detailApi'
 import { format } from 'date-fns'
@@ -713,7 +713,7 @@ const AuditForm = ({ navigation }) => {
             validate={errors.totalAmount}
           />
           <View style={styles.rowCotainer}>
-            <Text style={styles.qrCodeText}>Update from qr Code </Text>
+            <Text style={styles.qrCodeText}>Update from QR Code </Text>
             <View style={styles.buttonContainer}>
               <Button backgroundColor={COLORS.primaryThemeColor} title={'Scan'} onPress={() => navigation.navigate('Scanner', { onScan: handleScan, onClose: true })} />
             </View>

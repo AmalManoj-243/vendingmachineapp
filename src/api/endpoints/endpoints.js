@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
     VIEW_ATTENDANCE: '/viewAttendance',
     VIEW_SPARE_PARTS: '/viewSparePartsRequest',
     VIEW_KPI: '/viewKpiTasks',
+    VIEW_PICKUP: '/viewPickups',
 };
 
 export const DROP_DOWN_API_ENDPOINTS = {
