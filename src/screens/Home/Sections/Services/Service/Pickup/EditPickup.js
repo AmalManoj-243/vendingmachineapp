@@ -25,7 +25,7 @@ import { OverlayLoader } from '@components/Loader';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 
 const EditPickup = ({ navigation, route }) => {
-  const { pickupId } = route?.params || {};
+  const { id: pickupId } = route?.params || {};
   const [isLoading, setIsLoading] = useState(false);
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +50,6 @@ const EditPickup = ({ navigation, route }) => {
     salesPerson: []
   });
 
-  const isCoordinatorSignatureActive = driverSignatureUrl && customerSignatureUrl;
   const fetchDetails = async (pickupId) => {
     setIsLoading(true);
     try {
@@ -60,14 +59,15 @@ const EditPickup = ({ navigation, route }) => {
         date: detail?.date || new Date(),
         customerName: { id: detail?.customer_id || '', label: detail?.customer_name?.trim() || '' },
         device: { id: detail?.device_id || '', label: detail?.device_name || '' },
-        brand: { id: detail?.brand_id || '', label: detail?.brand_name || ''},
-        consumerModel: { id: detail?.consumer_model_id || '', label: detail?.consumer_model_name || ''},
+        brand: { id: detail?.brand_id || '', label: detail?.brand_name || '' },
+        consumerModel: { id: detail?.consumer_model_id || '', label: detail?.consumer_model_name || '' },
         serialNumber: detail?.serial_Number || '',
-        warehouse: { id: detail?.warehouse_id || '', label: detail?.warehouse_name || ''},
+        warehouse: { id: detail?.warehouse_id || '', label: detail?.warehouse_name || '' },
         pickupScheduleTime: detail?.pickup_schedule_time || null,
-        assignee: { id: detail?.assignee_id || '', label: detail?.assignee_name || ''},
-        salesPerson: { id: detail?.sales_person_id || '', label: detail?.sales_person_name || ''},
+        assignee: { id: detail?.assignee_id || '', label: detail?.assignee_name || '' },
+        salesPerson: { id: detail?.sales_person_id || '', label: detail?.sales_person_name || '' },
         remarks: detail?.remarks || '',
+        isShowCoordinatorSignaturePad: detail?.customer_signature && detail?.driver_signature
       }));
     } catch (error) {
       console.error('Error fetching pickup details:', error);
@@ -85,43 +85,46 @@ const EditPickup = ({ navigation, route }) => {
     }, [pickupId])
   );
 
+
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
         const customerNameData = await fetchCustomerNameDropdown();
-        setDropdown(prevDropdown => ({
+        const deviceData = await fetchDeviceDropdown();
+        const warehouseData = await fetchWarehouseDropdown();
+        const AssigneeData = await fetchAssigneeDropdown();
+        const salesPersonData = await fetchSalesPersonDropdown();
+        setDropdown((prevDropdown) => ({
           ...prevDropdown,
           customerName: customerNameData.map(data => ({
             id: data._id,
             label: data.name,
           })),
-        }));
-      } catch (error) {
-        console.error('Error fetching customer dropdown data:', error);
-      }
-    };
-
-    fetchDropdownData();
-  }, []);
-
-  useEffect(() => {
-    const fetchDropdownData = async () => {
-      try {
-        const deviceData = await fetchDeviceDropdown();
-        setDropdown(prevDropdown => ({
-          ...prevDropdown,
           device: deviceData.map(data => ({
             id: data._id,
             label: data.model_name,
           })),
+          warehouse: warehouseData.map(data => ({
+            id: data._id,
+            label: data.warehouse_name,
+          })),
+          assignee: AssigneeData.map(data => ({
+            id: data._id,
+            label: data.name,
+          })),
+          salesPerson: salesPersonData.map(data => ({
+            id: data._id,
+            label: data.name,
+          })),
         }));
       } catch (error) {
-        console.error('Error fetching device dropdown data:', error);
+        console.error('Error fetching dropdown data:', error);
       }
     };
 
     fetchDropdownData();
   }, []);
+
 
   useEffect(() => {
     if (formData.device) {
@@ -162,63 +165,6 @@ const EditPickup = ({ navigation, route }) => {
       fetchconsumerModelData();
     }
   }, [formData.brand, formData.device]);
-
-  useEffect(() => {
-    const fetchDropdownData = async () => {
-      try {
-        const warehouseData = await fetchWarehouseDropdown();
-        setDropdown(prevDropdown => ({
-          ...prevDropdown,
-          warehouse: warehouseData.map(data => ({
-            id: data._id,
-            label: data.warehouse_name,
-          })),
-        }));
-      } catch (error) {
-        console.error('Error warehouse dropdown data:', error);
-      }
-    };
-
-    fetchDropdownData();
-  }, []);
-
-  useEffect(() => {
-    const fetchDropdownData = async () => {
-      try {
-        const AssigneeData = await fetchAssigneeDropdown();
-        setDropdown(prevDropdown => ({
-          ...prevDropdown,
-          assignee: AssigneeData.map(data => ({
-            id: data._id,
-            label: data.name,
-          })),
-        }));
-      } catch (error) {
-        console.error('Error fetching Assignee dropdown data:', error);
-      }
-    };
-
-    fetchDropdownData();
-  }, []);
-
-  useEffect(() => {
-    const fetchDropdownData = async () => {
-      try {
-        const salesPersonData = await fetchSalesPersonDropdown();
-        setDropdown(prevDropdown => ({
-          ...prevDropdown,
-          salesPerson: salesPersonData.map(data => ({
-            id: data._id,
-            label: data.name,
-          })),
-        }));
-      } catch (error) {
-        console.error('Error fetching sales person dropdown data:', error);
-      }
-    };
-
-    fetchDropdownData();
-  }, []);
 
   const handleFieldChange = (field, value) => {
     setFormData((prevFormData) => ({ ...prevFormData, [field]: value }));
@@ -495,17 +441,12 @@ const EditPickup = ({ navigation, route }) => {
           setUrl={setCustomerSignatureUrl}
           title={'Customer Signature'}
         />
-        <SignaturePad
+        {formData?.isShowCoordinatorSignaturePad  
+        && <SignaturePad
           setScrollEnabled={setScrollEnabled}
           setUrl={setCoordinatorSignatureUrl}
           title={'Co-Ordinator Signature'}
-          disabled={!isCoordinatorSignatureActive}
-          onPress={() => {
-            if (!customerSignatureUrl || !driverSignatureUrl) {
-              showToast({ type: 'error', title: 'Error', message: 'Fill the Customer and Driver signature' });
-            }
-          }}
-        />
+        />}
         <FormInput
           label={"Remarks"}
           placeholder={"Enter Remarks"}
