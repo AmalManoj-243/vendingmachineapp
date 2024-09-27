@@ -8,15 +8,15 @@ import { RoundedContainer, SafeAreaView, SearchContainer } from '@components/con
 import { EmptyItem, EmptyState } from '@components/common/empty';
 import { NavigationHeader } from '@components/Header';
 import { fetchKPIDashboardData } from '@api/services/generalApi';
-import KPIList from './KpiList';
+import KPIList from './KPIList';
 import { useAuthStore } from '@stores/auth';
 
 const KPIListingScreen = ({ navigation }) => {
     const isFocused = useIsFocused();
-    const currentUser = useAuthStore((state)=> state.user);
+    const currentUser = useAuthStore((state) => state.user);
     const currentUserId = currentUser?.related_profile?._id || '';
     const [loading, setLoading] = useState(false);
-    const route = useRoute(); 
+    const route = useRoute();
     const { kpiCategory } = route.params;
     const [dashBoardDetails, setDashBoardDetails] = useState({
         assignedKpiData: [],
@@ -40,8 +40,8 @@ const KPIListingScreen = ({ navigation }) => {
                 taskManagements: data.task_managments || [],
                 inProgressKpi: data.in_progress_kpi || [],
                 completedKpi: data.completed_kpi || []
-        });
-        } catch(error){
+            });
+        } catch (error) {
             console.error('Error fetching visit details:', error);
             showToastMessage('Failed to fetch visit details');
         }
@@ -53,7 +53,7 @@ const KPIListingScreen = ({ navigation }) => {
     }, [isFocused]);
 
     const getDataForCategory = () => {
-        switch(kpiCategory) {
+        switch (kpiCategory) {
             case 'Complete':
                 return dashBoardDetails.completedKpi;
             case 'In Progress':
@@ -72,9 +72,9 @@ const KPIListingScreen = ({ navigation }) => {
     }
     const kpiData = getDataForCategory();
 
-    const renderItem = ({item}) => {
-        if(item.empty){
-            return <EmptyItem/>
+    const renderItem = ({ item }) => {
+        if (item.empty) {
+            return <EmptyItem />
         }
         return <KPIList item={item} onPress={() => console.log("")} />
     }
@@ -84,38 +84,38 @@ const KPIListingScreen = ({ navigation }) => {
     )
 
     const renderContent = () => (
-        <FlashList 
-        data={formatData(kpiData, 1)}
-        numColumns={1}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={{ padding: 10, paddingBottom: 50 }}
-        showsVerticalScrollIndicator={false}
-        onEndReachedThreshold={0.2}
-        estimatedItemSize={100}
+        <FlashList
+            data={formatData(kpiData, 1)}
+            numColumns={1}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString()}
+            contentContainerStyle={{ padding: 10, paddingBottom: 50 }}
+            showsVerticalScrollIndicator={false}
+            onEndReachedThreshold={0.2}
+            estimatedItemSize={100}
         />
     );
     const renderKPIList = () => {
-        console.log("kpiData",kpiData);
+        console.log("kpiData", kpiData);
         if (kpiData.length === 0 && !loading) {
-          return renderEmptyState();
+            return renderEmptyState();
         }
         return renderContent();
-      };
+    };
 
-      return (
+    return (
         <SafeAreaView>
-          <NavigationHeader
-            title={`${kpiCategory} KPI List`}
-            onBackPress={() => navigation.goBack()}
-          />
-          {/* <SearchContainer placeholder="Search Enquiries.." onChangeText={''} /> */}
-          <RoundedContainer>
-            {renderKPIList()}
-          </RoundedContainer>
-          <OverlayLoader visible={loading} />
+            <NavigationHeader
+                title={`${kpiCategory} KPI List`}
+                onBackPress={() => navigation.goBack()}
+            />
+            {/* <SearchContainer placeholder="Search Enquiries.." onChangeText={''} /> */}
+            <RoundedContainer>
+                {renderKPIList()}
+            </RoundedContainer>
+            <OverlayLoader visible={loading} />
         </SafeAreaView>
-      );
-    
+    );
+
 }
 export default KPIListingScreen;

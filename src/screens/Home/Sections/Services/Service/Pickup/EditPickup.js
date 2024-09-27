@@ -65,9 +65,6 @@ const EditPickup = ({ navigation, route }) => {
         detailCoordinatorSignatureUrl: detail?.service_coordinator_signature || null,
         coordinatorSignatureUrl: detail?.service_coordinator_signature || null,
         imageUrls: detail?.attachment_details || [],
-        // below two are not shown in web so commanded
-        // assignee: { id: detail?.assignee_id || '', label: detail?.assignee_name || '' },
-        // salesPerson: { id: detail?.sales_person_id || '', label: detail?.sales_person_name || '' },
       }));
     } catch (error) {
       console.error('Error fetching pickup details:', error);

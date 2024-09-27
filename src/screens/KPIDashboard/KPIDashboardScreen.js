@@ -3,10 +3,9 @@ import { View, StyleSheet, Dimensions, Text, Platform } from 'react-native';
 import { PieChart } from 'react-native-svg-charts';
 import { NavigationHeader } from '@components/Header';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
-import { RoundedContainer, RoundedScrollContainer, SafeAreaView } from '@components/containers';
+import { RoundedScrollContainer, SafeAreaView } from '@components/containers';
 import { useIsFocused } from '@react-navigation/native';
 import { useAuthStore } from '@stores/auth';
-import { useDataFetching } from '@hooks';
 import { showToastMessage } from '@components/Toast';
 import { fetchKPIDashboardData } from '@api/services/generalApi';
 
