@@ -7,5 +7,7 @@ import RulesModal from "./RulesModal";
 import AddUpdateModal from "./AddUpdateModal";
 import MeetingsScheduleModal from "./MeetingsScheduleModal";
 import ConfirmationModal from "./ConfirmationModal";
+import PauseModal from "./PauseModal";
+import UpdatesModal from "./UpdatesModal";
 
-export { ActionModal, LogoutModal, InputModal, CustomListModal, EmployeeListModal, RulesModal, AddUpdateModal, MeetingsScheduleModal, ConfirmationModal }
+export { ActionModal, LogoutModal, InputModal, CustomListModal, EmployeeListModal, RulesModal, AddUpdateModal, MeetingsScheduleModal, ConfirmationModal, PauseModal, UpdatesModal }

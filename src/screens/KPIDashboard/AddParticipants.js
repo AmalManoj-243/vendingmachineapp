@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { RoundedScrollContainer, SafeAreaView } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
-import { fetchAssigneeDropdown } from '@api/dropdowns/dropdownApi';
+import { fetchEmployeesDropdown } from '@api/dropdowns/dropdownApi';
 import { DropdownSheet } from '@components/common/BottomSheets';
 import { NavigationHeader } from '@components/Header';
 import { Button } from '@components/common/Button';
@@ -26,7 +26,7 @@ const AddParticipants = ({ navigation, route }) => {
     useEffect(() => {
         const fetchDropdownData = async () => {
             try {
-                const EmployeeData = await fetchAssigneeDropdown();
+                const EmployeeData = await fetchEmployeesDropdown();
                 setDropdown(prevDropdown => ({
                     ...prevDropdown,
                     employee: EmployeeData.map(data => ({
@@ -73,7 +73,7 @@ const AddParticipants = ({ navigation, route }) => {
             };
             console.log('Added Participants:', participantData);
             addParticipants(participantData);
-            navigation.goBack({ id }); // Navigate back to KPIActionDetails
+            navigation.goBack({ id });
         }
     };
 

@@ -52,9 +52,7 @@ const QuickServiceDetails = ({ navigation, route }) => {
                 job_stage: "Closed",
                 job_stage_close_reason: null,
             };
-            console.log("Success", closeJobData)
             const response = await put('/updateJobRegistration', closeJobData);   
-            console.log(response)
             if (response.success === "true") {
                 showToastMessage('Job successfully closed!');
                 navigation.navigate('QuickServiceScreen');
@@ -62,7 +60,6 @@ const QuickServiceDetails = ({ navigation, route }) => {
                 showToastMessage('Failed to close job. Please try again.');
             }
         } catch (error) {
-            console.error('API error:', error);
             showToastMessage('An error occurred. Please try again.');
         } finally {
             fetchDetails();
@@ -78,6 +75,7 @@ const QuickServiceDetails = ({ navigation, route }) => {
                 service_id: serviceId,
             };
             const response = await post('/createJobApproveQuote', updateJobData);
+            console.log('API Response:', response);
             if (response.success === "true") {
                 navigation.navigate('QuickServiceUpdateDetails', {
                     id: serviceId,
@@ -98,7 +96,6 @@ const QuickServiceDetails = ({ navigation, route }) => {
                 showToastMessage('Failed to update job. Please try again.');
             }
         } catch (error) {
-            console.error('API error:', error);
             showToastMessage('An error occurred. Please try again.');
         } finally {
             fetchDetails();

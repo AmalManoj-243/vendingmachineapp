@@ -54,8 +54,8 @@ const KPIDashboardScreen = ({ navigation }) => {
     //     { name: 'Urgent', value: dashBoardDetails.urgentKpiData.length || 0, color: '#d802db' },
     //     { name: 'Important', value: dashBoardDetails.importantKpiData.length || 0, color: '#36A2EB' },
     //     { name: 'Regular Task', value: dashBoardDetails.serviceKpiData.length || 0, color: '#FFCE56' },
-    //     { name: 'In Progress', value: dashBoardDetails.inProgressKpi.length || 0, color: '#4BB543' },
-    //     { name: 'Complete', value: dashBoardDetails.completedKpi.length || 0, color: '#4BC0C0' },
+    //     { name: 'In-Progress', value: dashBoardDetails.inProgressKpi.length || 0, color: '#4BB543' },
+    //     { name: 'Completed', value: dashBoardDetails.completedKpi.length || 0, color: '#4BC0C0' },
     // ];
 
 
@@ -69,8 +69,8 @@ const KPIDashboardScreen = ({ navigation }) => {
         'Urgent': '#FFDE43',
         'Important': '#36A2EB',
         'Regular Task': '#4BB543',
-        'In Progress': '#FF6384',
-        'Complete': '#4BC0C0',
+        'In-Progress': '#FF6384',
+        'Completed': '#4BC0C0',
     };
 
     const pieData = [
@@ -78,8 +78,8 @@ const KPIDashboardScreen = ({ navigation }) => {
         { name: 'Urgent', value: dashBoardDetails.urgentKpiData.length || 0 },
         { name: 'Important', value: dashBoardDetails.importantKpiData.length || 0 },
         { name: 'Regular Task', value: dashBoardDetails.serviceKpiData.length || 0 },
-        { name: 'In Progress', value: dashBoardDetails.inProgressKpi.length || 0 },
-        { name: 'Complete', value: dashBoardDetails.completedKpi.length || 0 },
+        { name: 'In-Progress', value: dashBoardDetails.inProgressKpi.length || 0 },
+        { name: 'Completed', value: dashBoardDetails.completedKpi.length || 0 },
     ]
         .map((item, index) => ({
             name: item.name, // Name to be used in the legend

@@ -11,18 +11,29 @@ import { OverlayLoader } from '@components/Loader';
 import { LoadingButton } from '@components/common/Button';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { post, put } from '@api/services/utils';
-import { ConfirmationModal } from '@components/Modal';
+import { put } from '@api/services/utils';
+import { ConfirmationModal, PauseModal, UpdatesModal } from '@components/Modal';
+import { formatDateTime } from '@utils/common/date';
+import { UpdateList } from '@components/CRM';
+import { useAuthStore } from '@stores/auth';
+import PauseList from '@components/CRM/PauseList';
+import ReAssignModal from '@components/Modal/ReAssignModal';
 
 const KPIActionDetails = ({ navigation, route }) => {
+
     const { id } = route?.params || {};
+    const currentUser = useAuthStore((state) => state.user);
     const [details, setDetails] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
-    const [isStartModalVisible, setIsStartModalVisible] = useState(false);
+    const [participants, setParticipants] = useState([]);
+    const [isModalVisible, setIsModalVisible] = useState(false);
     const [actionToPerform, setActionToPerform] = useState(null);
-    const [participants, setParticipants] = useState(null);
+    const [isStartModalVisible, setIsStartModalVisible] = useState(false);
+    const [isPauseModalVisible, setIsPauseModalVisible] = useState(false);
+    const [isAssignModalVisible, setIsAssignModalVisible] = useState(false);
+    const [updatesList, setUpdatesList] = useState([]);
+    const [pauseList, setPauseList] = useState([]);
 
     const fetchDetails = async () => {
         setIsLoading(true);
@@ -45,24 +56,21 @@ const KPIActionDetails = ({ navigation, route }) => {
         }, [id])
     );
 
-    const addParticipants = (addedItems) => {
-        const structuredParticipants = addedItems?.employees.map(employee => ({
-            assignee_id: employee.id,
-            assignee_name: employee.label,
-        }));
-        setParticipants(prevItems => [...prevItems, structuredParticipants]);
-        console.log("Structure Participants", structuredParticipants)
-    };
-
     const handleStartTask = async () => {
         setIsSubmitting(true);
         try {
-            const updateJobData = {
-                service_id: kpiId,
+            const updateStartData = {
+                _id: kpi_id,
+                status: 'In progress',
+                assignee_id: currentUser._id,
+                assignee_name: currentUser?.related_profile?.name,
+                progress_status: 'Ongoing',
+                isDeveloper: false,
+                estimatedTime: foundAssignee?.estimated_time,
             };
-            const response = await post('/createJobApproveQuote', updateJobData);
+            const response = await put('/updateKpiTasks', updateStartData);
             if (response.success === "true") {
-                showToastMessage('KPI Started Successfully');
+                showToastMessage('Action Started Successfully');
             } else {
                 showToastMessage('Failed to start task. Please try again.');
             }
@@ -74,6 +82,82 @@ const KPIActionDetails = ({ navigation, route }) => {
             setIsSubmitting(false);
             setIsStartModalVisible(false);
         }
+    };
+
+    const handlePauseTask = async () => {
+        setIsSubmitting(true);
+        try {
+            const updatePauseData = {
+                id: _id,
+                assignee_id: currentUser._id,
+                assignee_name: currentUser?.related_profile?.name,
+                progress_status: 'Pause',
+                pause_reason: pause?.pause_reason,
+                isDeveloper: false,
+            };
+            const response = await put('/updateKpiTasks', updatePauseData);
+            if (response.success === "true") {
+                showToastMessage('Action paused Successfully');
+            } else {
+                showToastMessage('Failed to pause task. Please try again.');
+            }
+        } catch (error) {
+            console.error('API error:', error);
+            showToastMessage('An error occurred. Please try again.');
+        } finally {
+            fetchDetails();
+            setIsSubmitting(false);
+            setIsStartModalVisible(false);
+        }
+    };
+
+    const handleReAssignTask = async () => {
+        setIsSubmitting(true);
+        try {
+            const updatePauseData = {
+                assignee_id: this.login_employee_id,
+                assignee_name: this.login_employee_name,
+                // reassign_reason: ${this.login_employee_name} reassined the task to ${this.re_assign.assignee_name} due to ${this.re_assign.reassign_reason},
+                // _id: kpi_id,
+                // assignedToId: this.re_assign.assignee_id,
+                // assignedToName: this.re_assign.assignee_name,
+                // estimatedTime: this.re_assign.estimatedTime,
+                // isDeveloper: false,
+            };
+            const response = await put('/updateKpiTasks', updatePauseData);
+            if (response.success === "true") {
+                showToastMessage('Action paused Successfully');
+            } else {
+                showToastMessage('Failed to pause task. Please try again.');
+            }
+        } catch (error) {
+            console.error('API error:', error);
+            showToastMessage('An error occurred. Please try again.');
+        } finally {
+            fetchDetails();
+            setIsSubmitting(false);
+            setIsStartModalVisible(false);
+        }
+    };
+
+    const saveUpdates = async (updateText, isPauseUpdate = false) => {
+        const updateHistoryData = {
+            kpiStatusUpdates: [
+                {
+                    isDeveloper: false,
+                    assignee_id: currentUser._id,
+                    assignee_name: currentUser?.related_profile?.name,
+                    time: formatDateTime(new Date(), "Pp"),
+                    updateText: updateText || null,
+                    _id: Date.now().toString(),
+                }
+            ],
+        };
+        if (isPauseUpdate) {
+            setPauseList((prevPauseList) => [...prevPauseList, ...updateHistoryData.kpiStatusUpdates]);
+        } else {
+            setUpdatesList((prevUpdates) => [...prevUpdates, ...updateHistoryData.kpiStatusUpdates]);
+        } setIsModalVisible(false);
     };
 
     return (
@@ -103,81 +187,177 @@ const KPIActionDetails = ({ navigation, route }) => {
                 <DetailField label="Is Manager Review Needed" value={details?.is_manager_review_needed || '-'} />
                 <DetailField label="Is Customer Review Needed" value={details?.is_customer_review_needed || '-'} />
                 <DetailField label="Guidelines" value={details?.deadline || '-'} />
-                <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: 10 }}>
+
+                {/* Participants */}
+                {/* <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: 10 }}>
                     <Text style={styles.label}>Add Participants</Text>
                     <TouchableOpacity activeOpacity={0.7}
                         onPress={() => {
-                            navigation.navigate('AddParticipants', { id, addParticipants });
+                            navigation.navigate('AddParticipants', { id });
                         }}>
                         <AntDesign name="pluscircle" size={26} color={COLORS.orange} />
                     </TouchableOpacity>
                 </View>
+
                 <FlatList
                     data={participants}
                     renderItem={({ item }) => (
                         <Text>{item.assignee_name}</Text>
-                    )}
+                    )} 
                     keyExtractor={(item, index) => item.assignee_id || index.toString()}
+                /> */}
+
+                <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: 10 }}>
+                    <Text style={styles.label}>Updates</Text>
+                    <TouchableOpacity activeOpacity={0.7}
+                        onPress={() => setIsModalVisible(true)} >
+                        <AntDesign name="pluscircle" size={27} color={COLORS.orange} />
+                    </TouchableOpacity>
+                </View>
+
+                <FlatList
+                    data={updatesList}
+                    keyExtractor={(item) => item._id}
+                    contentContainerStyle={{ padding: 10, paddingBottom: 50 }}
+                    renderItem={({ item }) => (
+                        <UpdateList item={item} />
+                    )}
+                    showsVerticalScrollIndicator={false}
+                />
+                <FlatList
+                    data={pauseList}
+                    keyExtractor={(item) => item._id}
+                    contentContainerStyle={{ padding: 10, paddingBottom: 50 }}
+                    renderItem={({ item }) => (
+                        <PauseList item={item} />
+                    )}
+                    showsVerticalScrollIndicator={false}
                 />
 
                 <View style={{ flexDirection: 'row', marginVertical: 5, padding: 1 }}>
                     <LoadingButton
-                        width={'25%'}
+                        width={'50%'}
                         backgroundColor={COLORS.brightBlue}
-                        title="Start"
                         onPress={() => {
                             setActionToPerform('start');
                             setIsStartModalVisible(true);
                         }}
+                        title={(
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                                <AntDesign name="rightcircle" size={20} color={COLORS.white} />
+                                <Text style={{
+                                    marginLeft: 8,
+                                    fontSize: 16,
+                                    color: COLORS.white,
+                                    fontFamily: FONT_FAMILY.urbanistSemiBold,
+                                }}>Start
+                                </Text>
+                            </View>
+                        )}
                     />
                     <View style={{ width: 5 }} />
                     <LoadingButton
-                        width={'25%'}
+                        width={'50%'}
                         backgroundColor={COLORS.yellow}
-                        title="Pause"
                         onPress={() => {
                             setActionToPerform('pause');
-                            // setIsConfirmationModalVisible(true);
+                            setIsPauseModalVisible(true);
                         }}
-                    />
-                    <View style={{ width: 5 }} />
-                    <LoadingButton
-                        width={'25%'}
-                        backgroundColor={COLORS.brightBlue}
-                        title="Re-Assign"
-                        onPress={() => {
-                            setActionToPerform('');
-                        }}
-                    />
-                    <View style={{ width: 5 }} />
-                    <LoadingButton
-                        width={'25%'}
-                        backgroundColor={COLORS.green}
-                        title="Complete"
-                        onPress={() => {
-                            setActionToPerform('complete');
-                        }}
+                        title={(
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                                <AntDesign name="pausecircle" size={20} color={COLORS.white} />
+                                <Text style={{
+                                    marginLeft: 8,
+                                    fontSize: 16,
+                                    color: COLORS.white,
+                                    fontFamily: FONT_FAMILY.urbanistSemiBold,
+                                }}>Pause
+                                </Text>
+                            </View>
+                        )}
                     />
                 </View>
 
+                <View style={{ flexDirection: 'row', marginVertical: 5, padding: 1 }}>
+                    <LoadingButton
+                        width={'50%'}
+                        backgroundColor={COLORS.brightBlue}
+                        onPress={() => {
+                            setActionToPerform('reAssign');
+                            setIsAssignModalVisible(true);
+                        }}
+                        title={(
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                                <AntDesign name="reload1" size={20} color={COLORS.white} />
+                                <Text style={{
+                                    marginLeft: 8,
+                                    fontSize: 16,
+                                    color: COLORS.white,
+                                    fontFamily: FONT_FAMILY.urbanistSemiBold,
+                                }}>Re-Assign
+                                </Text>
+                            </View>
+                        )}
+                    />
+                    <View style={{ width: 5 }} />
+                    <LoadingButton
+                        width={'50%'}
+                        backgroundColor={COLORS.green}
+                        onPress={() => {
+                            setActionToPerform('complete');
+                        }}
+                        title={(
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                                <AntDesign name="checkcircleo" size={20} color={COLORS.white} />
+                                <Text style={{
+                                    marginLeft: 8,
+                                    fontSize: 16,
+                                    color: COLORS.white,
+                                    fontFamily: FONT_FAMILY.urbanistSemiBold,
+                                }}>Complete
+                                </Text>
+                            </View>
+                        )}
+                    />
+                </View>
+
+                {/* Modals */}
+                <UpdatesModal
+                    isVisible={isModalVisible}
+                    header='Add Update'
+                    title={'Add Updates'}
+                    multiline
+                    numberOfLines={5}
+                    onClose={() => setIsModalVisible(!isModalVisible)}
+                    onSubmit={saveUpdates}
+                />
+                <PauseModal
+                    isVisible={isPauseModalVisible}
+                    header='Pausing'
+                    title={'Reason'}
+                    multiline
+                    numberOfLines={2}
+                    onClose={() => setIsPauseModalVisible(!isPauseModalVisible)}
+                    onSubmit={(pauseReason) => {
+                        saveUpdates(pauseReason, true);
+                        handlePauseTask();
+                    }}
+                />
+                <ReAssignModal
+                    isVisible={isAssignModalVisible}
+                    header='Re-Assigning'
+                    title={'Reason'}
+                    multiline
+                    numberOfLines={2}
+                    onClose={() => setIsAssignModalVisible(!isAssignModalVisible)}
+                    onSubmit={saveUpdates}
+                />
                 <ConfirmationModal
                     isVisible={isStartModalVisible}
                     onCancel={() => setIsStartModalVisible(false)}
                     onConfirm={handleStartTask}
                     headerMessage='Are you sure you want to Start this task?'
                 />
-
-                {/* <ConfirmationModal
-                    isVisible={isConfirmationModalVisible}
-                    onCancel={() => setIsConfirmationModalVisible(false)}
-                    onConfirm={() => {
-                        if (actionToPerform === 'close') {
-                            handleCloseJob();
-                        }
-                    }}
-                    headerMessage='Are you sure you want to close this service job?'
-                /> */}
-
                 <OverlayLoader visible={isLoading || isSubmitting} />
             </RoundedScrollContainer>
         </SafeAreaView>
@@ -190,7 +370,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: COLORS.primaryThemeColor,
         fontFamily: FONT_FAMILY.urbanistSemiBold,
-    },
+    }
 });
 
 export default KPIActionDetails;

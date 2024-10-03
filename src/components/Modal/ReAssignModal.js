@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import { NavigationHeader } from '@components/Header';
 
-const AddUpdateModal = ({ isVisible, onClose, onSubmit, title, header = '', placeholder = 'Enter updates' }) => {
+const ReAssignModal = ({ isVisible, onClose, onSubmit, title, header = ''}) => {
     const [updateText, setUpdateText] = useState('');
     const [errorText, setErrorText] = useState('');
 
@@ -49,13 +49,31 @@ const AddUpdateModal = ({ isVisible, onClose, onSubmit, title, header = '', plac
                 <View style={styles.modalContent}>
                     <Text style={styles.label}>{title}</Text>
                     <TextInput
-                        placeholder={placeholder}
                         value={updateText}
                         onChangeText={(text) => {
                             setUpdateText(text);
                             setErrorText('');
                         }}
                         multiline
+                        style={[styles.textInput, errorText && styles.textInputError]}
+                    />
+                    <TextInput
+                        value={updateText}
+                        onChangeText={(text) => {
+                            setUpdateText(text);
+                            setErrorText('');
+                        }}
+                        multiline
+                        style={[styles.textInput, errorText && styles.textInputError]}
+                    />
+                    <TextInput
+                        value={updateText}
+                        onChangeText={(text) => {
+                            setUpdateText(text);
+                            setErrorText('');
+                        }}
+                        multiline
+                        numberOfLines={3}
                         style={[styles.textInput, errorText && styles.textInputError]}
                     />
                     {errorText ? (
@@ -66,11 +84,7 @@ const AddUpdateModal = ({ isVisible, onClose, onSubmit, title, header = '', plac
                     ) : null}
                     <View style={styles.buttonRow}>
                         <View style={{ flex: 3 }}>
-                            <Button title="Cancel" onPress={onClose} />
-                        </View>
-                        <View style={{ width: 10 }} />
-                        <View style={{ flex: 6 }}>
-                            <Button title="Save" onPress={handleSave} />
+                            <Button title="Pause" onPress={handleSave} />
                         </View>
                     </View>
                 </View>
@@ -123,4 +137,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AddUpdateModal;
+export default ReAssignModal;
