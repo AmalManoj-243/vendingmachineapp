@@ -16,6 +16,7 @@ import { CompleteModal, ConfirmationModal, DocumentModal, PauseModal, ReAssignMo
 import { useAuthStore } from '@stores/auth';
 import { KPIUpdateList } from '@components/KPI';
 import { formatDateTime } from '@utils/common/date';
+import { TitleWithButton } from '@components/Header';
 
 const KPIActionDetails = ({ navigation, route }) => {
   const { id } = route?.params || {};
@@ -301,15 +302,8 @@ const KPIActionDetails = ({ navigation, route }) => {
         <DetailField label="Is Customer Review Needed" value={details?.is_customer_review_needed ? 'Needed' : 'Not Needed' || '-'} />
         <DetailField label="Guidelines" value={details?.guide_lines?.join(', ') || '-'} />
 
-        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: 10 }}>
-          <Text style={styles.label}>Add Participants</Text>
-          <TouchableOpacity activeOpacity={0.7}
-            onPress={() => {
-              navigation.navigate('AddParticipants', { id });
-            }}>
-            <AntDesign name="pluscircle" size={25} color={COLORS.orange} />
-          </TouchableOpacity>
-        </View>
+        <TitleWithButton label={'Add Participants'} onPress={() => { navigation.navigate('AddParticipants', { id }) }} />
+
         <FlatList
           data={participants}
           renderItem={({ item }) => (
@@ -318,13 +312,8 @@ const KPIActionDetails = ({ navigation, route }) => {
           keyExtractor={(item, index) => item.assignee_id || index.toString()}
         />
 
-        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: 10 }}>
-          <Text style={styles.label}>Updates</Text>
-          <TouchableOpacity activeOpacity={0.7}
-            onPress={() => setIsModalVisible(true)} >
-            <AntDesign name="pluscircle" size={26} color={COLORS.orange} />
-          </TouchableOpacity>
-        </View>
+        <TitleWithButton label={'Updates'} onPress={() => setIsModalVisible(true)} />
+
         <DocumentModal
           visible={isModalVisible}
           title="Files"

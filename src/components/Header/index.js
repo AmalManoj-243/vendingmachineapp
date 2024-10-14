@@ -1,3 +1,4 @@
 import NavigationHeader from "./NavigationHeader";
 import BottomSheetHeader from "./BottomSheetHeader";
-export { NavigationHeader, BottomSheetHeader }
+import TitleWithButton from "./TitleWithButton";
+export { NavigationHeader, BottomSheetHeader, TitleWithButton }
