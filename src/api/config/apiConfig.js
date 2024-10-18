@@ -7,10 +7,13 @@
 // const API_BASE_URL = 'https://alphalize.369ai.biz:3042'
 
 {/* ----UAE Test ----- */ }
-const API_BASE_URL = 'https://uaetest.369ai.biz:3027'
+// const API_BASE_URL = 'https://uaetest.369ai.biz:3027'
 
 {/* ----Common Test ----- */ }
-// const API_BASE_URL = 'https://test.369ai.biz:3016' //backend test
+const API_BASE_URL = 'https://test.369ai.biz:3016' //backend test
+
+{/* ----Auditing Test ----- */ }
+// const API_BASE_URL = 'https://danatqatar.369ai.biz:3031' //backend test
 
 {/* ----Oman live ----- */ }
 // const API_BASE_URL = 'https://danatoman.369ai.biz:3029' //oman live

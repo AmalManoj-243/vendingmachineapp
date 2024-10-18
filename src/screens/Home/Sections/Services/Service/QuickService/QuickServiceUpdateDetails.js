@@ -30,7 +30,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
   const [calculatedTax, setCalculatedTax] = useState(0);
 
   const [formData, setFormData] = useState({
-    subTotal: null,
+    subTotal: subTotal,
     serviceCharge: 100,
     spareTotalPrice: null,
     total: null,
@@ -46,7 +46,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
       uom_id: addedItems?.uom?.id,
       uom: addedItems?.uom.label,
       unit_price: addedItems.unitPrice,
-      unit_cost: addedItems.unitCost,    // undefined
+      unit_cost: addedItems.unitPrice,    // undefined
       tax_type_id: addedItems?.taxType?.id,  
       tax_type_name: addedItems?.taxType?.label,
       tax: addedItems?.tax,
@@ -244,7 +244,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
           numberOfLines={3}
           textAlignVertical={'top'}
         />
-        <DetailField label="Mobile Number" value={details?.customer_mobile || '-'} />
+        <DetailField label="Mobile Number" value={details?.customer_lists?.[0]?.customer_mobile || '-'} />
         <DetailField label="Email" value={details?.customer_email || '-'} />
         <DetailField label="Warehouse Name" value={details?.warehouse_name || '-'} />
         <DetailField label="Created On" value={formatDateTime(details.date)} />
@@ -252,6 +252,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
         <DetailField label="Brand Name" value={details?.brand_name || '-'} />
         <DetailField label="Device Name" value={details?.device_name || '-'} />
         <DetailField label="Consumer Model" value={details?.consumer_model_name || '-'} />
+        <DetailField label="Serial Number" value={details?.serial_no || '-'} />
         <FormInput
           label="Service Charge"
           placeholder="Enter Service Charge"

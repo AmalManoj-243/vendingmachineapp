@@ -9,17 +9,17 @@ import { formatDateTime } from '@utils/common/date';
 import { showToastMessage } from '@components/Toast';
 import { fetchServiceDetails } from '@api/details/detailApi';
 import { OverlayLoader } from '@components/Loader';
-import { Button } from '@components/common/Button';
+import { LoadingButton } from '@components/common/Button';
 import { COLORS } from '@constants/theme';
 import { post, put } from '@api/services/utils';
-import { CloseModal, ConfirmationModal } from '@components/Modal';
+import { ConfirmationModal } from '@components/Modal';
 
 const QuickServiceDetails = ({ navigation, route }) => {
     const { id: serviceId } = route?.params || {};
     const [details, setDetails] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isCloseModalVisible, setIsCloseModalVisible] = useState(false);
+    const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
     const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
     const [actionToPerform, setActionToPerform] = useState(null);
 
@@ -27,7 +27,6 @@ const QuickServiceDetails = ({ navigation, route }) => {
         setIsLoading(true);
         try {
             const updatedDetails = await fetchServiceDetails(serviceId);
-            console.log("QuickServiceDetails : ", updatedDetails)
             setDetails(updatedDetails[0] || {});
         } catch (error) {
             console.error('Error fetching service details:', error);
@@ -45,16 +44,15 @@ const QuickServiceDetails = ({ navigation, route }) => {
         }, [serviceId])
     );
 
-    const handleCloseJob = async (updateText) => {
+    const handleCloseJob = async () => {
         setIsSubmitting(true);
         try {
             const closeJobData = {
                 _id: details._id,
                 job_stage: "Closed",
-                job_stage_close_reason: updateText,
+                job_stage_close_reason: null,
             };
-            console.log("Closing Reason", closeJobData)
-            const response = await put('/updateJobRegistration', closeJobData);
+            const response = await put('/updateJobRegistration', closeJobData);   
             if (response.success === "true") {
                 showToastMessage('Job successfully closed!');
                 navigation.navigate('QuickServiceScreen');
@@ -70,43 +68,64 @@ const QuickServiceDetails = ({ navigation, route }) => {
         }
     };
 
-    const handleUpdateJob = () => {
-        navigation.navigate('QuickServiceUpdateDetails', {
-            id: serviceId
-        });
+    const handleUpdateJob = async () => {
+        setIsSubmitting(true);
+        try {
+            const updateJobData = {
+                service_id: serviceId,
+            };
+            const response = await post('/createJobApproveQuote', updateJobData);
+            console.log('API Response:', response);
+            if (response.success === "true") {
+                navigation.navigate('QuickServiceUpdateDetails', {
+                    id: serviceId,
+                    details: {
+                        customerName: details.customer_name,
+                        mobile: details.customer_mobile,
+                        email: details.customer_email,
+                        warehouse: details.warehouse_name,
+                        createdOn: details.date,
+                        createdBy: details.assignee_name,
+                        brandName: details.brand_name,
+                        deviceName: details.device_name,
+                        consumerModel: details.consumer_model_name,
+                        serialNumber: details.serial_no,
+                    }
+                });
+            } else {
+                showToastMessage('Failed to update job. Please try again.');
+            }
+        } catch (error) {
+            showToastMessage('An error occurred. Please try again.');
+        } finally {
+            fetchDetails();
+            setIsSubmitting(false);
+            setIsUpdateModalVisible(false);
+        }
     };
 
     const accessoriesString = details?.accessories?.map(acc => acc.accessory_name).join(', ') || '-';
 
-    const complaintsString = Array.isArray(details?.service_register_complaint_lists) 
-    ? details.service_register_complaint_lists.map(complaint => complaint.master_problem_name || 'No Complaint Name').join(', ') : '-';
-
-    const subComplaintsString = Array.isArray(details?.service_register_complaint_lists?.[0]?.sub_problems_ids) 
-    ? details.service_register_complaint_lists[0].sub_problems_ids.map(subComplaint => subComplaint.sub_problem_name || 'No Sub Complaint Name').join(', ') : '-';
-
-    const isJobClosedOrCompleted = details.job_stage === "Closed" || details.job_stage === "Completed";
-
     return (
         <SafeAreaView>
             <NavigationHeader
-                title={details?.sequence_no || 'Quick Service Details'}
+                title= {details?.sequence_no || 'Quick Service Details'}
                 onBackPress={() => navigation.goBack()}
                 logo={false}
                 iconTwoName="plus"
                 iconTwoPress={() => { navigation.navigate('QuickServiceFormTabs', { serviceId: serviceId }) }}
             />
             <RoundedScrollContainer>
-                <DetailField label="Job Stage" value={details?.job_stage || '-'} />
-                <DetailField label="Close Reason" value={details?.job_stage_close_reason || '-'} />
                 <DetailField label="Customer"
-                    value={details?.customer_name ? details.customer_name.trim() : '-'}
-                    multiline={true}
+                    value={details?.customer_name ? details.customer_name.trim() : '-'} 
+                    multiline
+                    numberOfLines={3}
                     textAlignVertical={'top'} />
-                <DetailField label="Mobile Number" value={details?.customer_lists?.[0]?.customer_mobile || '-'} />
+                <DetailField label="Mobile Number" value={details?.customer_mobile || '-'} />
                 <DetailField label="Email" value={details?.customer_email || '-'} />
                 <DetailField label="Warehouse Name" value={details?.warehouse_name || '-'} />
                 <DetailField label="Created On" value={formatDateTime(details.date)} />
-                <DetailField label="Created By" value={details?.sales_person_name || '-'} />
+                <DetailField label="Created By" value={details?.assignee_name || '-'} />
                 <DetailField label="Brand Name" value={details?.brand_name || '-'} />
                 <DetailField label="Device Name" value={details?.device_name || '-'} />
                 <DetailField label="Consumer Model" value={details?.consumer_model_name || '-'} />
@@ -115,41 +134,35 @@ const QuickServiceDetails = ({ navigation, route }) => {
                 <DetailField label="Assigned To" value={details?.assignee_name || '-'} />
                 <DetailField label="Remarks"
                     value={details?.remarks || '-'}
-                    multiline={true}
+                    multiline
+                    numberOfLines={3}
                     textAlignVertical={'top'} />
                 <DetailField label="Pre Condition" value={details?.pre_condition || '-'} />
                 <DetailField label="Estimation" value={details?.estimation?.toString() || '-'} />
-                <DetailField label="Accessories"
-                    value={accessoriesString}
-                    multiline={true}
-                    textAlignVertical={'top'} />
-                <DetailField label="Complaints"
-                    value={complaintsString}
-                    multiline={true}
-                    textAlignVertical={'top'} />
-                <DetailField label="Sub Complaints"
-                    value={subComplaintsString}
-                    multiline={true}
-                    textAlignVertical={'top'} />
+                <DetailField label="Accessories" value={accessoriesString} />
+                {/* <DetailField label="Complaints"value={details?.service_register_complaints?.[0]?.
+                    master_problem_name || '-'} />
+                <DetailField label="Sub Complaints" value={details?.service_register_complaints?.[0]?.
+                    sub_problems_ids?.[0]?.sub_problem_name || '-'} />
                 <DetailField 
                     label="Remarks"
-                    value={details?.service_register_complaint_lists?.[0]?.remarks || '-'}
-                    multiline={true}
-                    textAlignVertical={'top'} /> 
+                    value={details?.service_register_complaints?.[0]?.remarks || '-'}
+                    multiline
+                    numberOfLines={3}
+                    textAlignVertical={'top'} /> */}
 
                 <View style={{ flexDirection: 'row', marginVertical: 20 }}>
-                    <Button
+                    <LoadingButton
                         width={'50%'}
                         backgroundColor={COLORS.lightRed}
                         title="CLOSE JOB"
                         onPress={() => {
                             setActionToPerform('close');
-                            setIsCloseModalVisible(true);
+                            setIsConfirmationModalVisible(true);
                         }}
-                        disabled={isJobClosedOrCompleted}
                     />
                     <View style={{ width: 5 }} />
-                    <Button
+                    <LoadingButton
                         width={'50%'}
                         backgroundColor={COLORS.green}
                         title="UPDATE"
@@ -157,23 +170,24 @@ const QuickServiceDetails = ({ navigation, route }) => {
                             setActionToPerform('update');
                             setIsUpdateModalVisible(true);
                         }}
-                        disabled={isJobClosedOrCompleted}
                     />
                 </View>
 
-                <CloseModal
-                    isVisible={isCloseModalVisible}
-                    header='Close'
-                    title={'Reason'}
-                    multiline
-                    numberOfLines={3}
-                    onClose={() => setIsCloseModalVisible(!isCloseModalVisible)}
-                    onSubmit={handleCloseJob}
+                <ConfirmationModal
+                    isVisible={isConfirmationModalVisible}
+                    onCancel={() => setIsConfirmationModalVisible(false)}
+                    onConfirm={() => {
+                        if (actionToPerform === 'close') {
+                            handleCloseJob();
+                        }
+                    }}
+                    headerMessage='Are you sure you want to close this service job?'
                 />
+
                 <ConfirmationModal
                     isVisible={isUpdateModalVisible}
                     onCancel={() => setIsUpdateModalVisible(false)}
-                    onConfirm={handleUpdateJob}
+                    onConfirm={handleUpdateJob}zz
                     headerMessage='Are you sure you want to update this service job?'
                 />
 

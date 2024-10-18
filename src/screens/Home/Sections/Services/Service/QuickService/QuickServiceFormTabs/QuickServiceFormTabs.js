@@ -45,8 +45,9 @@ const QuickServiceFormTabs = ({ navigation }) => {
     estimation: "",
     remarks: "",
     accessories: [],
-    complaints: "",
-    subComplaints: "",
+    complaints: [],
+    subComplaints: [],
+    subRemarks: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -105,10 +106,10 @@ const QuickServiceFormTabs = ({ navigation }) => {
         trn_no: parseInt(formData.trn, 10) || null,
         warehouse_id: formData?.warehouse.id ?? null,
         warehouse_name: formData.warehouse?.label ?? null,
-        brand_id: formData?.brand.id ?? null,
-        brand_name: formData.brand?.label ?? null,
         device_id: formData?.device.id ?? null,
         device_name: formData.device?.label ?? null,
+        brand_id: formData?.brand.id ?? null,
+        brand_name: formData.brand?.label ?? null,
         consumer_model_id: formData?.consumerModel.id ?? null,
         consumer_model_name: formData.consumerModel?.label ?? null,
         serial_no: formData.serialNumber || null,
@@ -123,30 +124,22 @@ const QuickServiceFormTabs = ({ navigation }) => {
         remarks: formData.remarks || null,
         sales_person_id: formData?.assignedTo.id ?? null,
         sales_person_name: formData.assignedTo?.label ?? null,
-        remarks: formData.remarks || null,
         accessories: formData.accessories?.map(accessories => ({
           accessory_id: accessories.id,
           accessory_name: accessories.label,
         })),
-        service_register_complaints: [
-          {
-            editable: false,
-            no: 0,
-            master_problem_id: formData?.complaints.id ?? null,
-            master_problem_name: formData.complaints?.label ?? null,
-            uom: null,
-            sub_problems_ids: [
-              {
-                sub_problem_id: formData?.subComplaints.id ?? null,
-                sub_problem_name: formData.subComplaints?.label ?? null,
-              }
-            ],
-            remarks: ""
-          }
-        ],
-      }
+        service_register_complaints : formData.complaints.map((complaint) => ({
+          editable: false,
+          master_problem_id: complaint.id,
+          master_problem_name: complaint.label,
+          remarks: formData.subRemarks || null,
+        sub_problems_ids: formData.subComplaints.map(subComplaint => ({
+          sub_problem_id: subComplaint.id,
+          sub_problem_name: subComplaint.label,
+        })),
+      }))
+    }
       console.log("🚀 ~ submit ~ serviceData:", JSON.stringify(serviceData, null, 2));
-
       try {
         const response = await post("/createJobRegistration", serviceData);
         console.log("🚀 ~ submit ~ response:", response);

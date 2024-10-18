@@ -20,7 +20,6 @@ import { TitleWithButton } from '@components/Header';
 
 const KPIActionDetails = ({ navigation, route }) => {
   const { id } = route?.params || {};
-  console.log("ID Here maybe", id)
   const currentUser = useAuthStore((state) => state.user);
   const [details, setDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -96,9 +95,7 @@ const KPIActionDetails = ({ navigation, route }) => {
       progress_status: 'Ongoing',
       isDeveloper: false,
       estimatedTime: details.totalEstimation?.[0]?.estimated_time || 0,
-      // time: new Date(),
     };
-    console.log("Start Data", data)
     handleTaskAction(data, 'Task Started Successfully', setIsStartModalVisible);
   };
 
@@ -111,25 +108,22 @@ const KPIActionDetails = ({ navigation, route }) => {
       assignee_id: currentUser?.related_profile?._id,
       assignee_name: currentUser?.related_profile?.name,
     };
-    console.log("Pause Data", data)
     handleTaskAction(data, 'Task Paused Successfully', setIsPauseModalVisible);
   };
 
   const handleReAssignTask = (reAssignReason, selectedAssignee) => {
-    // if (!selectedAssignee || !selectedAssignee._id) {
-    //   console.error("Selected assignee is missing or invalid.");
-    //   return;
-    // }
+    if (!selectedAssignee || !selectedAssignee._id) {
+      return;
+    }
     const data = {
       _id: details._id || id,
       assignee_id: currentUser?.related_profile?._id,
       assignee_name: currentUser?.related_profile?.name,
       estimatedTime: details.totalEstimation?.[0]?.estimated_time || 0,
-      // assignedToId: selectedAssignee._id,
-      // assignedToName: selectedAssignee.name,
-      // reassign_reason: ${currentUser?.related_profile?.name} reassigned the task to ${selectedAssignee.name} due to ${reAssignReason},
+      assignedToId: selectedAssignee._id,
+      assignedToName: selectedAssignee.name,
+      reassign_reason:` ${currentUser?.related_profile?.name} reassigned the task to ${selectedAssignee.name} due to ${reAssignReason}`,
     };
-    console.log("Reassign", data)
     handleTaskAction(data, 'Task Re-Assigned Successfully', setIsAssignModalVisible);
   };
 
@@ -144,6 +138,23 @@ const KPIActionDetails = ({ navigation, route }) => {
     handleTaskAction(data, 'Task Completed Successfully', setIsCompleteModalVisible);
   };
 
+  const saveUpdates = async (updateText) => {
+    const updateData = {
+      _id: details._id || id,
+      kpiStatusUpdates: [
+        {
+          isDeveloper: true,
+          assignee_id: currentUser?.related_profile?._id,
+          assignee_name: currentUser?.related_profile?.name,
+          updateText: updateText,
+          // file: documentUrls || [],
+          // time: new Date(),
+        },
+      ],
+    };
+    handleTaskAction(updateData, 'Update saved successfully', setIsModalVisible);
+  };
+
   const handleDocumentUploads = async (url) => {
     const data = {
       _id: details._id || id,
@@ -155,26 +166,9 @@ const KPIActionDetails = ({ navigation, route }) => {
         }
       ]
     };
-    console.log('Uploading documents with data:', data);
     handleTaskAction(data, 'File Uploaded successfully');
   };
 
-  const saveUpdates = async (updateText) => {
-    const updateData = {
-      _id: details._id || id,
-      kpiStatusUpdates: [
-        {
-          isDeveloper: true,
-          assignee_id: currentUser?.related_profile?._id,
-          assignee_name: currentUser?.related_profile?.name,
-          file: documentUrls || [],
-          updateText,
-          time: new Date(),
-        },
-      ],
-    };
-    handleTaskAction(updateData, 'Update saved successfully', setIsModalVisible);
-  };
 
   const UploadsContainer = ({ documentUrls, onDelete }) => {
     return (
@@ -248,6 +242,7 @@ const KPIActionDetails = ({ navigation, route }) => {
   const isTaskStarted = details.progress_status === 'Ongoing';
   const isTaskPaused = details.progress_status === 'Pause';
   const isTaskCompleted = details.progress_status === 'Completed';
+  const isNewStatus = details.status === 'New';
 
   return (
     <SafeAreaView>
@@ -260,17 +255,15 @@ const KPIActionDetails = ({ navigation, route }) => {
         <DetailField
           label="KRA"
           value={details?.kra?.name || '-'}
-          multiline
-          numberOfLines={3}
-          textAlignVertical={'top'}
-        />
+          multiline={true}
+          textAlignVertical="top"
+          marginTop={10} />
         <DetailField
           label="KPI Name"
           value={details?.kpi_name || '-'}
-          multiline
-          numberOfLines={3}
-          textAlignVertical={'top'}
-        />
+          multiline={true}
+          textAlignVertical="top"
+          marginTop={10} />
         <DetailField label="Created By" value={details?.created_by?.name || '-'} />
         <DetailField label="User Group" value={details?.usergroup?.group_name || '-'} />
         <DetailField label="Person" value={details?.employee?.name || '-'} />
@@ -279,33 +272,55 @@ const KPIActionDetails = ({ navigation, route }) => {
         <DetailField
           label="KPI Description"
           value={details?.kpi_description || '-'}
-          multiline
-          numberOfLines={10}
-          textAlignVertical={'top'}
-        />
+          multiline={true}
+          textAlignVertical="top"
+          marginTop={10} />
         <DetailField label="Is Mandatory" value={details?.is_mandatory ? 'Yes' : 'No' || '-'} />
         <DetailField label="Priority" value={details?.priority || '-'} />
         <DetailField label="Checklists" value={details?.remarks || '-'} />
-        <DetailField label="Reference Document" value={details?.pre_condition || '-'} />
+        <View style={{ marginTop: 10, marginBottom: 10 }}>
+          <DetailField
+            label="Reference Document"
+            value={details?.documentLink || '-'}
+            multiline={true}
+            textAlignVertical="top"
+          />
+          {details?.documentLink && (
+            <TouchableOpacity onPress={() => Linking.openURL(details.documentLink)}>
+              <Text style={{ marginVertical: 8,
+                fontSize: 16,
+                color: COLORS.lightenBoxTheme,
+                fontFamily: FONT_FAMILY.urbanistSemiBold, }}>
+                Open Reference Document
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
         <DetailField label="Estimated Time (HR)" value={details?.totalEstimation?.[0]?.estimated_time?.toString() || '-'} />
         <DetailField label="Deadline" value={formatDateTime(details?.deadline) || 'No data'} />
-        {/* <DetailField label="Deadline" value={details?.deadline || 'No Data'} /> */}
         <DetailField label="KPI Points" value={details?.kpi_points || '-'} />
         <DetailField label="Warehouse" value={details?.warehouse?.[0]?.warehouse_name || '-'} />
         <DetailField label="Is Manager Review Needed" value={details?.is_manager_review_needed ? 'Needed' : 'Not Needed' || '-'} />
         <DetailField label="Is Customer Review Needed" value={details?.is_customer_review_needed ? 'Needed' : 'Not Needed' || '-'} />
-        <DetailField label="Guidelines" value={details?.guide_lines?.join(', ') || '-'} />
+        <DetailField label="Guidelines" value={details?.guide_lines?.join(', ') || '-'}
+          multiline={true}
+          textAlignVertical="top"
+          marginTop={10} />
 
-        <TitleWithButton label={'Add Participants'} onPress={() => {
-          if (isMeet) {
-          // console.log('Navigating with id:', id);
-          navigation.navigate('AddParticipants', { id });
-          }
-        }}
-        disabled={!isMeet} />
+        <TitleWithButton
+          label={'Add Participants'}
+          onPress={() => {
+            if (isMeet) {
+              navigation.navigate('AddParticipants', { id });
+            }
+          }}
+          disabled={!isMeet || isNewStatus || !isTaskStarted} />
         <ParticipantsList participants={participants} />
 
-        <TitleWithButton label={'Updates'} onPress={() => setIsModalVisible(true)} />
+        <TitleWithButton
+          label={'Updates'}
+          onPress={() => setIsModalVisible(true)} disabled={!isTaskStarted} />
+
         <DocumentModal
           visible={isModalVisible}
           title="Files"

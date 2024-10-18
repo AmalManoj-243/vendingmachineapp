@@ -70,10 +70,10 @@ const KPIDashboardScreen = ({ navigation }) => {
         { name: 'Completed', value: dashBoardDetails.completedKpi.length || 0 },
     ]
         .map((item, index) => ({
-            name: item.name, // Name to be used in the legend
+            name: item.name, 
             value: item.value,
             svg: {
-                fill: colorMapping[item.name], // Use color mapping based on the name
+                fill: colorMapping[item.name],
                 onPress: () => navigation.navigate('KPIListingScreen', { kpiCategory: item.name }),
             },
             key: `pie-${index}`,
@@ -97,7 +97,7 @@ const KPIDashboardScreen = ({ navigation }) => {
                         <TouchableOpacity
                             key={index}
                             style={styles.legendItem}
-                            onPress={() => navigation.navigate('KPIListingScreen', { kpiCategory: item.name })} // Navigate on press
+                            onPress={() => navigation.navigate('KPIListingScreen', { kpiCategory: item.name })} 
                         >
                             <View style={[styles.legendDot, { backgroundColor: item.svg.fill }]} />
                             <Text style={styles.legendLabel}>{`${item.name}: ${item.value}`}</Text>
@@ -154,7 +154,6 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         paddingVertical: 10,
-        // backgroundColor: 'red'
     },
     legendItem: {
         flexDirection: 'row',

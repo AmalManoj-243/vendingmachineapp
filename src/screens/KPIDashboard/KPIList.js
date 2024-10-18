@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Platform, TouchableOpacity } from 'react-native';
+import { StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import Text from '@components/Text';
 import { FONT_FAMILY } from '@constants/theme';
 

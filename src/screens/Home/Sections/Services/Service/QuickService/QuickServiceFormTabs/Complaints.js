@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
-import { DropdownSheet } from '@components/common/BottomSheets';
+import { MultiSelectDropdownSheet } from '@components/common/BottomSheets';
 import { fetchComplaintsDropdown, fetchSubComplaintsDropdown } from '@api/dropdowns/dropdownApi';
 
-const Complaints = ({ formData, onFieldChange, errors }) => {
-
+const Complaints = ({ formData = { complaints: [], subComplaints: [] }, onFieldChange, errors }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
-
   const [dropdown, setDropdown] = useState({
     complaints: [],
     subComplaints: [],
@@ -35,25 +33,24 @@ const Complaints = ({ formData, onFieldChange, errors }) => {
   }, []);
 
   useEffect(() => {
-    if (formData.complaints) {
-      const fetchSubComplaintsData = async () => {
+    const fetchSubComplaintsData = async () => {
+      if (formData.complaints.length > 0) {
         try {
-          const subComplaintsData = await fetchSubComplaintsDropdown(formData.complaints.masterProblemId);
-          console.log('Fetched Sub Complaints:', subComplaintsData);
+          const subComplaintsData = await fetchSubComplaintsDropdown(formData.complaints[0].masterProblemId);
           setDropdown(prevDropdown => ({
             ...prevDropdown,
             subComplaints: subComplaintsData.map(data => ({
               id: data._id,
-              label: data.name, 
+              label: data.name,
             })),
           }));
-          
         } catch (error) {
           console.error('Error fetching sub-complaints dropdown data:', error);
         }
-      };
-      fetchSubComplaintsData();
-    }
+      }
+    };
+
+    fetchSubComplaintsData();
   }, [formData.complaints]);
 
   const toggleBottomSheet = (type) => {
@@ -77,11 +74,14 @@ const Complaints = ({ formData, onFieldChange, errors }) => {
       default:
         return null;
     }
+
     return (
-      <DropdownSheet
+      <MultiSelectDropdownSheet
         isVisible={isVisible}
         items={items}
+        refreshIcon={true}
         title={selectedType}
+        previousSelections={formData[fieldName] || []} 
         onClose={() => setIsVisible(false)}
         onValueChange={(value) => onFieldChange(fieldName, value)}
       />
@@ -94,20 +94,20 @@ const Complaints = ({ formData, onFieldChange, errors }) => {
         label={"Complaints"}
         placeholder={"Select Complaints"}
         dropIcon={"menu-down"}
-        items={dropdown.complaints}
         editable={false}
+        multiline={true}
         validate={errors.complaints}
-        value={formData.complaints?.label}
+        value={formData.complaints?.map(complaints => complaints.label).join(', ') || ''} // Fallback to empty string
         onPress={() => toggleBottomSheet('Complaints')}
       />
       <FormInput
         label="Sub Complaints"
         placeholder="Select Sub Complaints"
         dropIcon="menu-down"
-        items={dropdown.subComplaints}
         editable={false}
+        multiline={true}
         validate={errors.subComplaints}
-        value={formData.subComplaints?.label}
+        value={formData.subComplaints?.map(subComplaints => subComplaints.label).join(', ') || ''} // Fallback to empty string
         onPress={() => toggleBottomSheet('SubComplaints')}
       />
       <FormInput
@@ -118,7 +118,7 @@ const Complaints = ({ formData, onFieldChange, errors }) => {
         numberOfLines={5}
         textAlignVertical="top"
         marginTop={10}
-        onChangeText={(value) => onFieldChange('remarks', value)}
+        onChangeText={(value) => onFieldChange('subRemarks', value)}
       />
       {renderBottomSheet()}
     </RoundedScrollContainer>

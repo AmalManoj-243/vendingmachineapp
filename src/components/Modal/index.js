@@ -12,5 +12,6 @@ import UpdatesModal from "./UpdatesModal";
 import ReAssignModal from "./ReAssignModal";
 import CompleteModal from "./CompleteModal";
 import DocumentModal from "./DocumentModal";
+import CloseModal from "./CloseModal";
 
-export { ActionModal, LogoutModal, InputModal, CustomListModal, EmployeeListModal, RulesModal, AddUpdateModal, MeetingsScheduleModal, ConfirmationModal, PauseModal, UpdatesModal, ReAssignModal, CompleteModal, DocumentModal }
+export { ActionModal, LogoutModal, InputModal, CustomListModal, EmployeeListModal, RulesModal, AddUpdateModal, MeetingsScheduleModal, ConfirmationModal, PauseModal, UpdatesModal, ReAssignModal, CompleteModal, DocumentModal, CloseModal }

@@ -93,6 +93,7 @@ const CustomerDetails = ({ formData, onFieldChange, errors }) => {
         items={dropdown.customerName}
         editable={false}
         required
+        multiline={true}
         validate={errors.customerName}
         value={formData.customerName?.label}
         onPress={() => toggleBottomSheet('Customer Name')}

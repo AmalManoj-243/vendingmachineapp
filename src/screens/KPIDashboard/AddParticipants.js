@@ -12,7 +12,6 @@ import { put } from '@api/services/utils';
 
 const AddParticipants = ({ navigation, route }) => {
     const { id } = route.params || {};
-    console.log("Participants Id", id);
     const [details, setDetails] = useState({});
     const [selectedType, setSelectedType] = useState(null);
     const [isVisible, setIsVisible] = useState(false);
@@ -65,7 +64,6 @@ const AddParticipants = ({ navigation, route }) => {
             try {
                 const response = await put('/updateKpiTasks', participantData);
                 console.log('Participant response:', response);
-                console.log('Added Participants:', participantData);
                 navigation.navigate('KPIActionDetails', {id});
             } catch (error) {
                 console.error('Error Adding Participants:', error);
