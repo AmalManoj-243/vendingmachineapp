@@ -28,15 +28,17 @@ import { BoxInspectionForm, BoxInspectionScreen } from "@screens/Home/Options/Bo
 import { AttendanceScreen } from "@screens/Home/Options/Attendance";
 import { MarkAttendance, PunchingScreen } from "@screens/Home/Options/Attendance/Punching";
 import { AddParticipants, KPIActionDetails, KPIListingScreen } from "@screens/KPIDashboard";
+import { ServicesScreen } from "@screens/Home/Sections/Services";
+import { ServiceScreens } from "@screens/Home/Sections/Services/Service";
 import { SparePartsIssueCreation, SparePartsRequestDetails, SparePartsRequestScreen } from "@screens/Home/Sections/Services/SpareManagements/SparePartsRequest";
 import { AddSpareParts, QuickServiceDetails, QuickServiceScreen, QuickServiceUpdateDetails } from "@screens/Home/Sections/Services/Service/QuickService";
-import { ServiceScreens } from "@screens/Home/Sections/Services/Service";
-import { ServicesScreen } from "@screens/Home/Sections/Services";
 import { SpareManagementsScreen } from "@screens/Home/Sections/Services/SpareManagements";
 import { QuickServiceFormTabs } from "@screens/Home/Sections/Services/Service/QuickService/QuickServiceFormTabs";
 import { EditPickup, PickupDetails, PickupScreen } from "@screens/Home/Sections/Services/Service/Pickup";
 import { VisitFormTabs } from "@screens/Home/Options/Visits/VisitFormTabs";
-import { AddProductLines, EditPurchaseRequisitionDetails, PurchaseRequisitionDetails, PurchaseRequisitionForm, PurchaseRequisitionScreen } from "@screens/Home/Options/PurchaseRequisition";
+import { PurchasesScreen } from "@screens/Home/Options/Purchases";
+import { AddPriceLines, PriceEnquiryDetails, PriceEnquiryForm, PriceEnquiryScreen } from "@screens/Home/Options/Purchases/PriceEnquiry";
+import { AddProductLines, EditPurchaseRequisitionDetails, PurchaseRequisitionDetails, PurchaseRequisitionForm, PurchaseRequisitionScreen } from "@screens/Home/Options/Purchases/PurchaseRequisition";
 
 const Stack = createNativeStackNavigator();
 
@@ -398,7 +400,32 @@ const StackNavigator = () => {
         options={{ headerShown: false }}
       />
 
-      {/* Purchase Requisition */}
+      {/* Purchases */}
+      <Stack.Screen 
+      name="PurchasesScreen"
+      component={PurchasesScreen}
+      options={{headerShown: false}}
+      />
+      <Stack.Screen 
+      name="PriceEnquiryForm"
+      component={PriceEnquiryForm}
+      options={{headerShown: false}}
+      />
+      <Stack.Screen 
+      name="PriceEnquiryScreen"
+      component={PriceEnquiryScreen}
+      options={{headerShown: false}}
+      />
+      <Stack.Screen 
+      name="PriceEnquiryDetails"
+      component={PriceEnquiryDetails}
+      options={{headerShown: false}}
+      />
+      <Stack.Screen 
+      name="AddPriceLines"
+      component={AddPriceLines}
+      options={{headerShown: false}}
+      />
       <Stack.Screen 
       name="PurchaseRequisitionForm"
       component={PurchaseRequisitionForm}

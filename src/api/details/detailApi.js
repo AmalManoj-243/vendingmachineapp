@@ -211,3 +211,7 @@ export const fetchKPIDashboardDetails = async (detailId) => {
 export const fetchPurchaseRequisitionDetails = async (detailId) => {
   return fetchDetails(API_ENDPOINTS.VIEW_PURCHASE_REQUISITION, detailId);
 };
+
+export const fetchPriceEnquiryDetails = async (detailId) => {
+  return fetchDetails(API_ENDPOINTS.VIEW_PRICE, detailId);
+};

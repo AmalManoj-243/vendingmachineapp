@@ -23,6 +23,7 @@ export const API_ENDPOINTS = {
     VIEW_KPI: '/viewKpiTasks',
     VIEW_PICKUP: '/viewJobBooking',
     VIEW_PURCHASE_REQUISITION: '/viewPurchaseRequest',
+    VIEW_PRICE: '/viewPriceEnquiry',
 };
 
 export const DROP_DOWN_API_ENDPOINTS = {

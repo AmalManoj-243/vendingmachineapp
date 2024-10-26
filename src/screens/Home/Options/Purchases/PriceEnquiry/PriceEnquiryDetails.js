@@ -1,0 +1,152 @@
+import React, { useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { View, FlatList } from 'react-native';
+import { SafeAreaView } from '@components/containers';
+import NavigationHeader from '@components/Header/NavigationHeader';
+import { RoundedScrollContainer } from '@components/containers';
+import { DetailField } from '@components/common/Detail';
+import { formatDate } from '@utils/common/date';
+import { showToastMessage } from '@components/Toast';
+import { fetchPriceEnquiryDetails } from '@api/details/detailApi';
+import PriceDetailList from './PriceDetailList';
+import { OverlayLoader } from '@components/Loader';
+import { Button } from '@components/common/Button';
+import { COLORS } from '@constants/theme';
+import { put, post, deleteRequest } from '@api/services/utils';
+import { ConfirmationModal } from '@components/Modal';
+
+const PriceEnquiryDetails = ({ navigation, route }) => {
+    const { id: priceId } = route?.params || {};
+    const [details, setDetails] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [productLines, setProductLines] = useState([]);
+    const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+    const [actionToPerform, setActionToPerform] = useState(null);
+
+    const fetchDetails = async () => {
+        setIsLoading(true);
+        try {
+            const updatedDetails = await fetchPriceEnquiryDetails(priceId);
+            const requestDetails = updatedDetails[0]?.request_details?.[0];
+            setDetails(updatedDetails[0] || {});
+            setProductLines(requestDetails?.supplier_prices || []);
+        } catch (error) {
+            console.error('Error fetching price enquiry details:', error);
+            showToastMessage('Failed to fetch price enquiry details. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            if (priceId) {
+                fetchDetails(priceId);
+            }
+        }, [priceId])
+    );
+
+    const handleSendPurchase = async () => {
+        try {
+            const data = { _id: details._id };
+            const response = await post('/updatePurchaseRequest/push_to_price_enquiry', data);
+            if (response.success === true || response.success === 'true') {
+                showToastMessage('Purchase Succesfully added to Price Enquiry');
+                fetchDetails();
+                navigation.navigate('OptionsScreen');
+            } else {
+                showToastMessage('Failed. Please try again.');
+            }
+        } catch (error) {
+            showToastMessage('An error occurred. Please try again.');
+        }
+    };
+
+    const handleDeletePurchase = async () => {
+        setIsSubmitting(true);
+        try {
+            const { _id } = details;
+            const response = await deleteRequest(`/viewPurchaseRequest/${_id}`);
+            if (response.success === true || response.success === 'true') {
+                showToastMessage('Purchase Deleted Successfully');
+                navigation.navigate('PurchaseRequisitionScreen');
+            } else {
+                showToastMessage('Failed to Delete Purchase. Please try again.');
+            }
+        } catch (error) {
+            showToastMessage('An error occurred. Please try again.');
+        } finally {
+            fetchDetails();
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleEditPurchase = () => {
+        navigation.navigate('EditPurchaseRequisitionDetails', { id: priceId });
+    };
+
+    const isPurchaseOrderDisabled = productLines.some(item => item.status === 'Approved');
+
+    return (
+        <SafeAreaView>
+            <NavigationHeader
+                title={details?.sequence_no || 'Price Enquiry Details'}
+                onBackPress={() => navigation.goBack()}
+                logo={false}
+            />
+            <RoundedScrollContainer>
+                <DetailField label="Requested By" value={details?.request_details?.[0]?.requested_by?.employee_name || '-'} />
+                <DetailField label="Updated Date" value={formatDate(details?.request_details?.[0]?.request_date)} />
+                <DetailField label="Warehouse" value={details?.request_details?.[0]?.warehouse?.warehouse_name || '-'} />
+                <DetailField label="Require By" value={formatDate(details?.request_details?.[0]?.require_by)} />
+                <FlatList
+                    data={productLines}
+                    renderItem={({ item }) => <PriceDetailList item={item} />}
+                    keyExtractor={(item) => item._id}
+                />
+
+                <View style={{ flexDirection: 'row', marginVertical: 20 }}>
+                    <Button
+                        width={'30%'}
+                        backgroundColor={COLORS.lightRed}
+                        title="DELETE"
+                        onPress={() => {
+                            setActionToPerform('delete');
+                            setIsConfirmationModalVisible(true);
+                        }}
+                    />
+                    <View style={{ width: 5 }} />
+                    <Button
+                        width={'40%'}
+                        backgroundColor={COLORS.tabIndicator}
+                        title="Purchase Order"
+                        onPress={handleSendPurchase}
+                        disabled={isPurchaseOrderDisabled}
+                    />
+                    <View style={{ width: 5 }} />
+                    <Button
+                        width={'30%'}
+                        backgroundColor={COLORS.green}
+                        title="EDIT"
+                        onPress={handleEditPurchase}
+                    />
+                </View>
+
+                <ConfirmationModal
+                    isVisible={isConfirmationModalVisible}
+                    onCancel={() => setIsConfirmationModalVisible(false)}
+                    headerMessage='Are you sure you want to Delete this?'
+                    onConfirm={() => {
+                        handleDeletePurchase();
+                        setIsConfirmationModalVisible(false);
+                    }}
+                />
+
+                <OverlayLoader visible={isLoading || isSubmitting} />
+            </RoundedScrollContainer>
+        </SafeAreaView>
+    );
+};
+
+export default PriceEnquiryDetails;

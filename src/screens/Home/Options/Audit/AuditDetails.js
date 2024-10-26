@@ -9,7 +9,7 @@ import { showToastMessage } from '@components/Toast';
 import { formatDate } from '@utils/common/date';
 import { fetchAuditingDetails } from '@api/details/detailApi';
 import { OverlayLoader } from '@components/Loader';
-import { COLORS, FONT_FAMILY} from '@constants/theme';
+import { COLORS, FONT_FAMILY } from '@constants/theme';
 
 const AuditDetails = ({ navigation, route }) => {
     const { id: auditId } = route?.params || {};
@@ -20,30 +20,30 @@ const AuditDetails = ({ navigation, route }) => {
         setIsLoading(true);
         try {
             const updatedDetails = await fetchAuditingDetails(auditId);
-            setDetails(updatedDetails[0] || {}); 
+            setDetails(updatedDetails[0] || {});
         } catch (error) {
             console.error('Error fetching Audit details:', error);
             showToastMessage('Failed to fetch Audit details. Please try again.');
         } finally {
             setIsLoading(false);
         }
-    };    
+    };
 
     const SignatureField = ({ label, signature }) => {
         if (signature && (signature.startsWith('http') || signature.startsWith('https') || signature.startsWith('data:image'))) {
             return (
                 <View style={styles.signatureContainer}>
-                <Text style={styles.signatureLabel}>{label}</Text>
-                <Image
-                    source={{ uri: signature }}
-                    style={styles.signatureImage}
-                />
-            </View>
+                    <Text style={styles.signatureLabel}>{label}</Text>
+                    <Image
+                        source={{ uri: signature }}
+                        style={styles.signatureImage}
+                    />
+                </View>
             );
         }
         return <DetailField label={label} value="No signature" />;
     };
-      
+
     useFocusEffect(
         useCallback(() => {
             if (auditId) {
@@ -54,35 +54,35 @@ const AuditDetails = ({ navigation, route }) => {
 
     return (
         <SafeAreaView>
-        <NavigationHeader
-            title={details?.sequence_no || 'Audit Details'}
-            onBackPress={() => navigation.goBack()}
-            logo={false}
-        />
-        <RoundedScrollContainer>
-            <DetailField
-                label="Partner"
-                value={details?.customer_name || '-'}
-                multiline={true}
-                textAlignVertical={'top'}
+            <NavigationHeader
+                title={details?.sequence_no || 'Audit Details'}
+                onBackPress={() => navigation.goBack()}
+                logo={false}
             />
-            <DetailField label="Date" value={formatDate(details?.date)} />
-            <DetailField label="Amount" value={details?.amount?.toString() || '-'} />
-            <DetailField label="Tax" value={(details?.taxed_amount - details?.amount)?.toString() || '-'} />
-            <DetailField label="Total" value={details?.taxed_amount?.toString() || '-'} />
-            <DetailField label="Sales Person" value={details?.sales_person_name || '-'} />
-            <DetailField label="Warehouse" value={details?.warehouse_name || '-'} />
-            <DetailField label="Company" value={details?.company_name || '-'} />
-            <DetailField label="Invoice No" value={details?.inv_sequence_no || '-'} />
-            <DetailField label="Collection Type" value={details?.collection_type_name || '-'} />
-            <DetailField label="Cheque No" value={details?.chq_no || '-'} />
-            <DetailField label="Cheque Date" value={details?.chq_date || '-'} />
-            <DetailField label="Cheque Type" value={details?.chq_type || '-'} />
-            <DetailField label="Cheque Transaction Type" value={details?.cheque_transaction_type || '-'} />
-            <DetailField label="Chart Of Accounts" value={details?.chart_of_accounts_name || '-'} />
-            <SignatureField label="Customer Signature" signature={details?.customer_vendor_signature} />
-            <OverlayLoader visible={isLoading} />
-        </RoundedScrollContainer>
+            <RoundedScrollContainer>
+                <DetailField
+                    label="Partner"
+                    value={details?.customer_name || '-'}
+                    multiline={true}
+                    textAlignVertical={'top'}
+                />
+                <DetailField label="Date" value={formatDate(details?.date)} />
+                <DetailField label="Amount" value={details?.amount?.toFixed(2) || '-'} />
+                <DetailField label="Tax" value={((details?.taxed_amount - details?.amount)?.toFixed(2)) || '-'} />
+                <DetailField label="Total" value={details?.taxed_amount?.toFixed(2) || '-'} />
+                <DetailField label="Sales Person" value={details?.sales_person_name || '-'} />
+                <DetailField label="Warehouse" value={details?.warehouse_name || '-'} />
+                <DetailField label="Company" value={details?.company_name || '-'} />
+                <DetailField label="Invoice No" value={details?.inv_sequence_no || '-'} />
+                <DetailField label="Collection Type" value={details?.collection_type_name || '-'} />
+                <DetailField label="Cheque No" value={details?.chq_no || '-'} />
+                <DetailField label="Cheque Date" value={details?.chq_date || '-'} />
+                <DetailField label="Cheque Type" value={details?.chq_type || '-'} />
+                <DetailField label="Cheque Transaction Type" value={details?.cheque_transaction_type || '-'} />
+                <DetailField label="Chart Of Accounts" value={details?.chart_of_accounts_name || '-'} />
+                <SignatureField label="Customer Signature" signature={details?.customer_vendor_signature} />
+                <OverlayLoader visible={isLoading} />
+            </RoundedScrollContainer>
         </SafeAreaView>
     );
 };
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     signatureContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between', 
+        justifyContent: 'space-between',
         marginVertical: 10,
     },
     signatureLabel: {
