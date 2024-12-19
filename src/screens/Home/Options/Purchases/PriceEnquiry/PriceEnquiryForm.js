@@ -138,14 +138,15 @@ const PriceEnquiryForm = ({ route, navigation }) => {
     if (validateForm(fieldsToValidate)) {
       setIsSubmitting(true);
       const priceData = {
+        // request_date: formData?.requestDate?.split('T')[0] || null,
         request_date: formData?.requestDate ?? null,
         requested_by: formData?.requestedByName?.id ?? null,
         require_by: formData?.requireBy ?? null,
         ware: formData?.warehouse?.label ?? '',
-        _id: null,
-        supplier_id: null,
-        supplier_name: null,
-        employee_name: null,
+        _id: '',
+        supplier_id: '',
+        supplier_name: '',
+        employee_name: '',
         request_details: [0],
         alternate_products: [],
         product_lines: productLines.map((item, index) => ({

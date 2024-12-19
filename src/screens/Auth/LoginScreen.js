@@ -120,8 +120,8 @@ const LoginScreen = () => {
                 onChangeText={(text) => handleOnchange(text, "username")}
                 onFocus={() => handleError(null, "username")}
                 iconName="account-outline"
-                label="Username or email"
-                placeholder="Enter username or email"
+                label="Username or Email"
+                placeholder="Enter Username or Email"
                 error={errors.username}
                 column={true}
                 login={true}

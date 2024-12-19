@@ -11,6 +11,7 @@ const VendorBillList = ({ item, onPress }) => {
         <Text style={styles.head}>{item?.sequence_no || '-'}</Text>
         <View style={styles.rightColumn}>
           <Text style={styles.content}>{item?.supplier?.supplier_name || '-'}</Text>
+          <Text style={styles.content}>{item?.sales_preson?.sales_person_name || '-'}</Text>
         </View>
         <View style={styles.rightColumn}> 
           <Text style={styles.content}>{formatDate(item?.date) || '-'}</Text>

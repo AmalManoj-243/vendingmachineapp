@@ -30,7 +30,7 @@ const AuditForm = ({ navigation }) => {
   const [ledger, setLedger] = useState({})
   const [imageLoading, setImageLoading] = useState(true);
   const [scannedBillDetails, setScannedBillDetails] = useState({});
-  // console.log("🚀 ~ Audit Form ~ scannedBillDetails:", JSON.stringify(scannedBillDetails, null, 2));
+  console.log("🚀 ~ Audit Form ~ scannedBillDetails:", JSON.stringify(scannedBillDetails, null, 2));
   const [remarks, setRemarks] = useState('')
   const [splittedBillName, setSplittedBillName] = useState('')
   const loginUser = useAuthStore(state => state.user)
@@ -58,6 +58,7 @@ const AuditForm = ({ navigation }) => {
     const billName = billParts[0]
     console.log("BillName : ", billName)
     const billSequence = billParts.slice(1).join('-')
+    console.log("Bill Sequence : ", billSequence)
     setSplittedBillName(billName)
     resetFormState();
 
@@ -296,7 +297,7 @@ const AuditForm = ({ navigation }) => {
     }
 
     for (const field in errorMessages) {
-      // Skip validation for displayName field if bill name is "Spare Issue"
+      // Skip validation for displayName field if bill name is "Spare Issue" & "E/PPAY"
       if (field === "displayName" && (splittedBillName === "Spare Issue" || splittedBillName === 'E/PPAY')) {
         continue;
       }
@@ -355,7 +356,7 @@ const AuditForm = ({ navigation }) => {
         collection_type_id: collectionType?._id ?? null,
         collection_type_name: collectionType?.collection_type_name ?? null,
         bussiness_type_id: collectionType?.bussiness_type_id ?? null,
-        customer_id: null,
+        customer_id: scannedBillDetails?.customer?.customer_id ?? null,
         customer_name: '',
         invoice_id: scannedBillDetails?._id,
         inv_sequence_no: displayBillDetails?.documentNumber ?? null,

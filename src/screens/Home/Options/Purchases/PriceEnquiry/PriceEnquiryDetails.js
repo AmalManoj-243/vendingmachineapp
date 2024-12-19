@@ -21,6 +21,7 @@ const PriceEnquiryDetails = ({ navigation, route }) => {
     const currentUser = useAuthStore((state) => state.user);
     // console.log("🚀 ~ PriceEnquiryDetails ~ currentUser:", JSON.stringify(currentUser, null, 2));
     const [details, setDetails] = useState({});
+    console.log("🚀 ~ PriceEnquiryDetails ~ details:", JSON.stringify(details, null, 2));
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [priceLines, setPriceLines] = useState(updatedPriceLines || []);
@@ -59,7 +60,7 @@ const PriceEnquiryDetails = ({ navigation, route }) => {
                 employee_id: currentUser?._id || "",
                 product_purchase_enquiry_id: details?._id,
                 employee_name: currentUser?.user_name || "",
-                bill_date: formatDate(new Date, 'yyyy/MM/dd'),
+                bill_date: formatDate(new Date, 'dd/mm/yyyy'),
                 order_date: formatDate(new Date, 'yyyy/MM/dd'),
                 update_date: formatDate(new Date, 'yyyy/MM/dd'),
                 payment_status: "Submitted",

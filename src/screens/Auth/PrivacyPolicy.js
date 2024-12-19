@@ -17,14 +17,14 @@ const PrivacyPolicy = ({ navigation, route }) => {
             <RoundedScrollContainer>
                 <Text style={{ fontFamily: FONT_FAMILY.urbanistBold }}>
                     <Text style={styles.heading}>GENERAL INSTRUCTIONS</Text> {'\n'}
-                    1	SALES IN CHARGE{'\n'}
+                    1	  SALES IN CHARGE{'\n'}
                     2 	CREDIT COLLECTION{'\n'}
                     3 	SHIPMENT FOR CUSTOMER{'\n'}
                     4 	CREDIT PAYMENT RECEIPT{'\n'}
                     5 	EXPENSES AND PAYMENTS {'\n'}
                     6 	RMA {'\n'}
                     7 	SERVICE ATTENDING{'\n'}
-                    8 	 TECHNICIANS {'\n'}
+                    8 	TECHNICIANS {'\n'}
                     9 	CASHIER OR IN CHARGE{'\n'}
                     10 	ACCOUNTANT/BACKGROUND + SALES{'\n'}
                     11 	CUSTOMER ACCOUNT CROSS CHECKING{'\n'}
@@ -324,7 +324,7 @@ const PrivacyPolicy = ({ navigation, route }) => {
 
                     • കാരണം നമ്മൾ കമ്പനിക്കു വേണ്ടി ചിലവാക്കുന്ന ടാക്സ്നമുക്കു റീഫണ്ട്കിട്ടുന്നതാണ്. അതു കൊണ്ട് ഒറ്റ ക്ലിക്കിൽ നമ്മൾ ചിലവാക്കിയ പണത്തിന്റെ ടാക്സ് എത്രയാണെന്ന് അറിയാൻ സാധിക്കും.{'\n'}
 
-                    This is because tax paid for a company will be refunded.  Sowe can figure out how much tax for the money we spend by a single click.{'\n'}{'\n'}
+                    This is because tax paid for a company will be refunded.  So we can figure out how much tax for the money we spend by a single click.{'\n'}{'\n'}
                 </Text>
                 <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'space-between' }}>
                     <View style={{ flex: 2 }}>

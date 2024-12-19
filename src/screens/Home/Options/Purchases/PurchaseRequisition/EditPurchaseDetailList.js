@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Platform, TouchableOpacity } from "react-native";
 import Text from "@components/Text";
 import { FONT_FAMILY } from "@constants/theme";
@@ -8,26 +8,32 @@ import { fetchSupplierDropdown } from "@api/dropdowns/dropdownApi";
 
 const EditPurchaseDetailList = ({ item, onPress }) => {
   const [selectedSuppliers, setSelectedSuppliers] = useState([]);
+  console.log("Suppliers : ", selectedSuppliers)
   const [errors, setErrors] = useState({});
   const [dropdown, setDropdown] = useState({ suppliers: [] });
   const [searchText, setSearchText] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
 
-  const fetchSuppliers = async () => {
-    try {
-      const supplierData = await fetchSupplierDropdown(searchText);
-      setDropdown((prevDropdown) => ({
-        ...prevDropdown,
-        suppliers: supplierData?.map((data) => ({
-          id: data._id,
-          label: data.name?.trim(),
-        })),
-      }));
-    } catch (error) {
-      console.error("Error fetching Supplier dropdown data:", error);
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        const supplierData = await fetchSupplierDropdown(searchText);
+        setDropdown((prevDropdown) => ({
+          ...prevDropdown,
+          suppliers: supplierData?.map((data) => ({
+            id: data._id,
+            label: data.name?.trim(),
+          })),
+        }));
+      } catch (error) {
+        console.error("Error fetching Supplier dropdown data:", error);
+      }
+    };
+    if (selectedType === "Supplier") {
+      fetchSuppliers();
     }
-  };
+  }, [searchText, selectedType]);
 
   const handleSupplierSelection = (selectedValues) => {
     const newSuppliers = selectedValues.map((supplier) => ({
@@ -41,43 +47,36 @@ const EditPurchaseDetailList = ({ item, onPress }) => {
     setSelectedSuppliers(newSuppliers);
   };
 
-//   const validateSelection = () => {
-//     if (selectedSuppliers.length === 0) {
-//       setErrors((prev) => ({ ...prev, suppliers: "Please select at least one supplier." }));
-//     } else {
-//       setErrors((prev) => ({ ...prev, suppliers: null }));
-//     }
-//   };
-
+  
   const toggleBottomSheet = (type) => {
     setSelectedType(type);
-    setIsVisible(true);
-    if (type === "Supplier") fetchSuppliers();
+    setIsVisible((prev) => !prev);
   };
 
   const renderBottomSheet = () => {
-    if (!isVisible) return null;
-
     if (selectedType === "Supplier") {
+      const previousSelections = selectedSuppliers.map((supplier) => ({
+        id: supplier.supplier_id,
+        label: supplier.supplier?.suplier_name,
+      }));
+  
       return (
         <MultiSelectDropdownSheet
           isVisible={isVisible}
           items={dropdown.suppliers}
-          title="Select Suppliers"
+          title={selectedType}
           refreshIcon={false}
           search
           onSearchText={(value) => setSearchText(value)}
-          previousSelections={selectedSuppliers}
+          previousSelections={previousSelections}
           onValueChange={handleSupplierSelection}
-          onClose={() => {
-            setIsVisible(false);
-            // validateSelection();
-          }}
+          onClose={() => setIsVisible(false)}
         />
       );
     }
     return null;
   };
+   
 
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.itemContainer}>
@@ -171,3 +170,11 @@ const styles = StyleSheet.create({
 });
 
 export default EditPurchaseDetailList;
+
+//   const validateSelection = () => {
+//     if (selectedSuppliers.length === 0) {
+//       setErrors((prev) => ({ ...prev, suppliers: "Please select at least one supplier." }));
+//     } else {
+//       setErrors((prev) => ({ ...prev, suppliers: null }));
+//     }
+//   };

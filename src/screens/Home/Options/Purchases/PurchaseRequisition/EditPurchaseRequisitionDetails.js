@@ -21,7 +21,6 @@ const EditPurchaseRequisitionDetails = ({ navigation, route }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [productLines, setProductLines] = useState([]);
     const [selectedSuppliers, setSelectedSuppliers] = useState([]);
-    console.log("Edit : ",selectedSuppliers)
 
     const fetchDetails = async () => {
         setIsLoading(true);

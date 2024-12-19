@@ -63,7 +63,7 @@ const VendorBillDetails = ({ navigation, route }) => {
             <DetailField label="Ordered Date" value={formatDate(details?.order_date)} />
             <DetailField label="Bill Date" value={formatDate(details?.bill_date)} />
             <DetailField label="Purchase Type" value={details?.purchase_type || '-'} />
-            <DetailField label="Sales Person" value={details?.sales_person_name || '-'} />
+            <DetailField label="Sales Person" value={details?.sales_preson?.sales_person_name || '-'} />
             <DetailField label="Warehouse" value={details?.warehouse_name || '-'} />
             <DetailField label="Country" value={details?.country?.country_name || '-'} />
             <DetailField label="Currency" value={details?.currency?.currency_name || '-'} />

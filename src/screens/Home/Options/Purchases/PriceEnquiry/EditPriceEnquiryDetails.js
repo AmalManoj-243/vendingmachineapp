@@ -43,23 +43,6 @@ const EditPriceEnquiryDetails = ({ navigation, route }) => {
         }, [priceId])
     );
 
-    const handleViewPrice = async () => {
-        setIsLoading(true);
-        try {
-            const response = await get(`/viewPriceEnquiry/${priceId}`);
-            if (response.success) {
-                navigation.navigate('PriceEnquiryDetails', { id: priceId });
-            } else {
-                showToastMessage('Failed to retrieve price enquiry details. Please try again.');
-            }
-        } catch (error) {
-            console.error('Error in handleViewPrice:', error.message || 'Unknown error');
-            showToastMessage('An error occurred. Please try again.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const handleEditPrice = async () => {
         setIsSubmitting(true);
         try {
@@ -78,8 +61,9 @@ const EditPriceEnquiryDetails = ({ navigation, route }) => {
             const response = await put('/updateSupplierPriceArray', updateData);
             if (response && (response.status === "true" || response.status === true)) {
                 showToastMessage('Successfully Added Price');
+                navigation.navigate('PriceEnquiryDetails', { id: priceId });
             } else {
-                showToastMessage('Failed to update purchase. Please try again.');
+                showToastMessage('Failed to update price. Please try again.');
             }
         } catch (error) {
             console.error('Error in handleEditPrice:', error.message || 'Unknown error');
@@ -119,21 +103,11 @@ const EditPriceEnquiryDetails = ({ navigation, route }) => {
                     keyExtractor={(item) => item._id}
                 />
 
-                <View style={{ flexDirection: 'row', marginVertical: 20 }}>
-                    <Button
-                        width={'50%'}
-                        backgroundColor={COLORS.tabIndicator}
-                        title="VIEW"
-                        onPress={handleViewPrice}
-                    />
-                    <View style={{ width: 5 }} />
-                    <Button
-                        width={'50%'}
-                        backgroundColor={COLORS.green}
-                        title="SUBMIT"
-                        onPress={handleEditPrice}
-                    />
-                </View>
+                <Button
+                    backgroundColor={COLORS.green}
+                    title="SUBMIT"
+                    onPress={handleEditPrice}
+                />
 
                 <OverlayLoader visible={isLoading || isSubmitting} />
             </RoundedScrollContainer>
