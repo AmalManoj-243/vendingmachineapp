@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Platform, TouchableOpacity } from "react-native";
 import Text from "@components/Text";
+import { FONT_FAMILY } from "@constants/theme";
 import { TextInput as FormInput } from "@components/common/TextInput";
 import { MultiSelectDropdownSheet } from "@components/common/BottomSheets";
 import { fetchSupplierDropdown } from "@api/dropdowns/dropdownApi";
@@ -8,11 +9,12 @@ import { fetchSupplierDropdown } from "@api/dropdowns/dropdownApi";
 const EditPurchaseDetailList = ({ item, onPress }) => {
   const [selectedSuppliers, setSelectedSuppliers] = useState([]);
   const [dropdownSuppliers, setDropdownSuppliers] = useState([]);
+  const [searchText, setSearchText] = useState("");
   const [isVisible, setIsVisible] = useState(false);
 
-  // Initialize selected suppliers from props on mount
+  // Initialize selected suppliers from item.suppliers
   useEffect(() => {
-    if (item?.suppliers?.length > 0) {
+    if (item?.suppliers) {
       const initialSelections = item.suppliers.map((supplier) => ({
         id: supplier.supplier?.suplier_id,
         label: supplier.supplier?.suplier_name,
@@ -21,44 +23,36 @@ const EditPurchaseDetailList = ({ item, onPress }) => {
     }
   }, [item]);
 
-  // Fetch dropdown data when the dropdown opens
-  const fetchDropdownSuppliers = async () => {
-    try {
-      const supplierData = await fetchSupplierDropdown();
-      const formattedSuppliers = supplierData?.map((supplier) => ({
-        id: supplier._id,
-        label: supplier.name,
-      }));
+  // Fetch supplier dropdown data when the bottom sheet is visible or search text changes
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        const supplierData = await fetchSupplierDropdown(searchText);
+        const formattedSuppliers = supplierData?.map((data) => ({
+          id: data._id,
+          label: data.name?.trim(),
+        }));
+        setDropdownSuppliers(formattedSuppliers || []);
+      } catch (error) {
+        console.error("Error fetching supplier dropdown data:", error);
+      }
+    };
 
-      // Combine selected suppliers with fetched suppliers
-      const mergedSuppliers = [
-        ...selectedSuppliers,
-        ...formattedSuppliers
-      ];
+    if (isVisible) fetchSuppliers();
+  }, [searchText, isVisible]);
 
-      setDropdownSuppliers(mergedSuppliers || []);
-    } catch (error) {
-      console.error("Error fetching supplier data:", error);
-    }
-  };
-
-  // Toggle dropdown visibility
-  const toggleDropdown = () => {
-    if (!isVisible) {
-      fetchDropdownSuppliers();
-    }
-    setIsVisible(!isVisible);
-  };
-
-  // Handle supplier selection
+  // Handle selection changes from the dropdown
   const handleSupplierSelection = (selectedValues) => {
     setSelectedSuppliers(selectedValues);
   };
 
+  // Toggle the visibility of the bottom sheet
+  const toggleBottomSheet = () => setIsVisible((prev) => !prev);
+
   return (
-    <TouchableOpacity style={styles.itemContainer} onPress={onPress}>
+    <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.itemContainer}>
       <View style={styles.leftColumn}>
-        <Text style={styles.head}>{item?.product?.product_name || "-"}</Text>
+        <Text style={styles.head}>{item?.product?.product_name?.trim() || "-"}</Text>
         <View style={styles.rightColumn}>
           <Text style={styles.content}>{item?.quantity || "-"}</Text>
           <Text style={styles.content}>{item?.remarks || "-"}</Text>
@@ -66,19 +60,22 @@ const EditPurchaseDetailList = ({ item, onPress }) => {
       </View>
       <FormInput
         label="Supplier"
-        value={selectedSuppliers.map((s) => s.label).join(", ")}
-        editable={false}
         dropIcon="menu-down"
-        onPress={toggleDropdown}
+        multiline
+        editable={false}
+        value={selectedSuppliers?.map((supplier) => supplier.label).join(", ")}
+        onPress={toggleBottomSheet}
       />
       {isVisible && (
         <MultiSelectDropdownSheet
           isVisible={isVisible}
           items={dropdownSuppliers}
-          previousSelections={selectedSuppliers}
           title="Select Supplier"
+          search
+          onSearchText={(value) => setSearchText(value)}
+          previousSelections={selectedSuppliers}
           onValueChange={handleSupplierSelection}
-          onClose={toggleDropdown}
+          onClose={toggleBottomSheet}
         />
       )}
     </TouchableOpacity>
@@ -91,25 +88,35 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     backgroundColor: "white",
     borderRadius: 15,
-    elevation: 4,
+    ...Platform.select({
+      android: {
+        elevation: 4,
+      },
+      ios: {
+        shadowColor: "black",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+      },
+    }),
     padding: 20,
   },
   leftColumn: {
     flex: 1,
   },
   rightColumn: {
-    flexDirection: "row",
     justifyContent: "space-between",
+    flexDirection: "row",
     flex: 1,
   },
   head: {
+    fontFamily: FONT_FAMILY.urbanistBold,
     fontSize: 17,
-    fontWeight: "bold",
     marginBottom: 5,
   },
   content: {
-    color: "#666",
+    color: "#666666",
     fontSize: 14,
+    fontFamily: FONT_FAMILY.urbanistSemiBold,
     textTransform: "capitalize",
   },
 });
