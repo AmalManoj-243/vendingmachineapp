@@ -7,6 +7,7 @@ import { RoundedScrollContainer } from '@components/containers';
 import { DropdownSheet } from "@components/common/BottomSheets";
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { formatDate } from '@utils/common/date';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { showToastMessage } from '@components/Toast';
 import { fetchSupplierDropdown, fetchCurrencyDropdown, fetchCountryDropdown, fetchWarehouseDropdown } from "@api/dropdowns/dropdownApi";
 import { purchaseType } from "@constants/dropdownConst";
@@ -15,23 +16,22 @@ import EditPurchaseOrderList from './EditPurchaseOrderList';
 import { OverlayLoader } from '@components/Loader';
 import { Button } from '@components/common/Button';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
-import { ConfirmationModal } from '@components/Modal';
 import { put } from '@api/services/utils';
 
 const EditPoDetails = ({ navigation, route }) => {
   const { id: purchaseOrderId } = route?.params || {};
   const [detail, setDetail] = useState({});
-  // console.log("🚀 ~ Details ~ detail:", JSON.stringify(detail, null, 2));
+  // console.log("🚀 ~ EditPODetails ~ detail:", JSON.stringify(detail, null, 2));
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [purchaseOrderLines, setPurchaseOrderLines] = useState([]);
-  const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+  console.log("🚀 ~ handleUpdatePurchaseOrder ~ purchaseOrderLines:", JSON.stringify(purchaseOrderLines, null, 2));
   const [isVisible, setIsVisible] = useState(false);
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({});
-  const [productLines, setProductLines] = useState([]);
+  // console.log("🚀 ~ EditPODetails ~ formData:", JSON.stringify(formData, null, 2));
   const [searchText, setSearchText] = useState("");
   const [dropdown, setDropdown] = useState({
     vendorName: [],
@@ -45,7 +45,6 @@ const EditPoDetails = ({ navigation, route }) => {
     setIsLoading(true);
     try {
       const [detail] = await fetchPurchaseOrderDetails(purchaseOrderId);
-      console.log("🚀 ~ fetchDetails ~ detail:", JSON.stringify(detail, null, 2));
       if (detail) {
         setFormData((prevFormData) => ({
           ...prevFormData,
@@ -184,25 +183,25 @@ const EditPoDetails = ({ navigation, route }) => {
   const handleUpdatePurchaseOrder = async () => {
     setIsSubmitting(true);
     const updatedPurchaseOrder = {
-      _id: "677bcd7d3d5403cc4d080057",
-      supplier: "670675464e15450d26ba8eb8",
-      Trn_number: 1222,
+      _id: purchaseOrderId,
+      supplier: formData?.vendorName?.id ?? null,
+      Trn_number: formData?.trnNumber || null,
       status: "Pending",
-      currency: "6540b68c05fb79149c3eb7d8",
-      purchase_type: "International Purchase",
-      country: "6540b68405fb79149c3eb5c2",
-      bill_date: "2025-01-30",
-      order_date: "2025-01-06",
-      untaxed_total_amount: 2240,
-      total_amount: 2352,
+      currency: formData?.currency?.id ?? null,
+      purchase_type: formData?.purchaseType?.label ?? null,
+      country: formData?.countryOfOrigin?.id ?? null,
+      bill_date: formData?.billDate || null,
+      order_date: formData?.orderDate || null,
+      untaxed_total_amount: formData?.untaxedAmount || null,
+      total_amount: formData?.totalAmount || null,
       payment_status: "Pending",
       due_amount: 0,
       paid_amount: 0,
       due_date: 0,
       remarks: "test",
       date: "2025-01-30",
-      warehouse_id: "66307fc0ceb8eb834bb25509",
-      warehouse_name: "Danat Hub",
+      warehouse_id: formData?.warehouse?.id ?? null,
+      warehouse_name: formData?.warehouse?.label ?? null,
       update_purchase_line_ids: updatedPurchaseOrder.map((item) => ({
         purchase_line_ids: item.purchase_line_ids,
         product: item.product_id,
@@ -218,49 +217,49 @@ const EditPoDetails = ({ navigation, route }) => {
       })),
       create_purchase_line_ids: [
         {
-          product: "6549fbbc170e1456c861c9ad",
-          taxes: "648d9b54ef9cd868dfbfa37b",
-          quantity: 2,
-          recieved_quantity: 0,
-          unit_price: 120,
-          sub_total: 240,
+          product: "",
+          taxes: "",
+          quantity: "",
+          recieved_quantity: "",
+          unit_price: "",
+          sub_total: "",
           description: "",
           billed_quantity: 0,
           product_unit_of_measure: "",
-          scheduled_date: "2025-01-07",
+          scheduled_date: "",
         },
       ],
       delete_purchase_line_ids: [],
     };
   console.log("Updated Purchase Order:", updatedPurchaseOrder);
-    try {
-      const response = await put("/updatePurchaseOrder", updatedPurchaseOrder);
-      console.log("Submitting Updated Purchase Order:", updatedPurchaseOrder);
-      if (response.success === 'true') {
-        showToast({
-          type: "success",
-          title: "Success",
-          message: response.message || "Purchase Order Updated Successfully",
-        });
-        navigation.navigate("PurchaseOrderDetails");
-      } else {
-        console.error("Submit Failed:", response.message);
-        showToast({
-          type: "error",
-          title: "ERROR",
-          message: response.message || "Purchase Order update failed",
-        });
-      }
-    } catch (error) {
-      console.error("Error Submitting Purchase Order Update:", error);
-      showToast({
-        type: "error",
-        title: "ERROR",
-        message: "An unexpected error occurred. Please try again later.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    // try {
+    //   const response = await put("/updatePurchaseOrder", updatedPurchaseOrder);
+    //   console.log("Submitting Updated Purchase Order:", updatedPurchaseOrder);
+    //   if (response.success === 'true') {
+    //     showToast({
+    //       type: "success",
+    //       title: "Success",
+    //       message: response.message || "Purchase Order Updated Successfully",
+    //     });
+    //     navigation.navigate("PurchaseOrderDetails");
+    //   } else {
+    //     console.error("Submit Failed:", response.message);
+    //     showToast({
+    //       type: "error",
+    //       title: "ERROR",
+    //       message: response.message || "Purchase Order update failed",
+    //     });
+    //   }
+    // } catch (error) {
+    //   console.error("Error Submitting Purchase Order Update:", error);
+    //   showToast({
+    //     type: "error",
+    //     title: "ERROR",
+    //     message: "An unexpected error occurred. Please try again later.",
+    //   });
+    // } finally {
+    //   setIsSubmitting(false);
+    // }
   };  
 
   const renderBottomSheet = () => {
@@ -321,7 +320,7 @@ const EditPoDetails = ({ navigation, route }) => {
     let untaxed = 0;
     purchaseOrderLines.forEach((item) => {
       untaxed += item.sub_total || 0;
-      taxes += item.tax_value || 0;
+      taxes += item.tax_value || item.tax || 0;
     });
     return {
       untaxedTotal: untaxed.toFixed(2),
@@ -381,7 +380,7 @@ const EditPoDetails = ({ navigation, route }) => {
           items={purchaseType}
           editable={false}
           validate={errors.purchaseType}
-          value={formData.purchaseType}
+          value={formData.purchaseType?.label}
           required
           onPress={() => toggleBottomSheet("Purchase Type")}
         />
@@ -444,22 +443,22 @@ const EditPoDetails = ({ navigation, route }) => {
         <Button
           backgroundColor={COLORS.primaryThemeColor}
           title="UPDATE"
-          onPress={() => {
-            setIsConfirmationModalVisible(true);
-          }}
+          onPress={handleUpdatePurchaseOrder}
         />
 
-        <ConfirmationModal
-          isVisible={isConfirmationModalVisible}
-          onCancel={() => setIsConfirmationModalVisible(false)}
-          headerMessage="Are you sure you want to update this?"
-          onConfirm={() => {
-            handleUpdatePurchaseOrder();
-            setIsConfirmationModalVisible(false);
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          minimumDate={new Date()}
+          onConfirm={(date) => {
+            setIsDatePickerVisible(false);
+            handleFieldChange("billDate", date);
           }}
+          onCancel={() => setIsDatePickerVisible(false)}
         />
-        <OverlayLoader visible={isLoading || isSubmitting} />
+        
       </RoundedScrollContainer>
+      <OverlayLoader visible={isLoading || isSubmitting} />
     </SafeAreaView>
   );
 };

@@ -11,6 +11,7 @@ import { validateFields } from '@utils/validation';
 import { formatDate } from '@utils/common/date';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useAuthStore } from "@stores/auth";
+import { showToastMessage } from "@components/Toast";
 
 const AddEditPurchaseLines = ({ navigation }) => {
   const currentUser = useAuthStore((state) => state.user);
@@ -31,13 +32,16 @@ const AddEditPurchaseLines = ({ navigation }) => {
     productName: '',
     description: '',
     scheduledDate: new Date(),
-    quantity: '0',
+    quantity: '',
+    receivedQuantity: '', 
+    billedQuantity: '',
     uom: '',
     unitPrice: '',
     taxes: 'vat 0%',
     subTotal: '',
     totalAmount: ''
   });
+  console.log("🚀 ~ AddEditPurchaseLines ~ formData:", JSON.stringify(formData, null, 2));
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -143,7 +147,7 @@ const AddEditPurchaseLines = ({ navigation }) => {
   };
 
   const handleQuantityChange = (value) => {
-    const quantity = parseFloat(value) || 1;
+    const quantity = parseFloat(value);
     setFormData((prevFormData) => ({
       ...prevFormData,
       quantity,
@@ -178,13 +182,23 @@ const AddEditPurchaseLines = ({ navigation }) => {
 
   const handleAddProducts = () => {
     const fieldsToValidate = ['productName'];
+    if (!formData.quantity) {
+      showToastMessage('Quantity is required');
+      return; 
+    }
+    if (formData.quantity <= 0) {
+      showToastMessage('Quantity should be greater than 0');
+      return; 
+    }
     if (validateForm(fieldsToValidate)) {
       const productLine = {
-        product_name: formData.productName,
         product_id: formData.productId,
+        product_name: formData.productName,
         description: formData.description || '',
         scheduledDate: formatDate(formData.scheduledDate || ''),
         quantity: formData.quantity || '',
+        receivedQuantity: formData.receivedQuantity || '',
+        billedQuantity: formData.billedQuantity || '',
         uom: formData.uom || '',
         unitPrice: formData.unitPrice || '',
         taxes: formData.taxes || '',
@@ -194,7 +208,6 @@ const AddEditPurchaseLines = ({ navigation }) => {
         totalAmount: formData.totalAmount || '',
       };
       console.log("🚀 ~ AddEditPurchaseLines ~ productLine:", JSON.stringify(productLine, null, 2));
-      // navigation.navigate("EditPoDetails", { newProductLine: productLine });
       navigation.navigate('EditPoDetails', { newProductLine: productLine });
     }
   };
@@ -276,6 +289,20 @@ const AddEditPurchaseLines = ({ navigation }) => {
           placeholder="Enter Quantity"
           keyboardType="numeric"
           value={formData.quantity}
+          onChangeText={(value) => handleQuantityChange(value)}
+        />
+        <FormInput
+          label="Received Quantity"
+          placeholder="Enter Received Quantity"
+          keyboardType="numeric"
+          value={formData.receivedQuantity}
+          onChangeText={(value) => handleQuantityChange(value)}
+        />
+        <FormInput
+          label="Billed Quantity"
+          placeholder="Enter Billed Quantity"
+          keyboardType="numeric"
+          value={formData.billedQuantity}
           onChangeText={(value) => handleQuantityChange(value)}
         />
         <FormInput

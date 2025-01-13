@@ -47,17 +47,16 @@ const PurchaseOrderDetails = ({ navigation, route }) => {
             }
         }, [purchaseOrderId])
     );
-
     
-    const { taxTotal } = useMemo(() => {
-        let taxes = 0;
-        purchaseOrderLines.forEach((item) => {
-            taxes += item.tax_value || 0;
-        });
-        return {
-            taxTotal: taxes.toFixed(2),
-        };
-    }, [purchaseOrderLines]);
+    // const { taxTotal } = useMemo(() => {
+    //     let taxes = 0;
+    //     purchaseOrderLines.forEach((item) => {
+    //         taxes += item.tax_value || item.tax || 0;
+    //     });
+    //     return {
+    //         taxTotal: taxes.toFixed(2),
+    //     };
+    // }, [purchaseOrderLines]);
     
     const handleVendorBill = async () => {
         navigation.navigate('VendorBillFormTabs', { id: purchaseOrderId });
@@ -148,7 +147,8 @@ const PurchaseOrderDetails = ({ navigation, route }) => {
                 </View>
                 <View style={styles.totalSection}>
                     <Text style={styles.totalLabel}>Taxes : </Text>
-                    <Text style={styles.totalValue}>{taxTotal}</Text>
+                    <Text style={styles.totalValue}>{(details.total_amount)-(details.untaxed_total_amount)}</Text>
+                    {/* <Text style={styles.totalValue}>{taxTotal}</Text> */}
                 </View>
                 <View style={styles.totalSection}>
                     <Text style={styles.totalLabel}>Total : </Text>
