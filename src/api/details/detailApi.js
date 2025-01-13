@@ -70,7 +70,6 @@ const fetchDetails = async (endpoint, detailId) => {
   }
 }
 
-
 // Fetches details for a given endpoint and detail ID.
 const fetchBarcodeDetails = async (endpoint, code) => {
   try {
@@ -93,6 +92,16 @@ const fetchDetailBySearch = async (endpoint, search, warehouseId) => {
   }
 }
 
+const fetchKPIDetail = async (endpoint, detailId, loginEmployeeId) => {
+  try {
+    const response = await get(`${endpoint}/${detailId}?login_employee_id=${loginEmployeeId}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+}
+
 // Function to fetch collection type details
 const fetchCollectionType = async (businessTypeId, paymentMethodId) => {
   try {
@@ -103,6 +112,7 @@ const fetchCollectionType = async (businessTypeId, paymentMethodId) => {
     throw error;
   }
 }
+
 // Function to fetch collection type details
 const fetchLedgerDetail = async (ledgerId) => {
   try {
@@ -209,8 +219,10 @@ export const fetchVisitPlanDetails = async (detailId) => {
   return fetchDetails(API_ENDPOINTS.VIEW_VISIT_PLAN, detailId);
 };
 
-export const fetchKPIDashboardDetails = async (detailId) => {
-  return fetchDetails(API_ENDPOINTS.VIEW_KPI, detailId);
+export const fetchKPIDashboardDetails = async (detailId, loginEmployeeId) => {
+  console.log("detailId : ", detailId);
+  console.log("loginEmployeeId : ", loginEmployeeId);
+  return fetchKPIDetail(API_ENDPOINTS.VIEW_KPI, detailId, loginEmployeeId);
 };
 
 export const fetchPurchaseRequisitionDetails = async (detailId) => {

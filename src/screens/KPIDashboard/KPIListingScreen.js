@@ -77,7 +77,7 @@ const KPIListingScreen = ({ navigation }) => {
                 data = [];
                 break;
         }
-        console.log("🚀 ~ KPI Data for Category:", JSON.stringify(kpiCategory, null, 2));
+        // console.log("KPI Data for Category :", kpiCategory);
         return data;
     };    
 
@@ -106,7 +106,7 @@ const KPIListingScreen = ({ navigation }) => {
         />
     );
     const renderKPIList = () => {
-        console.log("🚀 ~ kpiData:", JSON.stringify(kpiData, null, 2))
+        // console.log("🚀 ~ kpiData:", JSON.stringify(kpiData, null, 2))
         if (kpiData.length === 0 && !loading) {
             return renderEmptyState();
         }

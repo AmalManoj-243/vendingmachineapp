@@ -104,7 +104,6 @@ const KPIDashboardScreen = ({ navigation }) => {
                         </TouchableOpacity>
                     ))}
                 </View>
-
             </View>
         </View>
     );

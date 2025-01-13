@@ -1,12 +1,16 @@
 import React from 'react';
-import { StyleSheet, Platform, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import Text from '@components/Text';
 import { FONT_FAMILY } from '@constants/theme';
 
 const KPIList = ({ item, onPress }) => {
     return(
         <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.itemContainer}>
-            <Text style={styles.head}>{item?.kpi_name  || item?.kpiStatusUpdates?.kpi_name  || '-'}</Text>
+          <View style={styles.leftColumn}>
+            <Text style={styles.head}>{item?.kpi_sequenceNo}</Text>
+            <Text style={styles.content}>{item?.kpi_name  || '-'}</Text>
+            <Text style={styles.content}>{item?.progress_status || '-'}</Text>
+        </View> 
         </TouchableOpacity>
     )
 }

@@ -36,11 +36,12 @@ const KPIActionDetails = ({ navigation, route }) => {
   const [kpiDocument, setKpiDocument] = useState([]);
   const [formData, setFormData] = useState({ documentUrls: [] });
   const [errors, setErrors] = useState({});
+  const loginEmployeeId = currentUser?.related_profile?._id || "";
 
   const fetchDetails = async () => {
     setIsLoading(true);
     try {
-      const [updatedDetails] = await fetchKPIDashboardDetails(id);
+      const [updatedDetails] = await fetchKPIDashboardDetails(id,loginEmployeeId);
       setDetails(updatedDetails || {});
       setKpiUpdates(updatedDetails?.kpiStatusUpdates || []);
       // Map through document uploads and the files
@@ -241,7 +242,14 @@ const KPIActionDetails = ({ navigation, route }) => {
   const isTaskPaused = details.progress_status === 'Pause';
   const isTaskCompleted = details.progress_status === 'Completed';
   const isNewStatus = details.status === 'New';
-  // const isTaskOngoing = details.progress_status === 'Ongoing';
+  const isTaskOngoing = 
+  Array.isArray(details.active_tasks) && details.active_tasks.length > 0
+    ? details.active_tasks[0].progress_status === 'Ongoing'
+    : false;
+
+if (isTaskOngoing) {
+  showToastMessage('Task Already Exists');
+}
 
   return (
     <SafeAreaView>
@@ -378,8 +386,8 @@ const KPIActionDetails = ({ navigation, route }) => {
                 handleStartTask();
               }
             }}
-            disabled={isTaskStarted || isTaskCompleted}
-            // disabled={isTaskStarted || isTaskCompleted || isTaskOngoing}
+            // disabled={isTaskStarted || isTaskCompleted}
+            disabled={isTaskStarted || isTaskCompleted || isTaskOngoing}
             title={(
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 <AntDesign name="rightcircle" size={20} color={COLORS.white} />
