@@ -17,7 +17,7 @@ const PrivacyPolicy = ({ navigation, route }) => {
             <RoundedScrollContainer>
                 <Text style={{ fontFamily: FONT_FAMILY.urbanistBold }}>
                     <Text style={styles.heading}>GENERAL INSTRUCTIONS</Text> {'\n'}
-1                    1	  SALES IN CHARGE{'\n'}
+                    1	  SALES IN CHARGE{'\n'}
                     2 	CREDIT COLLECTION{'\n'}
                     3 	SHIPMENT FOR CUSTOMER{'\n'}
                     4 	CREDIT PAYMENT RECEIPT{'\n'}
@@ -27,7 +27,7 @@ const PrivacyPolicy = ({ navigation, route }) => {
                     8 	TECHNICIANS {'\n'}
                     9 	CASHIER OR IN CHARGE{'\n'}
                     10 	ACCOUNTANT/BACKGROUND + SALES{'\n'}
-                    11 	CUSTOMER ACCOUNT CROSS CHECKING{'\n'}
+                    11 	 CUSTOMER ACCOUNT CROSS CHECKING{'\n'}
                     12 	AUDITING{'\n'}
                     13 	STOCK MANAGEMENT{'\n'}
                     14 	PURCHASE ORDER{'\n'}
@@ -40,7 +40,7 @@ const PrivacyPolicy = ({ navigation, route }) => {
                         Warning :{'\n'}
                     </Text>
 
-                    The Username &amp; Passwords are assigned as per the requirements and its full responsibility of the given Users.  Company will not be responsible for any malpractice or misuse. {'\n'}
+                    The Username &amp; Passwords are assigned as per the requirements and its full responsibility of the given users.  Company will not be responsible for any malpractice or misuse. {'\n'}
 
 
                     മുന്നറിയിപ്പ് .{'\n'}

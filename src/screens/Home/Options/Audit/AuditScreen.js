@@ -39,7 +39,7 @@ const AuditScreen = ({ navigation }) => {
   };
 
   const renderEmptyState = () => (
-    <EmptyState imageSource={require('@assets/images/EmptyData/transaction_empty.png')} message={''} />
+    <EmptyState imageSource={require('@assets/images/EmptyData/transaction_empty.png')} message={'No Auditing Found'} />
   );
 
   const renderContent = () => (
