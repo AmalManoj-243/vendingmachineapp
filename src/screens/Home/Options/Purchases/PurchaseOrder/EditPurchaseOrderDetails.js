@@ -22,12 +22,13 @@ import { showToast } from '@utils/common';
 const EditPurchaseOrderDetails = ({ navigation, route }) => {
   const { id: purchaseOrderId } = route?.params || {};
   console.log("Purchase Order ID:", purchaseOrderId)
-  const [detail, setDetail] = useState({});
+  const [details, setDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [purchaseOrderLines, setPurchaseOrderLines] = useState([]);
   // console.log("Purchase Order Lines :", purchaseOrderLines)
   const [isVisible, setIsVisible] = useState(false);
+  const [deletePurchaseLine, setDeletePurchaseLine] = useState([]);
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
   const [errors, setErrors] = useState({});
@@ -44,21 +45,21 @@ const EditPurchaseOrderDetails = ({ navigation, route }) => {
   const fetchDetails = async (purchaseOrderId) => {
     setIsLoading(true);
     try {
-      const [detail] = await fetchPurchaseOrderDetails(purchaseOrderId);
-      if (detail) {
+      const [details] = await fetchPurchaseOrderDetails(purchaseOrderId);
+      if (details) {
         setFormData((prevFormData) => ({
           ...prevFormData,
-          vendorName: { id: detail?.supplier?.supplier_id || '', label: detail?.supplier?.supplier_name?.trim() || '' },
-          trnNumber: detail?.Trn_number.toString() || '-',
-          currency: { id: detail?.currency?.currency_id || '', label: detail?.currency?.currency_name || '' },
-          orderDate: detail?.order_date || new Date(),
-          purchaseType: detail?.purchase_type || '',
-          countryOfOrigin: { id: detail?.country?.country_id || '', label: detail?.country?.country_name || '' },
-          billDate: detail?.bill_date || null,
-          warehouse: { id: detail?.warehouse_id || '', label: detail?.warehouse_name || '' },
+          vendorName: { id: details?.supplier?.supplier_id || '', label: details?.supplier?.supplier_name?.trim() || '' },
+          trnNumber: details?.Trn_number.toString() || '-',
+          currency: { id: details?.currency?.currency_id || '', label: details?.currency?.currency_name || '' },
+          orderDate: details?.order_date || new Date(),
+          purchaseType: details?.purchase_type || '',
+          countryOfOrigin: { id: details?.country?.country_id || '', label: details?.country?.country_name || '' },
+          billDate: details?.bill_date || null,
+          warehouse: { id: details?.warehouse_id || '', label: details?.warehouse_name || '' },
         }));
-        setDetail(detail);
-        setPurchaseOrderLines(detail?.products_lines || []);
+        setDetails(details);
+        setPurchaseOrderLines(details?.products_lines || []);
       } else {
         console.warn('No valid data received for purchase order details.');
         setFormData(null);
@@ -83,16 +84,6 @@ const EditPurchaseOrderDetails = ({ navigation, route }) => {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      if (purchaseOrderId) {
-        fetchDetails(purchaseOrderId);
-      } else {
-        console.error("Missing Purchase Order Id on component mount.");
-      }
-    }, [purchaseOrderId])
-  );
-
   useEffect(() => {
     const fetchSuppliers = async () => {
       if (selectedType === "Vendor Name") {
@@ -112,6 +103,22 @@ const EditPurchaseOrderDetails = ({ navigation, route }) => {
     };
     fetchSuppliers();
   }, [searchText, selectedType]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (purchaseOrderId) {
+        fetchDetails(purchaseOrderId);
+        // } else {
+        //   console.log("No Purchase Order ID found");
+      }
+    }, [purchaseOrderId])
+  );
+
+  useEffect(() => {
+    if (route.params?.newProductLine) {
+      addProducts(route.params.newProductLine);
+    }
+  }, [route.params?.newProductLine]);
 
   useEffect(() => {
     const fetchDropdownData = async () => {
@@ -173,15 +180,15 @@ const EditPurchaseOrderDetails = ({ navigation, route }) => {
       tax: parseFloat(addedItem.tax),
       total: parseFloat(addedItem.totalAmount),
     };
-    console.log("Structure : ", structuredProduct)
     setPurchaseOrderLines((prevItems) => [...prevItems, structuredProduct]);
   };
 
-  useEffect(() => {
-    if (route.params?.newProductLine) {
-      addProducts(route.params.newProductLine);
-    }
-  }, [route.params?.newProductLine]);
+  const handleDelete = (id) => {
+    setDeletePurchaseLine((prevIds) => [...prevIds, id]);
+    setPurchaseOrderLines((prevLines) =>
+      prevLines.filter((line) => line._id !== id)
+    );
+  };
 
   const handleUpdatePurchaseOrder = async () => {
     setIsSubmitting(true);
@@ -203,7 +210,7 @@ const EditPurchaseOrderDetails = ({ navigation, route }) => {
         }));
 
       const createPurchaseLineIds = purchaseOrderLines
-        .filter((item) => !item._id) 
+        .filter((item) => !item._id)
         .map((item) => ({
           product: item.product_id,
           taxes: item.tax_type_id,
@@ -217,8 +224,10 @@ const EditPurchaseOrderDetails = ({ navigation, route }) => {
           scheduled_date: item.scheduled_date,
         }));
 
+      const deletePurchaseLineIds = deletePurchaseLine;
+
       const updatedPurchaseOrder = {
-        _id: purchaseOrderId,
+        _id: "678f9d98302b090a0cfab6e1",
         supplier: formData?.vendorName?.id ?? null,
         Trn_number: formData?.trnNumber || null,
         status: "Pending",
@@ -239,17 +248,17 @@ const EditPurchaseOrderDetails = ({ navigation, route }) => {
         warehouse_name: formData?.warehouse?.label ?? null,
         update_purchase_line_ids: updatePurchaseLineIds,
         create_purchase_line_ids: createPurchaseLineIds,
+        delete_purchase_line_ids: deletePurchaseLineIds
       };
       console.log("Updated Purchase Order:", updatedPurchaseOrder);
       const response = await put("/updatePurchaseOrder", updatedPurchaseOrder);
-      console.log("Response:", response);
-      if (response.success === "true") {
+      if (response.message === "Succesfully updated Purchase order") {
         showToast({
           type: "success",
           title: "Success",
           message: "Purchase Order Updated Successfully",
         });
-        navigation.navigate("PurchaseOrderDetails");
+        navigation.navigate("PurchaseOrderScreen");
       } else {
         throw new Error(response.message || "Failed to update Purchase Order");
       }
@@ -324,6 +333,7 @@ const EditPurchaseOrderDetails = ({ navigation, route }) => {
     };
   }, [purchaseOrderLines]);
 
+
   return (
     <SafeAreaView>
       <NavigationHeader
@@ -375,7 +385,7 @@ const EditPurchaseOrderDetails = ({ navigation, route }) => {
           items={purchaseType}
           editable={false}
           validate={errors.purchaseType}
-          value={formData.purchaseType?.label}
+          value={formData.purchaseType}
           required
           onPress={() => toggleBottomSheet("Purchase Type")}
         />
@@ -411,12 +421,15 @@ const EditPurchaseOrderDetails = ({ navigation, route }) => {
         />
         <TitleWithButton
           label="Add an item"
-          onPress={() => navigation.navigate('AddEditPurchaseLines', { id : purchaseOrderId, addProducts })}
+          onPress={() => navigation.navigate('AddEditPurchaseLines', { id: purchaseOrderId })}
         />
         <FlatList
           data={purchaseOrderLines}
-          renderItem={({ item }) => <EditPurchaseOrderList item={item}
-            onPress={() => navigation.navigate('EditPurchaseLines', { id: item._id })} />}
+          renderItem={({ item }) =>
+            <EditPurchaseOrderList
+              item={item}
+              onPress={() => navigation.navigate('EditPurchaseLines', { id: item._id })}
+              onDeletePress={() => handleDelete(item?._id)} />}
           keyExtractor={(item) => item._id}
         />
 

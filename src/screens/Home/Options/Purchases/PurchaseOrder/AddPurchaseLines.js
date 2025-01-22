@@ -32,10 +32,10 @@ const AddPurchaseLines = ({ navigation }) => {
     productName: '',
     description: '',
     scheduledDate: new Date(),
-    quantity: '0',
+    quantity: '',
     uom: '',
     unitPrice: '',
-    taxes: 'vat 0%',
+    taxes: '',
     subTotal: '',
     totalAmount: ''
   });
@@ -146,14 +146,14 @@ const AddPurchaseLines = ({ navigation }) => {
   };
 
   const handleQuantityChange = (value) => {
-    const quantity = parseFloat(value) || 1;
+    const quantity = parseFloat(value);
     setFormData((prevFormData) => ({
       ...prevFormData,
       quantity,
-      subTotal: quantity * (prevFormData.unitPrice || 0),
+      subTotal: quantity > 0 ? quantity * (prevFormData.unitPrice || 0) : 0,
     }));
   };
-
+  
   const handleFieldChange = (field, value) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -174,15 +174,23 @@ const AddPurchaseLines = ({ navigation }) => {
       productName: selectedProduct.label,
       description: selectedProduct.product_description || '',
       unitPrice: selectedProduct.cost || '',
-      subTotal: (selectedProduct.cost || 0) * (prevFormData.quantity || 1),
+      subTotal: (selectedProduct.cost) * (prevFormData.quantity),
     }));
     setIsVisible(false);
   };
 
   const handleAddProducts = () => {
     const fieldsToValidate = ['productName'];
-    if (Number(formData.quantity) === 0) {
+    if (Number(formData.quantity) <= 0) {
       showToastMessage('Quantity should be greater than 0');
+      return;
+    }
+    if (!formData.quantity) {
+      showToastMessage('Quantity is required');
+      return;
+    }
+    if (formData.taxes === '' || formData.taxes === undefined || formData.taxes === null) {
+      showToastMessage('Tax is required');
       return;
     }
     if (validateForm(fieldsToValidate)) {
@@ -191,7 +199,7 @@ const AddPurchaseLines = ({ navigation }) => {
         product_id: formData.productId,
         description: formData.description || '',
         scheduledDate: formatDate(formData.scheduledDate || ''),
-        quantity: formData.quantity || '',
+        quantity: formData.quantity.toString() || '',
         uom: formData.uom || '',
         unitPrice: formData.unitPrice || '',
         taxes: formData.taxes || '',
@@ -291,7 +299,7 @@ const AddPurchaseLines = ({ navigation }) => {
           editable={false}
           value={formData.uom?.label || ''}
           // onPress={() => toggleBottomSheet('')}
-        onPress={() => toggleBottomSheet('UOM')}
+          onPress={() => toggleBottomSheet('UOM')}
         />
         <FormInput
           label="Unit Price"
@@ -302,10 +310,10 @@ const AddPurchaseLines = ({ navigation }) => {
         />
         <FormInput
           label="Tax"
-          placeholder="Tax Type"
+          placeholder="Select Tax Type"
           dropIcon="menu-down"
           editable={false}
-          value={formData.taxes?.label || 'vat 0%'}
+          value={formData.taxes?.label}
           onPress={() => toggleBottomSheet('Tax')}
         />
         <FormInput

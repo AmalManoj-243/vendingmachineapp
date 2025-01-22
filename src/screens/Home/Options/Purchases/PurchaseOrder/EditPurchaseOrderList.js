@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Platform, TouchableOpacity, TextInput } from 'react-native';
 import Text from '@components/Text';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
 
-const EditPurchaseOrderList = ({ item, onPress }) => {
+const EditPurchaseOrderList = ({ item, onPress, onDeletePress }) => {
   const {
-    product = { product_name: '-'},
+    product = { product_name: '-' },
     description = '-',
     scheduled_date = '-',
     quantity = '-',
@@ -20,30 +21,35 @@ const EditPurchaseOrderList = ({ item, onPress }) => {
 
   const pendingQuantity = quantity - recieved_quantity;
   return (
-    <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.itemContainer}>
-      <View style={styles.leftColumn}>
-        <Text style={styles.head}>{product.product_name?.trim()} || {product_name?.trim() || '-'}</Text>
-        <View style={styles.rightColumn}>
-          <Text style={styles.content}>Scheduled Date: {scheduled_date}</Text>
+    <View style={styles.itemContainer}>
+      <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.itemsContainer}>
+        <View style={styles.leftColumn}>
+          <Text style={styles.head}>{product.product_name?.trim()} || {product_name?.trim() || '-'}</Text>
+          <View style={styles.rightColumn}>
+            <Text style={styles.content}>Scheduled Date: {scheduled_date}</Text>
+          </View>
+          <View style={styles.rightColumn}>
+            <Text style={styles.content}>Sub Total: {sub_total}</Text>
+            <Text style={styles.content}>Quantity: {quantity}</Text>
+          </View>
+          <View style={styles.rightColumn}>
+            <Text style={styles.content}>Description: {description || '-'}</Text>
+            <Text style={styles.content}>Received Quantity: {recieved_quantity}</Text>
+          </View>
+          <View style={styles.rightColumn}>
+            <Text style={styles.content}>Pending Quantity: {pendingQuantity}</Text>
+            <Text style={styles.contentRight}>UOM: {product_unit_of_measure}</Text>
+          </View>
+          <View style={styles.rightColumn}>
+            <Text style={styles.content}>Unit Price: {unit_price}</Text>
+            <Text style={styles.content}>Taxes: {taxes.taxes_name} || {tax_type_name}</Text>
+          </View>
         </View>
-        <View style={styles.rightColumn}>
-          <Text style={styles.content}>Sub Total: {sub_total}</Text>
-          <Text style={styles.content}>Quantity: {quantity}</Text>
-        </View>
-        <View style={styles.rightColumn}>
-          <Text style={styles.content}>Description: {description || '-'}</Text>
-          <Text style={styles.content}>Received Quantity: {recieved_quantity}</Text>
-        </View>
-        <View style={styles.rightColumn}>
-          <Text style={styles.content}>Pending Quantity: {pendingQuantity}</Text>
-          <Text style={styles.contentRight}>UOM: {product_unit_of_measure}</Text>
-        </View>
-        <View style={styles.rightColumn}>
-          <Text style={styles.content}>Unit Price: {unit_price}</Text>
-          <Text style={styles.content}>Taxes: {taxes.taxes_name} || {tax_type_name}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={onDeletePress} style={styles.deleteIcon}>
+        <AntDesign name="delete" size={20} />
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -64,6 +70,9 @@ const styles = StyleSheet.create({
       },
     }),
     padding: 20,
+  },
+  itemsContainer: {
+    flex: 1,
   },
   leftColumn: {
     flex: 1,
@@ -102,6 +111,11 @@ const styles = StyleSheet.create({
     padding: 5,
     marginBottom: 10,
   },
+  deleteIcon: {
+    padding: 1,
+    left: 140,
+    color: COLORS.primaryThemeColor
+  }
 });
 
 export default EditPurchaseOrderList;

@@ -219,11 +219,11 @@ const PurchaseOrderForm = ({ route, navigation }) => {
 
   const handleSubmit = async () => {
     const fieldsToValidate = ['vendorName', 'trnNumber', 'currency', 'purchaseType', 'countryOfOrigin', 'billDate', 'warehouse'];
-    if (productLines.length === 0) {
-      showToastMessage('Please Add Products');
-      return; 
-    }
     if (validateForm(fieldsToValidate)) {
+      if (productLines.length === 0) {
+        showToastMessage('Please Add Products');
+        return; 
+      }
       Keyboard.dismiss();
       setIsSubmitting(true);
       const purchaseOrderData = {
@@ -357,7 +357,6 @@ const PurchaseOrderForm = ({ route, navigation }) => {
           required
           validate={errors.billDate}
           value={formatDate(formData.billDate, 'dd-MM-yyyy')}
-          // value={formatDate(formData.billDate, 'dd-MM-yyyy')}
           onPress={() => setIsDatePickerVisible(true)}
         />
         <FormInput

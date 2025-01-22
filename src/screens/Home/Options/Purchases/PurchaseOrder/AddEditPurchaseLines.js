@@ -38,7 +38,7 @@ const AddEditPurchaseLines = ({ navigation, route }) => {
     billedQuantity: '',
     uom: '',
     unitPrice: '',
-    taxes: 'vat 0%',
+    taxes: '',
     subTotal: '',
     totalAmount: ''
   });
@@ -153,7 +153,7 @@ const AddEditPurchaseLines = ({ navigation, route }) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       quantity,
-      subTotal: quantity * (prevFormData.unitPrice || 0),
+      subTotal: quantity > 0 ? quantity * (prevFormData.unitPrice || 0) : 0,
     }));
   };
 
@@ -177,20 +177,24 @@ const AddEditPurchaseLines = ({ navigation, route }) => {
       productName: selectedProduct.label,
       description: selectedProduct.product_description || '',
       unitPrice: selectedProduct.cost || '',
-      subTotal: (selectedProduct.cost || 0) * (prevFormData.quantity || 1),
+      subTotal: (selectedProduct.cost) * (prevFormData.quantity),
     }));
     setIsVisible(false);
   };
 
   const handleAddProducts = () => {
     const fieldsToValidate = ['productName'];
-    if (!formData.quantity) {
+    if (formData.quantity === '' || formData.quantity === undefined || formData.quantity === null) {
       showToastMessage('Quantity is required');
-      return; 
+      return;
     }
-    if (formData.quantity <= 0) {
+    if (Number(formData.quantity) <= 0) {
       showToastMessage('Quantity should be greater than 0');
-      return; 
+      return;
+    }    
+    if (formData.taxes === '' || formData.taxes === undefined || formData.taxes === null) {
+      showToastMessage('Tax is required');
+      return;
     }
     if (validateForm(fieldsToValidate)) {
       const purchaseOrderLines = {
@@ -209,7 +213,7 @@ const AddEditPurchaseLines = ({ navigation, route }) => {
         tax: formData.tax || '',
         totalAmount: formData.totalAmount || '',
       };
-      // console.log("🚀 ~ AddEditPurchaseLines ~ purchaseOrderLines:", JSON.stringify(purchaseOrderLines, null, 2));
+      // // console.log("🚀 ~ AddEditPurchaseLines ~ purchaseOrderLines:", JSON.stringify(purchaseOrderLines, null, 2));
       navigation.navigate('EditPurchaseOrderDetails', { purchaseOrderId, newProductLine: purchaseOrderLines });
       // navigation.navigate('EditPurchaseOrderDetails', { newProductLine: purchaseOrderLines });
     }
@@ -325,10 +329,11 @@ const AddEditPurchaseLines = ({ navigation, route }) => {
         />
         <FormInput
           label="Tax"
-          placeholder="Tax Type"
+          placeholder="Select Tax Type"
           dropIcon="menu-down"
           editable={false}
-          value={formData.taxes?.label || 'vat 0%'}
+          validate={errors.taxes}
+          value={formData.taxes?.label}
           onPress={() => toggleBottomSheet('Tax')}
         />
         <FormInput
