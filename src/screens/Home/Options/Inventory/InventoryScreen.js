@@ -27,6 +27,7 @@ import { reasons } from "@constants/dropdownConst";
 import { fetchEmployeesDropdown } from "@api/dropdowns/dropdownApi";
 import { Text, View, Pressable } from 'react-native';
 import axios from 'axios';
+import INVENTORY_API_BASE from '@api/config/inventoryConfig';
 
 const InventoryScreen = ({ navigation }) => {
   // Managing modal, loading, and state variables
@@ -141,7 +142,7 @@ const InventoryScreen = ({ navigation }) => {
   const handleModalInput = async (boxNumber) => {
     setModalLoading(true);
     try {
-      const response = await axios.get(`https://d3ba3b9573cc.ngrok-free.app/api/view_inventory_box/${boxNumber}`);
+    const response = await axios.get(`${INVENTORY_API_BASE}/api/view_inventory_box/${boxNumber}`);
       console.log('API response:', response.data); // <-- Log the response structure
       // Fix: Use response.data.inventory_boxes if present
       let boxes = Array.isArray(response.data.inventory_boxes)
@@ -171,9 +172,49 @@ const InventoryScreen = ({ navigation }) => {
     setIsVisibleCustomListModal(true);
   };
 
-  // Render inventory items or empty state
+  // Handle item press: fetch details and navigate or show modal (mirrors handleScan behaviour)
+  const handleItemPress = async (item) => {
+    setScanLoading(true);
+    try {
+      // Try to derive an identifier for the inventory detail
+      const id = item?._id || item?.id || item?.boxes?._id || item?.boxes?.id;
+      let inventoryDetails = [];
+
+      if (id) {
+        // If we have an id, fetch by id
+        const resp = await fetchInventoryDetails(id);
+        inventoryDetails = resp && resp.data ? resp.data : resp;
+      } else {
+        // Fallback: search by box name or item name
+        const name = item?.boxes?.name || item?.name || item?.box_no || '';
+        const resp = await fetchInventoryDetailsByName(name, warehouseId);
+        inventoryDetails = resp && resp.data ? resp.data : resp;
+      }
+
+      if (inventoryDetails && inventoryDetails.length > 0) {
+        const details = inventoryDetails[0];
+        setGetDetail(details);
+        if (isResponsibleOrEmployee(details)) {
+          setIsVisibleCustomListModal(true);
+        } else {
+          navigation.navigate('InventoryDetails', {
+            inventoryDetails: details,
+          });
+        }
+      } else {
+        showToastMessage('No inventory box found for this item');
+      }
+    } catch (error) {
+      console.error('Error fetching inventory details on item press:', error);
+      showToastMessage('Error fetching inventory details');
+    } finally {
+      setScanLoading(false);
+    }
+  };
+
+  // Render inventory items or empty state (pass onPress handler)
   const renderItem = ({ item }) =>
-    item.empty ? <EmptyItem /> : <InventoryList item={item} />;
+    item.empty ? <EmptyItem /> : <InventoryList item={item} onPress={() => handleItemPress(item)} />;
 
   const renderEmptyState = () => (
     <EmptyState

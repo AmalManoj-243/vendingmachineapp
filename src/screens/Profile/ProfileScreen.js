@@ -35,6 +35,24 @@ const ProfileScreen = ({navigation}) => {
     }
   };
 
+  const displayName = (
+    userDetails?.related_profile?.name ||
+    userDetails?.user_name ||
+    userDetails?.name ||
+    userDetails?.username ||
+    'N/A'
+  );
+
+  const companyName = (
+    userDetails?.company?.name?.toUpperCase?.() ||
+    (Array.isArray(userDetails?.company_id) && userDetails?.company_id?.[1]?.toUpperCase?.()) ||
+    (typeof userDetails?.company_id === 'string' ? userDetails?.company_id?.toUpperCase?.() : undefined) ||
+    userDetails?.user_companies?.current_company?.name?.toUpperCase?.()
+  );
+
+  // If we ever have a location/address, populate here; otherwise omit the row
+  const locationText = undefined;
+
   return (
     <SafeAreaView backgroundColor={COLORS.primaryThemeColor}>
       <View style={{ width: "100%" }}>
@@ -52,18 +70,22 @@ const ProfileScreen = ({navigation}) => {
         />
 
         <Text style={{ fontSize: 30, fontFamily: FONT_FAMILY.urbanistBold, color: '#242760', marginVertical: 8 }}>
-          {userDetails?.related_profile?.name || userDetails?.user_name || 'N/A'}
+          {displayName}
         </Text>
-        <Text style={{ color: COLORS.black, fontSize: 20, fontFamily: FONT_FAMILY.urbanistSemiBold }}>
-          {userDetails?.company?.name?.toUpperCase() || 'N/A'}
-        </Text>
-
-        <View style={{ flexDirection: "row", marginVertical: 6, alignItems: "center" }}>
-          <MaterialIcons name="location-on" size={24} color="black" />
-          <Text style={{ fontSize: 14, fontFamily: FONT_FAMILY.urbanistSemiBold, marginLeft: 4 }}>
-            {'N/A'}
+        {companyName ? (
+          <Text style={{ color: COLORS.black, fontSize: 20, fontFamily: FONT_FAMILY.urbanistSemiBold }}>
+            {companyName}
           </Text>
-        </View>
+        ) : null}
+
+        {locationText ? (
+          <View style={{ flexDirection: "row", marginVertical: 6, alignItems: "center" }}>
+            <MaterialIcons name="location-on" size={24} color="black" />
+            <Text style={{ fontSize: 14, fontFamily: FONT_FAMILY.urbanistSemiBold, marginLeft: 4 }}>
+              {locationText}
+            </Text>
+          </View>
+        ) : null}
         <ButtonContainer>
           <Button paddingHorizontal={50} title={'LOGOUT'} onPress={() => setIsVisible(true)} />
         </ButtonContainer>

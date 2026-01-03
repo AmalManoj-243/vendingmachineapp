@@ -18,7 +18,7 @@ import { TextInput } from "@components/common/TextInput";
 import { RoundedScrollContainer, SafeAreaView } from "@components/containers";
 import { useAuthStore } from "@stores/auth";
 import { showToastMessage } from "@components/Toast";
-import { Checkbox } from "react-native-paper";
+// Removed privacy policy checkbox
 
 LogBox.ignoreLogs(["new NativeEventEmitter"]);
 LogBox.ignoreAllLogs();
@@ -27,11 +27,8 @@ const LoginScreen = () => {
 
   const navigation = useNavigation();
   const setUser = useAuthStore(state => state.login)
-  const [checked, setChecked] = useState(false);
 
-  const updateCheckedState = (value) => {
-    setChecked(value);
-  };
+  // Removed privacy policy checkbox state
   // destructuring Styles
   const { container, tinyLogo, imageContainer } = styles;
 
@@ -54,10 +51,7 @@ const LoginScreen = () => {
       handleError("Please input password", "password");
       isValid = false;
     }
-    if (!checked) {
-      showToastMessage('Please agree Privacy Policy')
-      isValid = false;
-    }
+    // Privacy policy agreement removed
     if (isValid) {
       login();
     }
@@ -105,14 +99,20 @@ const LoginScreen = () => {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <SafeAreaView style={container}>
+      <SafeAreaView backgroundColor={COLORS.white}>
         <OverlayLoader visible={loading} />
         {/* <ScrollView style={{ paddingHorizontal: 15, flex: 1, backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20 }}> */}
             <View style={imageContainer}>
-              <Image source={require('@assets/images/header/logo_header.png')} style={{ width: 300, height: 180, alignSelf: 'center' }} />
+              <View style={styles.logoWrapper}>
+                <Image
+                  source={require('@assets/images/header/logo_header.png')}
+                  style={{ width: 300, height: 180, alignSelf: 'center' }}
+                  resizeMode="contain"
+                />
+              </View>
             </View>
         <RoundedScrollContainer backgroundColor={COLORS.white} paddingHorizontal={15} borderTopLeftRadius={40} borderTopRightRadius={40}>
-          <View style={{ paddingTop: 50 }}>
+          <View style={{ paddingTop: 8 }}>
             <View style={{ marginVertical: 5, marginHorizontal: 10 }}>
               <View style={{ marginTop: 0, marginBottom: 15 }}>
                 <Text style={{ fontSize: 25, fontFamily: FONT_FAMILY.urbanistBold, color: '#2e2a4f' }}>Login</Text>
@@ -139,10 +139,7 @@ const LoginScreen = () => {
                 column={true}
                 login={true}
               />
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                <Checkbox onPress={() => navigation.navigate('PrivacyPolicy', { updateCheckedState })} status={checked ? 'checked' : 'unchecked'} color={COLORS.primaryThemeColor} />
-                <Text style={{ fontFamily: FONT_FAMILY.urbanistBold, fontSize: 15 }}>I agree to the Privacy Policy</Text>
-              </View>
+              {/* Privacy policy checkbox removed as requested */}
               <View style={styles.bottom}>
                 <Button title="Login" onPress={validate} />
               </View>
@@ -158,7 +155,7 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: COLORS.red,
+    backgroundColor: COLORS.white,
     paddingTop: 10
   },
   tinyLogo: {
@@ -167,7 +164,12 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     alignItems: "center",
-    marginBottom: '20%',
+    marginBottom: '4%',
+  },
+  logoWrapper: {
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: 8,
   },
   bottom: {
     alignItems: "center",

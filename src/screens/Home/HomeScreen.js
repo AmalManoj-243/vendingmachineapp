@@ -11,17 +11,18 @@ import {
   ImageContainer,
   ListHeader,
   Header,
-  NavigationBar,
 } from "@components/Home";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import { fetchCategories } from "@api/services/generalApi";
+import { fetchProductsOdoo } from "@api/services/generalApi";
 import { RoundedContainer, SafeAreaView } from "@components/containers";
 import { formatData } from "@utils/formatters";
 import { COLORS } from "@constants/theme";
 import { showToastMessage } from "@components/Toast";
-import { CategoryList } from "@components/Categories";
+import { ProductsList } from "@components/Product";
 import { useDataFetching, useLoader } from "@hooks";
+import { useProductStore } from '@stores/product';
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import { useAuthStore } from '@stores/auth';
 import { fetchProductDetailsByBarcode } from "@api/details/detailApi";
 import { OverlayLoader } from "@components/Loader";
 
@@ -31,7 +32,7 @@ const HomeScreen = ({ navigation }) => {
   const [backPressCount, setBackPressCount] = useState(0);
   const isFocused = useIsFocused();
   const { data, loading, fetchData, fetchMoreData } =
-    useDataFetching(fetchCategories);
+    useDataFetching(fetchProductsOdoo);
 
   const handleBackPress = useCallback(() => {
     if (navigation.isFocused()) {
@@ -80,8 +81,59 @@ const HomeScreen = ({ navigation }) => {
     }
   }, [isFocused]);
 
+  useEffect(() => {
+    if (data && Array.isArray(data)) {
+      // Log product details from Odoo model 'product filling' but redact image URLs
+      try {
+        const sanitized = data.map(({ image_url, ...rest }) => rest);
+        console.log('Fetched products from Odoo (product filling):', sanitized);
+      } catch (e) {
+        console.log('Fetched products from Odoo (product filling): [unable to sanitize]');
+      }
+    }
+  }, [data]);
+
   const handleLoadMore = () => {
     fetchMoreData();
+  };
+
+  const { addProduct, setCurrentCustomer } = useProductStore();
+  const authUser = useAuthStore((s) => s.user);
+
+  useEffect(() => {
+    if (authUser) {
+      const uid = authUser.uid || authUser.id || null;
+      console.log('[AUTH] current user id:', uid, 'api_token:', authUser.api_token, 'api_keys:', authUser.api_keys);
+    } else {
+      console.log('[AUTH] no authenticated user');
+    }
+  }, [authUser]);
+
+  const mapToStoreProduct = (p) => ({
+    id: `filling_${p.id}`,
+    remoteId: p.id,
+    name: p.product_name || p.name || p.product_name || 'Product',
+    product_name: p.product_name || p.name || p.product_name || 'Product',
+    price: Number(p.price ?? p.list_price ?? 0),
+    price_unit: Number(p.price ?? p.list_price ?? 0),
+    quantity: Number(p.quantity ?? p.qty ?? 1),
+    qty: Number(p.quantity ?? p.qty ?? 1),
+    image_url: p.image_url || null,
+    product_id: Array.isArray(p.product_id) ? p.product_id[0] : p.product_id || null,
+    product_code: p.default_code || p.product_code || null,
+  });
+
+  const handleProductPress = (item) => {
+    try {
+      try { setCurrentCustomer('pos_guest'); } catch (e) { /* ignore */ }
+      const storeItem = mapToStoreProduct(item);
+      const { image_url, ...logSafeItem } = storeItem;
+      console.log('[Home] Adding product to cart and opening cart:', logSafeItem);
+      addProduct(storeItem);
+      navigation.navigate('CartScreen');
+    } catch (e) {
+      console.error('Error adding product from Home to cart', e);
+    }
   };
 
   const renderItem = ({ item }) => {
@@ -89,9 +141,10 @@ const HomeScreen = ({ navigation }) => {
       return <View style={[styles.itemStyle, styles.itemInvisible]} />;
     }
     return (
-      <CategoryList
+      <ProductsList
         item={item}
-        onPress={() => navigation.navigate("Products", { id: item._id })}
+        onPress={() => handleProductPress(item)}
+        showQuickAdd={false}
       />
     );
   };
@@ -102,14 +155,15 @@ const HomeScreen = ({ navigation }) => {
 
   // Define different snap points based on screen height
   const snapPoints = useMemo(() => {
+    // Increase the default (first) snap point so more product rows are visible
     if (height < 700) {
-      return ["33%", "79%"];
+      return ["45%", "79%"];
     } else if (height < 800) {
-      return ["45%", "83%"];
+      return ["60%", "88%"];
     } else if (height < 810) {
-      return ["45%", "83%"];
+      return ["60%", "88%"];
     } else {
-      return ["50%", "85%"];
+      return ["65%", "90%"];
     }
   }, [height]);
 
@@ -140,58 +194,25 @@ const HomeScreen = ({ navigation }) => {
       <RoundedContainer>
         {/* Header */}
         <Header />
-        {/* Navigation Header */}
-        <NavigationBar
-          onSearchPress={() => navigation.navigate("Products")}
-          onOptionsPress={() => navigation.navigate("OptionsScreen")}
-          onScannerPress={() => navigation.navigate("Scanner", { onScan: handleScan })}
-        />
-        {/* Carousel */}
-        <CarouselPagination />
-
-        {/* Section */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginHorizontal: 8,
-          }}
-        >
-          <ImageContainer
-            source={require("@assets/images/Home/section/inventory_management.png")}
-            onPress={() => navigateToScreen("InventoryScreen")}
-            backgroundColor="#f37021"
-            title="INVMGT"
-          />
-          <ImageContainer
-            source={require("@assets/images/Home/section/services.png")}
-            onPress={() => navigateToScreen("ServicesScreen")}
-            backgroundColor="#f37021"
-            title="Services"
-          />
-          <ImageContainer
-            source={require("@assets/images/Home/section/customer.png")}
-            onPress={() => navigateToScreen("CustomerScreen")}
-            backgroundColor="#f37021"
-            title="Sales Order"
-          />
+        <View style={{ marginTop: -18, marginBottom: -8 }}>
+          <CarouselPagination />
         </View>
 
-        {/* Bottom sheet */}
+        {/* Section */}
+        {/* POS and Sales Order tiles removed as requested */}
+        {/* Products section (Categories removed) */}
         <BottomSheet snapPoints={snapPoints}>
-          {/* Product list header */}
-          <ListHeader title="Categories" />
-          {/* flatlist */}
+          <ListHeader title="Products" />
           <BottomSheetFlatList
             data={formatData(data, 3)}
             numColumns={3}
-            initialNumToRender={5}
+            initialNumToRender={9}
             renderItem={renderItem}
             keyExtractor={(item, index) => index.toString()}
             contentContainerStyle={{ paddingBottom: "25%" }}
             onEndReached={handleLoadMore}
             showsVerticalScrollIndicator={false}
-            onEndReachedThreshold={0.1}
+            onEndReachedThreshold={0.2}
             ListFooterComponent={
               loading && <ActivityIndicator size="large" color="#0000ff" />
             }

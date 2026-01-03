@@ -7,12 +7,11 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const CarouselPagination = () => {
     const [activeSlide, setActiveSlide] = useState(0);
     const data = [
-        { image: require('@assets/images/Home/Banner/banner_phone_1.jpg') },
-        { image: require('@assets/images/Home/Banner/banner_phone_2.jpg') },
-        { image: require('@assets/images/Home/Banner/banner_phone_3.jpg') },
-        { image: require('@assets/images/Home/Banner/banner_phone_4.jpg') },
-        { image: require('@assets/images/Home/Banner/banner_phone_5.jpg') },
-        { image: require('@assets/images/Home/Banner/banner_phone_6.jpg') }
+        { image: require('@assets/images/Home/Banner/sildeshow 1.png') },
+        { image: require('@assets/images/Home/Banner/sildeshow 2.png') },
+        { image: require('@assets/images/Home/Banner/sildeshow 3.png') },
+        { image: require('@assets/images/Home/Banner/sildeshow 4.png') },
+        { image: require('@assets/images/Home/Banner/sildeshow 5.png') }
     ];
     const carouselMargin = 8;
 
@@ -28,6 +27,11 @@ const CarouselPagination = () => {
                 sliderWidth={screenWidth - 2 * carouselMargin}
                 itemWidth={screenWidth - 2 * carouselMargin}
                 autoplay={true}
+                loop={true}
+                loopClonesPerSide={data.length}
+                autoplayDelay={500}
+                enableMomentum={false}
+                lockScrollWhileSnapping={true}
                 containerCustomStyle={styles.carouselContainer}
                 autoplayInterval={3000}
                 onSnapToItem={(index) => setActiveSlide(index)}
@@ -51,14 +55,15 @@ export default CarouselPagination
 const styles = StyleSheet.create({
     image: {
         width: '100%',
-        height: screenHeight * 0.20,
-        borderRadius: 5,
-        borderWidth: 1,
-        // resizeMode: 'contain'
+        height: screenHeight * 0.25,
+        borderRadius: 12,
+        borderWidth: 0,
+        marginTop: -10, // Move up less aggressively
     },
     carouselContainer: {
         marginHorizontal: 8,
-        marginVertical: 20
+        marginVertical: 0,
+        marginTop: -12, // Move up less aggressively
     },
     paginationContainer: {
         position: 'absolute',

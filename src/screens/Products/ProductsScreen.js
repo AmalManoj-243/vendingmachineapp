@@ -2,7 +2,8 @@ import React, { useEffect, useCallback } from 'react';
 import { View } from 'react-native';
 import { NavigationHeader } from '@components/Header';
 import { ProductsList } from '@components/Product';
-import { fetchProducts } from '@api/services/generalApi';
+// ⬇️ CHANGE: use Odoo version instead of old backend
+import { fetchProductsOdoo } from '@api/services/generalApi';
 import { useIsFocused, useFocusEffect } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { formatData } from '@utils/formatters';
@@ -12,14 +13,26 @@ import styles from './styles';
 import { EmptyState } from '@components/common/empty';
 import useDataFetching from '@hooks/useDataFetching';
 import useDebouncedSearch from '@hooks/useDebouncedSearch';
+import Toast from 'react-native-toast-message';
+import { useProductStore } from '@stores/product';
 
 const ProductsScreen = ({ navigation, route }) => {
-  const categoryId = route?.params?.id || '';
+  const categoryId = route?.params?.categoryId || '';
+  useEffect(() => {
+    console.log('ProductsScreen: categoryId:', categoryId);
+  }, [categoryId]);
   const { fromCustomerDetails } = route.params || {};
 
   const isFocused = useIsFocused();
-  const { data, loading, fetchData, fetchMoreData } = useDataFetching(fetchProducts);
-  const { searchText, handleSearchTextChange } = useDebouncedSearch((text) => fetchData({ searchText: text, categoryId }), 500);
+  const { addProduct, setCurrentCustomer } = useProductStore();
+
+  // ⬇️ CHANGE: hook now uses fetchProductsOdoo
+  const { data, loading, fetchData, fetchMoreData } = useDataFetching(fetchProductsOdoo);
+
+  const { searchText, handleSearchTextChange } = useDebouncedSearch(
+    (text) => fetchData({ searchText: text, categoryId }),
+    500
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -33,6 +46,13 @@ const ProductsScreen = ({ navigation, route }) => {
     }
   }, [isFocused, categoryId, searchText]);
 
+  // If opened from POS, ensure cart owner is the POS guest so quick-add works
+  useEffect(() => {
+    if (fromCustomerDetails || route?.params?.fromPOS) {
+      try { setCurrentCustomer('pos_guest'); } catch (e) { /* ignore */ }
+    }
+  }, [route?.params?.fromPOS, fromCustomerDetails]);
+
   const handleLoadMore = () => {
     fetchMoreData({ searchText, categoryId });
   };
@@ -41,7 +61,29 @@ const ProductsScreen = ({ navigation, route }) => {
     if (item.empty) {
       return <View style={[styles.itemStyle, styles.itemInvisible]} />;
     }
-    return <ProductsList item={item} onPress={() => navigation.navigate('ProductDetail', { detail: item, fromCustomerDetails })} />;
+    const handleQuickAdd = () => {
+      try {
+        const product = {
+          id: item.id,
+          name: item.product_name || item.name,
+          price: item.price || item.list_price || 0,
+          quantity: 1,
+        };
+        addProduct(product);
+        Toast.show({ type: 'success', text1: 'Added', text2: product.name });
+      } catch (e) {
+        console.warn('Quick add failed', e);
+      }
+    };
+
+    return (
+      <ProductsList
+        item={item}
+        onPress={() => navigation.navigate('ProductDetail', { detail: item, fromCustomerDetails, fromPOS: route?.params?.fromPOS })}
+        showQuickAdd={!!route?.params?.fromPOS}
+        onQuickAdd={handleQuickAdd}
+      />
+    );
   };
 
   const renderEmptyState = () => (
@@ -63,6 +105,7 @@ const ProductsScreen = ({ navigation, route }) => {
   );
 
   const renderProducts = () => {
+    console.log('ProductsScreen: products returned:', data.length);
     if (data.length === 0 && !loading) {
       return renderEmptyState();
     }
@@ -72,7 +115,11 @@ const ProductsScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView>
       <NavigationHeader title="Products" onBackPress={() => navigation.goBack()} />
-      <SearchContainer placeholder="Search Products" onChangeText={handleSearchTextChange} value={searchText} />
+      <SearchContainer
+        placeholder="Search Products"
+        onChangeText={handleSearchTextChange}
+        value={searchText}
+      />
       <RoundedContainer>
         {renderProducts()}
       </RoundedContainer>

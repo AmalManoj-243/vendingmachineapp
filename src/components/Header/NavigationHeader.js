@@ -9,7 +9,7 @@ const NavigationHeader = ({
     onBackPress,
     color = COLORS.white,
     backgroundColor = COLORS.primaryThemeColor,
-    logo = true,
+    logo = false,
     iconOneName,
     iconOnePress,
     iconTwoName,

@@ -1,2 +1,2 @@
 import ProductsScreen from "./ProductsScreen";
-export { ProductsScreen }
+export { ProductsScreen };

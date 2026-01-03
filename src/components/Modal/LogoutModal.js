@@ -24,9 +24,6 @@ const LogoutModal = ({
         >
 
             <View style={styles.alertContainer}>
-                <View style={{ borderRadius: 80, backgroundColor: COLORS.white, position: 'absolute', top: -40, borderWidth: 2, borderColor: COLORS.orange }}>
-                    <Image source={require('@assets/images/logo/logo.png')} style={{ resizeMode: 'contain', height: 80, width: 80, borderRadius: 80, }} />
-                </View>
                 <Text style={styles.alertText}>Are you sure you want to log out?</Text>
                 <View style={styles.buttonRow}>
                     <TouchableOpacity
@@ -54,8 +51,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderColor:COLORS.primaryThemeColor,
         borderWidth:2,
-        // padding: 40,
-        paddingVertical:30,
+        paddingVertical:22,
         alignItems: 'center',
         paddingHorizontal:10
     },

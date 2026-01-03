@@ -5,6 +5,7 @@ import { ProfileScreen } from "./Profile";
 import { MyOrdersScreen } from "./MyOrders";
 import { DashboardScreen } from "./Dashboard";
 import { SplashScreen } from "./Splash";
-import { ProductsScreen } from "./Products";
+import { ProductsScreen, ProductsScreenNew } from "./Products";
+import VendingCart from "./VendingCart/VendingCart";
 
-export { HomeScreen, CartScreen, CategoriesScreen, ProfileScreen, MyOrdersScreen, DashboardScreen, SplashScreen, ProductsScreen }
+export { HomeScreen, CartScreen, CategoriesScreen, ProfileScreen, MyOrdersScreen, DashboardScreen, SplashScreen, ProductsScreen, ProductsScreenNew, VendingCart };

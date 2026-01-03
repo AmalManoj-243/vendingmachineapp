@@ -39,43 +39,7 @@ const AppNavigator = () => {
             />
         }}
       />
-      <Tab.Screen
-        name="Categories"
-        component={CategoriesScreen}
-        options={{
-          tabBarIcon: ({ focused }) =>
-            <TabBarIcon
-              focused={focused}
-              iconComponent={require('@assets/icons/bottom_tabs/category.png')}
-              label="Categories"
-            />
-        }}
-      />
-      <Tab.Screen
-        name="KPI"
-        component={KPIDashboardScreen}
-        options={{
-          tabBarIcon: ({ focused }) =>
-            <TabBarIcon
-              focused={focused}
-              iconComponent={require('@assets/icons/bottom_tabs/kpi.png')}
-              label="KPI"
-            />
-          // tabBarStyle: { display: 'none' }
-        }}
-      />
-      <Tab.Screen
-        name="MyOrders"
-        component={MyOrdersScreen}
-        options={{
-          tabBarIcon: ({ focused }) =>
-            <TabBarIcon
-              focused={focused}
-              iconComponent={require('@assets/icons/bottom_tabs/order.png')}
-              label="Orders"
-            />
-        }}
-      />
+      {/* Orders tab removed as requested */}
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}

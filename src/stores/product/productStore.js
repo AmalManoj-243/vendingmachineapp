@@ -21,30 +21,31 @@ const useProductStore = create((set, get) => ({
   addProduct: (product) => set((state) => {
     const { currentCustomerId } = state;
     if (!currentCustomerId) return state;
-    
-    const currentCart = state.cartItems[currentCustomerId] || [];
-    const exists = currentCart.some((p) => p.id === product.id);
-    
-    if (!exists) {
-      return {
-        ...state,
-        cartItems: {
-          ...state.cartItems,
-          [currentCustomerId]: [...currentCart, product]
-        }
-      };
-    } else {
-      const updatedCart = currentCart.map((p) =>
-        p.id === product.id ? { ...p, quantity: product.quantity, price: product.price } : p
-      );
-      return {
-        ...state,
-        cartItems: {
-          ...state.cartItems,
-          [currentCustomerId]: updatedCart
-        }
-      };
-    }
+
+    // Enforce single-item cart: replace any existing items with the new one
+    const newPriceUnit = typeof product.price_unit !== 'undefined'
+      ? product.price_unit
+      : (typeof product.price !== 'undefined' ? product.price : (product.price_unit ?? product.price ?? 0));
+    const newPrice = typeof product.price !== 'undefined' ? product.price : (product.price ?? newPriceUnit);
+    const subtotal = 1 * Number(newPriceUnit);
+
+    const prod = {
+      ...product,
+      quantity: 1,
+      qty: 1,
+      price: newPrice,
+      price_unit: newPriceUnit,
+      price_subtotal: subtotal,
+      price_subtotal_incl: subtotal,
+    };
+
+    return {
+      ...state,
+      cartItems: {
+        ...state.cartItems,
+        [currentCustomerId]: [prod]
+      }
+    };
   }),
   
   removeProduct: (productId) => set((state) => {

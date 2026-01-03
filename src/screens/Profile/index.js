@@ -1,2 +1,2 @@
-import ProfileScreen from "./ProfileScreen";
-export {ProfileScreen}
+import ProfileScreen from "./ProfileNewScreen";
+export { ProfileScreen }
