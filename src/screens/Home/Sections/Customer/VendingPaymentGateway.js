@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@stores/auth';
+import { DEFAULT_ODOO_DB, DEFAULT_ODOO_BASE_URL } from '@api/config/odooConfig';
 import {
   View,
   Text,
@@ -660,7 +661,7 @@ const PaymentScreen = (props) => {
                     const handle = async () => {
                       setIsGetLoading(true);
                       try {
-                        const db = 'testdb2';
+                        const db = DEFAULT_ODOO_DB;
                         const token = apiToken;
                         const invoice_id = invoiceId || '';
                         if (!token || !invoice_id) {
@@ -669,7 +670,7 @@ const PaymentScreen = (props) => {
                         }
                         const reqPayload = { db, token, invoice_id };
                         console.log('[GET API] Request:', JSON.stringify(reqPayload, null, 2));
-                        const response = await fetch('http://103.42.198.95:8969/api/vending/process', {
+                        const response = await fetch(`${DEFAULT_ODOO_BASE_URL}api/vending/process`, {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify(reqPayload),

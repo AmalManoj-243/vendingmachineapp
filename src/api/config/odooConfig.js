@@ -2,10 +2,10 @@
 
 // 🔹 Put your Odoo server URL here ONE time
 // Current test server
-const ODOO_BASE_URL = "http://103.42.198.95:8969/";
+const ODOO_BASE_URL = "http://115.246.240.218:9169/";
 
 // Default DB to use for Odoo JSON-RPC login (change to your test DB)
-const DEFAULT_ODOO_DB = "testdb2";
+const DEFAULT_ODOO_DB = "amal";
 
 
 // Named export for default base URL for backward compatibility
