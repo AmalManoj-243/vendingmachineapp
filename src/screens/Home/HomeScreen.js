@@ -26,7 +26,23 @@ import { useAuthStore } from '@stores/auth';
 import { fetchProductDetailsByBarcode } from "@api/details/detailApi";
 import { OverlayLoader } from "@components/Loader";
 
-const { height } = Dimensions.get("window");
+const { height, width } = Dimensions.get("window");
+
+// Responsive breakpoints
+const isSmallPhone = width < 360; // Small phones (e.g., iPhone SE)
+const isPhone = width < 768; // Regular phones
+const isTablet = width >= 768 && width < 1024; // Tablets
+const isLargeTablet = width >= 1024; // Large tablets/iPad Pro
+
+// Determine number of columns based on screen width
+const getNumColumns = () => {
+  if (isLargeTablet) return 5;
+  if (isTablet) return 4;
+  if (isSmallPhone) return 2;
+  return 3; // Default for regular phones
+};
+
+const NUM_COLUMNS = getNumColumns();
 
 const HomeScreen = ({ navigation }) => {
   const [backPressCount, setBackPressCount] = useState(0);
@@ -43,7 +59,7 @@ const HomeScreen = ({ navigation }) => {
         BackHandler.exitApp();
       }
     }
-    return false; // Allow default back action
+    return false;
   }, [backPressCount, navigation]);
 
   useEffect(() => {
@@ -63,7 +79,6 @@ const HomeScreen = ({ navigation }) => {
   }, [backPressCount]);
 
   useEffect(() => {
-    // Show toast message when backPressCount changes to 1
     if (backPressCount === 1) {
       showToastMessage("Press back again to exit");
     }
@@ -83,7 +98,6 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (data && Array.isArray(data)) {
-      // Log product details from Odoo model 'product filling' but redact image URLs
       try {
         const sanitized = data.map(({ image_url, ...rest }) => rest);
         console.log('Fetched products from Odoo (product filling):', sanitized);
@@ -153,9 +167,35 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate(screenName);
   };
 
-  // Define different snap points based on screen height
+  // Responsive snap points based on device type and screen height
   const snapPoints = useMemo(() => {
-    // Increase the default (first) snap point so more product rows are visible
+    // For large tablets - prevent overlap with slideshow
+    if (isLargeTablet) {
+      if (height < 900) {
+        return ["55%", "88%"];
+      }
+      return ["58%", "90%"];
+    }
+    
+    // For regular tablets - prevent overlap with slideshow
+    if (isTablet) {
+      if (height < 900) {
+        return ["52%", "86%"];
+      } else if (height < 1000) {
+        return ["54%", "88%"];
+      }
+      return ["56%", "90%"];
+    }
+    
+    // For small phones - less initial space
+    if (isSmallPhone) {
+      if (height < 600) {
+        return ["40%", "75%"];
+      }
+      return ["45%", "80%"];
+    }
+    
+    // For regular phones
     if (height < 700) {
       return ["45%", "79%"];
     } else if (height < 800) {
@@ -166,7 +206,6 @@ const HomeScreen = ({ navigation }) => {
       return ["65%", "90%"];
     }
   }, [height]);
-
 
   const [detailLoading, startLoading, stopLoading] = useLoader(false);
 
@@ -187,32 +226,46 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  // Responsive padding bottom based on device type
+  const contentPaddingBottom = useMemo(() => {
+    if (isLargeTablet) return "20%";
+    if (isTablet) return "22%";
+    if (isSmallPhone) return "30%";
+    return "25%";
+  }, []);
+
+  // Responsive initial render count
+  const initialNumToRender = useMemo(() => {
+    if (isLargeTablet) return 15; // 5 columns × 3 rows
+    if (isTablet) return 12; // 4 columns × 3 rows
+    if (isSmallPhone) return 6; // 2 columns × 3 rows
+    return 9; // 3 columns × 3 rows (default)
+  }, []);
 
   return (
     <SafeAreaView backgroundColor={COLORS.primaryThemeColor}>
-      {/* rounded border */}
       <RoundedContainer>
         {/* Header */}
         <Header />
-        <View style={{ marginTop: -18, marginBottom: -8 }}>
+        <View style={styles.carouselContainer}>
           <CarouselPagination />
         </View>
 
-        {/* Section */}
-        {/* POS and Sales Order tiles removed as requested */}
-        {/* Products section (Categories removed) */}
+        {/* Products section with responsive BottomSheet */}
         <BottomSheet snapPoints={snapPoints}>
           <ListHeader title="Products" />
           <BottomSheetFlatList
-            data={formatData(data, 3)}
-            numColumns={3}
-            initialNumToRender={9}
+            data={formatData(data, NUM_COLUMNS)}
+            numColumns={NUM_COLUMNS}
+            key={NUM_COLUMNS} // Force re-render when columns change
+            initialNumToRender={initialNumToRender}
             renderItem={renderItem}
             keyExtractor={(item, index) => index.toString()}
-            contentContainerStyle={{ paddingBottom: "25%" }}
+            contentContainerStyle={{ paddingBottom: contentPaddingBottom }}
             onEndReached={handleLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.2}
+            columnWrapperStyle={NUM_COLUMNS > 1 ? styles.columnWrapper : null}
             ListFooterComponent={
               loading && <ActivityIndicator size="large" color="#0000ff" />
             }
@@ -225,16 +278,27 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  carouselContainer: {
+    marginTop: isTablet ? -24 : -18,
+    marginBottom: isTablet ? -12 : -8,
+  },
   itemInvisible: {
     backgroundColor: "transparent",
   },
   itemStyle: {
     flex: 1,
     alignItems: "center",
-    margin: 6,
-    borderRadius: 8,
-    marginTop: 5,
+    margin: isSmallPhone ? 4 : (isTablet ? 8 : 6),
+    borderRadius: isTablet ? 10 : 8,
+    marginTop: isSmallPhone ? 3 : 5,
     backgroundColor: "white",
+    // Responsive min/max widths to prevent items from being too small or too large
+    minWidth: isSmallPhone ? 140 : (isTablet ? 120 : 100),
+    maxWidth: isLargeTablet ? 220 : (isTablet ? 200 : 180),
+  },
+  columnWrapper: {
+    justifyContent: isTablet ? 'flex-start' : 'space-between',
+    paddingHorizontal: isTablet ? 8 : 4,
   },
 });
 

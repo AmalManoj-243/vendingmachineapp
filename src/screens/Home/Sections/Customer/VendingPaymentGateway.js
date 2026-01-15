@@ -13,9 +13,15 @@ import {
   Dimensions,
   Linking,
   Alert,
+  ScrollView,
+  Platform,
 } from 'react-native';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+
+// Determine if device is tablet or mobile
+const isTablet = width >= 768;
+const isMobile = width < 768;
 
 // UPI App configurations
 const UPI_APPS = [
@@ -69,7 +75,7 @@ const UPI_APPS = [
   },
 ];
 
-// Custom Icon Components (SVG-like using View)
+// Custom Icon Components
 const StoreIcon = () => (
   <View style={styles.storeIconContainer}>
     <View style={styles.storeIconRoof} />
@@ -101,21 +107,17 @@ const FailIcon = () => (
   </View>
 );
 
-// QR Code Component (Simple representation)
+// QR Code Component
 const QRCodeDisplay = ({ value, size = 150 }) => {
-  // In production, use a library like 'react-native-qrcode-svg'
-  // This is a visual placeholder that shows the concept
   const generateQRPattern = () => {
     const cells = [];
     const cellCount = 21;
     const cellSize = size / cellCount;
     
-    // Generate pseudo-random pattern based on value
     const seed = value.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     
     for (let row = 0; row < cellCount; row++) {
       for (let col = 0; col < cellCount; col++) {
-        // Position detection patterns (corners)
         const isTopLeftCorner = row < 7 && col < 7;
         const isTopRightCorner = row < 7 && col >= cellCount - 7;
         const isBottomLeftCorner = row >= cellCount - 7 && col < 7;
@@ -123,7 +125,6 @@ const QRCodeDisplay = ({ value, size = 150 }) => {
         let isFilled = false;
         
         if (isTopLeftCorner || isTopRightCorner || isBottomLeftCorner) {
-          // Draw finder patterns
           const localRow = row >= cellCount - 7 ? row - (cellCount - 7) : row;
           const localCol = col >= cellCount - 7 ? col - (cellCount - 7) : col;
           
@@ -133,7 +134,6 @@ const QRCodeDisplay = ({ value, size = 150 }) => {
             isFilled = true;
           }
         } else {
-          // Random data pattern
           isFilled = ((seed * (row + 1) * (col + 1)) % 3) === 0;
         }
         
@@ -171,7 +171,6 @@ const PaymentScreen = (props) => {
   const { route = {}, navigation } = props;
   const params = route.params || {};
 
-  // Resolve initial values from either direct props (for unit tests) or navigation params
   const initialAmount = props.amount ?? params.amount ?? 1799;
   const initialInvoice = props.invoiceNumber ?? params.invoiceNumber ?? null;
   const initialInvoiceId = props.invoiceId ?? params.invoiceId ?? null;
@@ -187,7 +186,6 @@ const PaymentScreen = (props) => {
   const [amount, setAmount] = useState(initialAmount);
   const [invoiceNumber, setInvoiceNumber] = useState(initialInvoice || `INV11_${Date.now()}`);
   const [invoiceId, setInvoiceId] = useState(initialInvoiceId || null);
-  // Auth token from store (set during login)
   const authUser = useAuthStore((s) => s.user);
   const apiToken = authUser?.api_token || (Array.isArray(authUser?.api_keys) ? authUser.api_keys[0] : null);
   const [qrData, setQrData] = useState(null);
@@ -202,7 +200,6 @@ const PaymentScreen = (props) => {
   const [productImages, setProductImages] = useState([]);
   const [showProductModal, setShowProductModal] = useState(false);
 
-  // Generate Invoice Number on mount
   useEffect(() => {
     if (!initialInvoice) {
       const timestamp = new Date().toISOString().replace(/[-:T.Z]/g, '').slice(0, 14);
@@ -210,11 +207,9 @@ const PaymentScreen = (props) => {
     }
   }, []);
 
-  // Generate QR Code
   const generateQRCode = useCallback(async () => {
     setIsLoading(true);
     try {
-      // API call to generate dynamic QR code
       const response = await fetch(qrGenerateApiEndpoint, {
         method: 'POST',
         headers: {
@@ -232,31 +227,26 @@ const PaymentScreen = (props) => {
         const data = await response.json();
         setQrData(data.qr_string || generateUPIString());
       } else {
-        // Fallback to local QR generation
         setQrData(generateUPIString());
       }
     } catch (error) {
       console.log('QR API Error, using fallback:', error);
-      // Fallback to local QR generation
       setQrData(generateUPIString());
     } finally {
       setIsLoading(false);
     }
   }, [amount, invoiceNumber, merchantUpiId, merchantName]);
 
-  // Generate UPI String locally
   const generateUPIString = () => {
     const upiString = `upi://pay?pa=${merchantUpiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&tn=${invoiceNumber}&cu=INR`;
     return upiString;
   };
 
-  // Handle Test Mode
   const handleTestMode = async () => {
     setIsTestMode(true);
     setIsLoading(true);
     
     try {
-      // API call for test mode payment
       const response = await fetch(testModeApiEndpoint, {
         method: 'POST',
         headers: {
@@ -272,7 +262,6 @@ const PaymentScreen = (props) => {
       const data = await response.json();
       
       if (response.ok && data.success) {
-        // Payment Success
         setTransactionId(data.transaction_id || `TXN${Date.now()}`);
         setPaymentStatus('success');
         setShowSuccessModal(true);
@@ -283,7 +272,6 @@ const PaymentScreen = (props) => {
           status: 'success',
         });
       } else {
-        // Payment Failed
         setPaymentStatus('failed');
         setShowFailureModal(true);
         onPaymentFailure?.({
@@ -294,7 +282,6 @@ const PaymentScreen = (props) => {
         });
       }
     } catch (error) {
-      // Network or API error - show failure
       console.log('Test Mode API Error:', error);
       setPaymentStatus('failed');
       setShowFailureModal(true);
@@ -309,11 +296,9 @@ const PaymentScreen = (props) => {
     }
   };
 
-  // Handle UPI App Payment
   const handleUPIPayment = async (app) => {
     const upiString = qrData || generateUPIString();
 
-    // Different URL schemes for different apps
     let paymentUrl = upiString;
 
     if (app.id === 'gpay') {
@@ -331,7 +316,6 @@ const PaymentScreen = (props) => {
         return true;
       }
 
-      // Try generic UPI intent only if a handler exists
       const genericUPI = generateUPIString();
       const canOpenGeneric = await Linking.canOpenURL(genericUPI);
       if (canOpenGeneric) {
@@ -339,32 +323,25 @@ const PaymentScreen = (props) => {
         return true;
       }
 
-      // No UPI app/handler available — log and let caller decide next steps
       console.warn(`${app.name} not available and no UPI handler found.`);
       return false;
     } catch (error) {
-      // Log error and let caller decide next steps
       console.warn('UPI launch error', error);
       return false;
     }
   };
 
-  // Start UPI flow with realistic processing indicator, then reveal Get button
   const handleStartUPI = async (app) => {
     try {
       setShowGetButton(false);
       setIsLoading(true);
-      // Attempt to launch UPI app (or generic handler). We don't reveal Get here;
-      // the Get button should only appear after the processing delay below.
       await handleUPIPayment(app);
 
-      // Simulate realistic processing delay (give user time to switch to UPI app)
       setTimeout(() => {
         setIsLoading(false);
         setShowGetButton(true);
       }, 2500);
     } catch (err) {
-      // Ensure we stop loading and reveal Get after the same processing interval
       console.warn('handleStartUPI error', err);
       setTimeout(() => {
         setIsLoading(false);
@@ -373,23 +350,35 @@ const PaymentScreen = (props) => {
     }
   };
 
-  // Format amount with currency
   const formatAmount = (value) => {
     return `₹${value.toLocaleString('en-IN')}`;
   };
 
-  // Render UPI App Button
   const renderUPIApp = (app) => {
     const largeIds = ['gpay','paytm','phonepe','bhim','amazonpay','whatsapp'];
     const isLarge = largeIds.includes(app.id);
     const isAmazon = app.id === 'amazonpay';
     const isGpay = app.id === 'gpay';
     const imageSource = typeof app.icon === 'number' || (app.icon && typeof app.icon === 'object') ? app.icon : { uri: app.icon };
-    const containerStyle = isLarge ? styles.upiAppIconContainerLarge : styles.upiAppIconContainer;
-    const containerStyleFinal = isAmazon ? styles.upiAppIconContainerAmazon : (isGpay ? styles.upiAppIconContainerLarge : containerStyle);
-    // override: make PhonePe outer round background white
+    
+    // Responsive sizing
+    const iconSize = isMobile ? (isLarge ? 60 : 40) : (isLarge ? 88 : 48);
+    const containerSize = isMobile ? (isLarge ? 68 : 48) : (isLarge ? 96 : 48);
+    
+    const containerStyle = isLarge ? 
+      { ...styles.upiAppIconContainerLarge, width: containerSize, height: containerSize, borderRadius: containerSize / 2 } : 
+      { ...styles.upiAppIconContainer, width: containerSize, height: containerSize, borderRadius: containerSize / 2 };
+    
+    const containerStyleFinal = isAmazon ? 
+      { ...styles.upiAppIconContainerAmazon, width: containerSize - 8, height: containerSize - 8, borderRadius: (containerSize - 8) / 2 } : 
+      (isGpay ? { ...styles.upiAppIconContainerLarge, width: containerSize, height: containerSize, borderRadius: containerSize / 2 } : containerStyle);
+    
     const containerOverride = app.id === 'phonepe' ? { backgroundColor: '#FFFFFF' } : {};
-    const imageOverride = app.id === 'phonepe' ? { backgroundColor: '#FFFFFF' } : {};
+    const imageStyle = isGpay ? 
+      { ...styles.upiAppIconGpay, width: iconSize, height: iconSize } : 
+      (isAmazon ? { ...styles.upiAppIconAmazon, width: iconSize - 8, height: iconSize - 8 } : 
+      (isLarge ? { ...styles.upiAppIconLarge, width: iconSize, height: iconSize } : 
+      { ...styles.upiAppIcon, width: iconSize * 0.6, height: iconSize * 0.6 }));
 
     return (
       <TouchableOpacity
@@ -398,19 +387,18 @@ const PaymentScreen = (props) => {
         onPress={() => handleStartUPI(app)}
         activeOpacity={0.7}
       >
-        <View style={[containerStyleFinal, containerOverride, { marginBottom: 8 }]}>
+        <View style={[containerStyleFinal, containerOverride, { marginBottom: isMobile ? 4 : 8 }]}>
           <Image
             source={imageSource}
-            style={isGpay ? styles.upiAppIconGpay : (isAmazon ? styles.upiAppIconAmazon : (isLarge ? styles.upiAppIconLarge : styles.upiAppIcon))}
+            style={imageStyle}
             resizeMode="contain"
           />
         </View>
-        <Text style={styles.upiAppName}>{app.name}</Text>
+        <Text style={[styles.upiAppName, isMobile && { fontSize: 10 }]}>{app.name}</Text>
       </TouchableOpacity>
     );
   };
 
-  // Success Modal
   const renderSuccessModal = () => (
     <Modal
       visible={showSuccessModal}
@@ -449,7 +437,6 @@ const PaymentScreen = (props) => {
     </Modal>
   );
 
-  // Failure Modal
   const renderFailureModal = () => (
     <Modal
       visible={showFailureModal}
@@ -501,7 +488,6 @@ const PaymentScreen = (props) => {
     </Modal>
   );
 
-  // Loading Overlay
   const renderLoadingOverlay = () => (
     <Modal visible={isLoading} transparent animationType="fade">
       <View style={styles.loadingOverlay}>
@@ -513,216 +499,347 @@ const PaymentScreen = (props) => {
     </Modal>
   );
 
-  return (
-    <View style={styles.container}>
-      {/* Left Panel - Order Summary */}
-      <View style={styles.leftPanel}>
-        
-        
-        <View style={styles.amountSection}>
-          <Text style={styles.totalPayableLabel}>Total Payable</Text>
-          <TouchableOpacity style={styles.amountContainer}>
-            <Text style={styles.amountText}>{formatAmount(amount)}</Text>
-            <Text style={styles.amountDropdown}>▼</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.secureCheckout}>
-          <View style={styles.payuLogo}>
-            <Text style={styles.payuText}>pay</Text>
-            <View style={styles.payuU}>
-              <Text style={styles.payuUText}>U</Text>
-            </View>
-          </View>
-          <Text style={styles.secureText}>Secure Checkout</Text>
-          <View style={styles.verifiedBadge}>
-            <Text style={styles.verifiedIcon}>✓</Text>
-          </View>
-        </View>
-
-        <TouchableOpacity
-          style={styles.showInvoicesButton}
-          onPress={() => {
-            if (typeof onShowInvoices === 'function') {
-              onShowInvoices();
-            } else {
-              Alert.alert('Invoices', 'Show invoices');
-            }
-          }}
-        >
-          <Text style={styles.showInvoicesButtonText}>Show Invoices</Text>
+  // Left Panel Content (reusable for both layouts)
+  const renderLeftPanelContent = () => (
+    <>
+      <View style={styles.amountSection}>
+        <Text style={styles.totalPayableLabel}>Total Payable</Text>
+        <TouchableOpacity style={styles.amountContainer}>
+          <Text style={styles.amountText}>{formatAmount(amount)}</Text>
+          <Text style={styles.amountDropdown}>▼</Text>
         </TouchableOpacity>
+      </View>
 
-        {apiToken && (
-          <View style={[styles.transactionInfo, { marginTop: 8 }]}>
-            <Text style={styles.transactionLabel}>API Token:</Text>
-            <View style={styles.tokenBox}>
-              <Text style={styles.tokenText}>{apiToken}</Text>
-            </View>
-          </View>
-        )}
-        <View style={styles.transactionInfo}>
-          <Text style={styles.transactionLabel}>Transaction Id:</Text>
-          <View style={styles.invoiceBox}>
-            <Text style={styles.invoiceText}>{invoiceNumber}</Text>
+      <View style={styles.secureCheckout}>
+        <View style={styles.payuLogo}>
+          <Text style={styles.payuText}>pay</Text>
+          <View style={styles.payuU}>
+            <Text style={styles.payuUText}>U</Text>
           </View>
         </View>
-        <View style={styles.transactionInfo}>
-          <Text style={styles.transactionLabel}>Invoice Id:</Text>
-          <View style={styles.invoiceBox}>
-            <Text style={styles.invoiceText}>{invoiceId || '—'}</Text>
+        <Text style={styles.secureText}>Secure Checkout</Text>
+        <View style={styles.verifiedBadge}>
+          <Text style={styles.verifiedIcon}>✓</Text>
+        </View>
+      </View>
+
+      <TouchableOpacity
+        style={styles.showInvoicesButton}
+        onPress={() => {
+          if (typeof onShowInvoices === 'function') {
+            onShowInvoices();
+          } else {
+            Alert.alert('Invoices', 'Show invoices');
+          }
+        }}
+      >
+        <Text style={styles.showInvoicesButtonText}>Show Invoices</Text>
+      </TouchableOpacity>
+
+      {apiToken && (
+        <View style={[styles.transactionInfo, { marginTop: 8 }]}>
+          <Text style={styles.transactionLabel}>API Token:</Text>
+          <View style={styles.tokenBox}>
+            <Text style={styles.tokenText} numberOfLines={1} ellipsizeMode="middle">{apiToken}</Text>
+          </View>
+        </View>
+      )}
+      <View style={styles.transactionInfo}>
+        <Text style={styles.transactionLabel}>Transaction Id:</Text>
+        <View style={styles.invoiceBox}>
+          <Text style={styles.invoiceText}>{invoiceNumber}</Text>
+        </View>
+      </View>
+      <View style={styles.transactionInfo}>
+        <Text style={styles.transactionLabel}>Invoice Id:</Text>
+        <View style={styles.invoiceBox}>
+          <Text style={styles.invoiceText}>{invoiceId || '—'}</Text>
+        </View>
+      </View>
+    </>
+  );
+
+  // Right Panel Header
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <Text style={styles.testModeLabel}>Test Mode</Text>
+      
+      <TouchableOpacity
+        style={styles.testModeButton}
+        onPress={handleTestMode}
+      >
+        <View style={styles.testModeIcon}>
+          <Text style={styles.testModeIconText}>⊕</Text>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+
+  // Payment options content
+  const renderPaymentContent = () => (
+    <>
+      {/* BHIM UPI Section */}
+      <View style={styles.bhimHeader}>
+        <Image source={require('../../../../../assets/icons/modal/Bhim-logo.png')} style={styles.bhimLogoImg} resizeMode="contain" />
+        <View style={styles.upiLogoContainer}>
+          <Image source={require('../../../../../assets/icons/modal/upi.png')} style={styles.upiLogoImg} resizeMode="contain" />
+        </View>
+      </View>
+
+      {/* QR Code Section */}
+      <View style={styles.qrSection}>
+        <Text style={styles.qrTitle}>SCAN QR & PAY</Text>
+        <View style={[styles.qrContent, isMobile && { flexDirection: 'column', alignItems: 'center' }]}>
+          <View style={[styles.qrInfo, isMobile && { paddingRight: 0, marginBottom: 12, alignItems: 'center' }]}>
+            <Text style={[styles.qrInfoTitle, isMobile && { textAlign: 'center', fontSize: 14 }]}>Pay instantly by QR code</Text>
+            <Text style={[styles.qrInfoSubtitle, isMobile && { textAlign: 'center', fontSize: 11 }]}>Scan & Pay using your preferred UPI App</Text>
+            <View style={styles.upiPoweredBy}>
+              <Text style={styles.poweredByText}>POWERED BY</Text>
+              <View style={styles.upiSmallLogo}>
+                <Image
+                  source={require('../../../../../assets/icons/modal/360_F_560501607_x7crxqBWbmbgK2k8zOL0gICbIbK9hP6y.png')}
+                  style={styles.upiSmallLogoImg}
+                  resizeMode="contain"
+                />
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.qrCodeWrapper}>
+            <Image
+              source={require('../../../../../assets/icons/modal/Qr-Code-Transparent-PNG.png')}
+              style={[styles.qrStaticImg, isMobile && { width: 100, height: 100 }]}
+              resizeMode="contain"
+            />
           </View>
         </View>
       </View>
 
-      {/* Right Panel - Payment Options */}
-      <View style={styles.rightPanel}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.testModeLabel}>Test Mode</Text>
-          
-          <TouchableOpacity
-            style={styles.testModeButton}
-            onPress={handleTestMode}
-          >
-            <View style={styles.testModeIcon}>
-              <Text style={styles.testModeIconText}>⊕</Text>
-            </View>
-          </TouchableOpacity>
+      {/* UPI Apps Header */}
+      <View style={styles.upiAppsSection}>
+        <View style={styles.upiAppsHeader}>
+          <View style={styles.upiLogoSmall}><Text style={styles.upiLogoText}>UPI</Text></View>
+          <Text style={[styles.upiAppsTitle, isMobile && { fontSize: 10 }]}>PAY USING ANY UPI APP</Text>
         </View>
+      </View>
 
-        <FlatList
-          data={UPI_APPS}
-          keyExtractor={(item) => item.id}
-          numColumns={3}
-          contentContainerStyle={styles.rightFlatListContent}
-          renderItem={({ item }) => renderUPIApp(item)}
-          ListHeaderComponent={() => (
-            <>
-              {/* BHIM UPI Section */}
-              <View style={styles.bhimHeader}>
-                <Image source={require('../../../../../assets/icons/modal/Bhim-logo.png')} style={styles.bhimLogoImg} resizeMode="contain" />
-                <View style={styles.upiLogoContainer}>
-                  <Image source={require('../../../../../assets/icons/modal/upi.png')} style={styles.upiLogoImg} resizeMode="contain" />
-                </View>
-              </View>
+      {/* UPI Apps Grid */}
+      <View style={styles.upiAppsGrid}>
+        {UPI_APPS.map(app => renderUPIApp(app))}
+      </View>
 
-              {/* QR Code Section */}
-              <View style={styles.qrSection}>
-                <Text style={styles.qrTitle}>SCAN QR & PAY</Text>
-                <View style={styles.qrContent}>
-                  <View style={styles.qrInfo}>
-                    <Text style={styles.qrInfoTitle}>Pay instantly by QR code</Text>
-                    <Text style={styles.qrInfoSubtitle}>Scan & Pay using your preferred UPI App</Text>
-                    <View style={styles.upiPoweredBy}>
-                      <Text style={styles.poweredByText}>POWERED BY</Text>
-                      <View style={styles.upiSmallLogo}>
-                        <Image
-                          source={require('../../../../../assets/icons/modal/360_F_560501607_x7crxqBWbmbgK2k8zOL0gICbIbK9hP6y.png')}
-                          style={styles.upiSmallLogoImg}
-                          resizeMode="contain"
-                        />
-                      </View>
-                    </View>
-                  </View>
-
-                  <View style={styles.qrCodeWrapper}>
-                    <Image
-                      source={require('../../../../../assets/icons/modal/Qr-Code-Transparent-PNG.png')}
-                      style={styles.qrStaticImg}
-                      resizeMode="contain"
-                    />
-                  </View>
-                </View>
+      {/* Partners Section */}
+      <View style={styles.partnersSection}>
+        <View style={styles.partnerLogos}>
+          <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/200px-Visa_Inc._logo.svg.png' }} style={styles.partnerLogo} resizeMode="contain" />
+          <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/200px-Mastercard-logo.svg.png' }} style={styles.partnerLogo} resizeMode="contain" />
+          <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/RuPay.svg/200px-RuPay.svg.png' }} style={styles.partnerLogo} resizeMode="contain" />
+        </View>
+        {showGetButton && (
+          <TouchableOpacity
+            style={[styles.getButton, isGetLoading ? styles.getButtonDisabled : null]}
+            onPress={async () => {
+              if (isGetLoading) return;
+              const handle = async () => {
+                setIsGetLoading(true);
+                try {
+                  const db = DEFAULT_ODOO_DB;
+                  const token = apiToken;
+                  const invoice_id = invoiceId || '';
+                  if (!token || !invoice_id) {
+                    Alert.alert('Error', 'Missing token or invoice id');
+                    return;
+                  }
+                  const reqPayload = { db, token, invoice_id };
+                  console.log('[GET API] Request:', JSON.stringify(reqPayload, null, 2));
+                  const response = await fetch(`${DEFAULT_ODOO_BASE_URL}api/vending/process`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reqPayload),
+                  });
+                  const respText = await response.text();
+                  let data;
+                  try {
+                    data = JSON.parse(respText);
+                  } catch (e) {
+                    data = respText;
+                  }
+                  console.log('[GET API] Response:', typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+                  if (Array.isArray(data) && data.length && data[0].product_id) {
+                    setProductImages(data);
+                    setShowProductModal(true);
+                    setTimeout(() => {
+                      setShowProductModal(false);
+                      try { navigation.navigate('Home'); } catch (e) { console.warn('Navigation to Home failed', e); }
+                    }, 2500);
+                  } else {
+                    console.log('[GET API] Non-array response:', typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+                    try { navigation.navigate('Home'); } catch (e) { console.warn('Navigation to Home failed', e); }
+                  }
+                } catch (err) {
+                  console.error('[GET API] Error:', err.message || err);
+                  try { navigation.navigate('Home'); } catch (e) { console.warn('Navigation to Home failed', e); }
+                } finally {
+                  setIsGetLoading(false);
+                }
+              };
+              handle();
+            }}
+            activeOpacity={0.8}
+          >
+            <View style={styles.getButtonInner}>
+              <View style={styles.getButtonIcon}>
+                <Text style={styles.getButtonIconText}>⇣</Text>
               </View>
-
-              {/* UPI Apps Header */}
-              <View style={styles.upiAppsSection}>
-                <View style={styles.upiAppsHeader}>
-                  <View style={styles.upiLogoSmall}><Text style={styles.upiLogoText}>UPI</Text></View>
-                  <Text style={styles.upiAppsTitle}>PAY USING ANY UPI APP</Text>
-                </View>
-              </View>
-            </>
-          )}
-          ListFooterComponent={() => (
-            <View style={styles.partnersSection}>
-              <View style={styles.partnerLogos}>
-                <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/200px-Visa_Inc._logo.svg.png' }} style={styles.partnerLogo} resizeMode="contain" />
-                <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/200px-Mastercard-logo.svg.png' }} style={styles.partnerLogo} resizeMode="contain" />
-                <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/RuPay.svg/200px-RuPay.svg.png' }} style={styles.partnerLogo} resizeMode="contain" />
-              </View>
-              {showGetButton && (
-                <TouchableOpacity
-                  style={[styles.getButton, isGetLoading ? styles.getButtonDisabled : null]}
-                  onPress={async () => {
-                    // delegate to handler to keep JSX concise
-                    if (isGetLoading) return;
-                    const handle = async () => {
-                      setIsGetLoading(true);
-                      try {
-                        const db = DEFAULT_ODOO_DB;
-                        const token = apiToken;
-                        const invoice_id = invoiceId || '';
-                        if (!token || !invoice_id) {
-                          Alert.alert('Error', 'Missing token or invoice id');
-                          return;
-                        }
-                        const reqPayload = { db, token, invoice_id };
-                        console.log('[GET API] Request:', JSON.stringify(reqPayload, null, 2));
-                        const response = await fetch(`${DEFAULT_ODOO_BASE_URL}api/vending/process`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify(reqPayload),
-                        });
-                        const respText = await response.text();
-                        let data;
-                        try {
-                          data = JSON.parse(respText);
-                        } catch (e) {
-                          data = respText;
-                        }
-                        console.log('[GET API] Response:', typeof data === 'string' ? data : JSON.stringify(data, null, 2));
-                        if (Array.isArray(data) && data.length && data[0].product_id) {
-                          setProductImages(data);
-                          setShowProductModal(true);
-                          // auto-close modal and navigate home after short delay
-                          setTimeout(() => {
-                            setShowProductModal(false);
-                            try { navigation.navigate('Home'); } catch (e) { console.warn('Navigation to Home failed', e); }
-                          }, 2500);
-                        } else {
-                          console.log('[GET API] Non-array response:', typeof data === 'string' ? data : JSON.stringify(data, null, 2));
-                          try { navigation.navigate('Home'); } catch (e) { console.warn('Navigation to Home failed', e); }
-                        }
-                      } catch (err) {
-                        console.error('[GET API] Error:', err.message || err);
-                        try { navigation.navigate('Home'); } catch (e) { console.warn('Navigation to Home failed', e); }
-                      } finally {
-                        setIsGetLoading(false);
-                      }
-                    };
-                    handle();
-                  }}
-                  activeOpacity={0.8}
-                >
-                  <View style={styles.getButtonInner}>
-                    <View style={styles.getButtonIcon}>
-                      <Text style={styles.getButtonIconText}>⇣</Text>
-                    </View>
-                    {isGetLoading ? (
-                      <ActivityIndicator size="small" color="#FFFFFF" style={{ marginLeft: 10 }} />
-                    ) : (
-                      <Text style={styles.getButtonText}>Get</Text>
-                    )}
-                  </View>
-                </TouchableOpacity>
+              {isGetLoading ? (
+                <ActivityIndicator size="small" color="#FFFFFF" style={{ marginLeft: 10 }} />
+              ) : (
+                <Text style={styles.getButtonText}>Get</Text>
               )}
             </View>
-          )}
-          showsVerticalScrollIndicator={false}
-        />
+          </TouchableOpacity>
+        )}
       </View>
+    </>
+  );
+
+  // Render tablet layout (side by side)
+  if (isTablet) {
+    return (
+      <View style={styles.container}>
+        {/* Left Panel */}
+        <View style={styles.leftPanel}>
+          {renderLeftPanelContent()}
+        </View>
+
+        {/* Right Panel */}
+        <View style={styles.rightPanel}>
+          {renderHeader()}
+          <ScrollView 
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {renderPaymentContent()}
+          </ScrollView>
+        </View>
+
+        {/* Modals */}
+        {renderSuccessModal()}
+        {renderFailureModal()}
+        {renderLoadingOverlay()}
+        {showProductModal && (
+          <Modal
+            visible={showProductModal}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setShowProductModal(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={[styles.modalContent, { width: '80%', paddingVertical: 16 }]}>
+                <Text style={styles.modalTitle}>Dispensed</Text>
+                <View style={{ maxHeight: 180, marginVertical: 8 }}>
+                  {productImages && productImages.length > 0 ? (
+                    productImages.map((it, idx) => (
+                      <View key={idx} style={{ paddingVertical: 6 }}>
+                        <Text style={{ textAlign: 'center', fontSize: 14, fontWeight: '600' }}>{it.product_name || it.name || `Product ${it.product_id || idx}`}</Text>
+                      </View>
+                    ))
+                  ) : (
+                    <Text style={{ textAlign: 'center' }}>No products</Text>
+                  )}
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+        {isGetLoading && (
+          <Modal visible={true} transparent animationType="fade">
+            <View style={styles.loadingOverlay}>
+              <View style={styles.loadingContent}>
+                <ActivityIndicator size="large" color="#FF6B00" />
+                <Text style={styles.loadingText}>Dispensing...</Text>
+              </View>
+            </View>
+          </Modal>
+        )}
+      </View>
+    );
+  }
+
+  // Render mobile layout (stacked)
+  return (
+    <View style={styles.container}>
+      <ScrollView 
+        style={styles.mobileContainer}
+        contentContainerStyle={styles.mobileScrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Mobile Header with amount */}
+        <View style={styles.mobileHeader}>
+          {renderHeader()}
+          <View style={styles.mobileAmountSection}>
+            <Text style={styles.totalPayableLabel}>Total Payable</Text>
+            <View style={styles.amountContainer}>
+              <Text style={styles.amountText}>{formatAmount(amount)}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Payment Content */}
+        <View style={styles.mobilePaymentSection}>
+          {renderPaymentContent()}
+        </View>
+
+        {/* Transaction Info - Bottom */}
+        <View style={styles.mobileInfoSection}>
+          <View style={styles.secureCheckout}>
+            <View style={styles.payuLogo}>
+              <Text style={styles.payuText}>pay</Text>
+              <View style={styles.payuU}>
+                <Text style={styles.payuUText}>U</Text>
+              </View>
+            </View>
+            <Text style={styles.secureText}>Secure Checkout</Text>
+            <View style={styles.verifiedBadge}>
+              <Text style={styles.verifiedIcon}>✓</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={styles.showInvoicesButton}
+            onPress={() => {
+              if (typeof onShowInvoices === 'function') {
+                onShowInvoices();
+              } else {
+                Alert.alert('Invoices', 'Show invoices');
+              }
+            }}
+          >
+            <Text style={styles.showInvoicesButtonText}>Show Invoices</Text>
+          </TouchableOpacity>
+
+          {apiToken && (
+            <View style={[styles.transactionInfo, { marginTop: 8 }]}>
+              <Text style={styles.transactionLabel}>API Token:</Text>
+              <View style={styles.tokenBox}>
+                <Text style={styles.tokenText} numberOfLines={1} ellipsizeMode="middle">{apiToken}</Text>
+              </View>
+            </View>
+          )}
+          <View style={styles.transactionInfo}>
+            <Text style={styles.transactionLabel}>Transaction Id:</Text>
+            <View style={styles.invoiceBox}>
+              <Text style={styles.invoiceText}>{invoiceNumber}</Text>
+            </View>
+          </View>
+          <View style={styles.transactionInfo}>
+            <Text style={styles.transactionLabel}>Invoice Id:</Text>
+            <View style={styles.invoiceBox}>
+              <Text style={styles.invoiceText}>{invoiceId || '—'}</Text>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
 
       {/* Modals */}
       {renderSuccessModal()}
@@ -736,7 +853,7 @@ const PaymentScreen = (props) => {
           onRequestClose={() => setShowProductModal(false)}
         >
           <View style={styles.modalOverlay}>
-            <View style={[styles.modalContent, { width: '80%', paddingVertical: 16 }] }>
+            <View style={[styles.modalContent, { width: '90%', paddingVertical: 16 }]}>
               <Text style={styles.modalTitle}>Dispensed</Text>
               <View style={{ maxHeight: 180, marginVertical: 8 }}>
                 {productImages && productImages.length > 0 ? (
@@ -770,11 +887,40 @@ const PaymentScreen = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: isTablet ? 'row' : 'column',
     backgroundColor: '#F5F5F5',
   },
   
-  // Left Panel Styles
+  // Mobile specific styles
+  mobileContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  mobileScrollContent: {
+    paddingBottom: 24,
+  },
+  mobileHeader: {
+    backgroundColor: '#FFFFFF',
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  mobileAmountSection: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+  },
+  mobilePaymentSection: {
+    paddingHorizontal: 20,
+  },
+  mobileInfoSection: {
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+    marginTop: 24,
+  },
+  
+  // Left Panel Styles (Tablet)
   leftPanel: {
     width: width * 0.35,
     backgroundColor: '#FFFFFF',
@@ -822,11 +968,11 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 4,
   },
   amountSection: {
-    marginBottom: 40,
-    marginTop: 72,
+    marginBottom: isMobile ? 16 : 40,
+    marginTop: isMobile ? 0 : 72,
   },
   totalPayableLabel: {
-    fontSize: 14,
+    fontSize: isMobile ? 12 : 14,
     color: '#666',
     marginBottom: 8,
   },
@@ -834,14 +980,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#E8F5E9',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: isMobile ? 12 : 16,
+    paddingVertical: isMobile ? 10 : 12,
     borderRadius: 6,
     borderWidth: 1,
     borderColor: '#4CAF50',
   },
   amountText: {
-    fontSize: 20,
+    fontSize: isMobile ? 18 : 20,
     fontWeight: '700',
     color: '#2E7D32',
   },
@@ -860,7 +1006,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   payuText: {
-    fontSize: 14,
+    fontSize: isMobile ? 12 : 14,
     fontWeight: '600',
     color: '#333',
   },
@@ -872,12 +1018,12 @@ const styles = StyleSheet.create({
     marginLeft: 1,
   },
   payuUText: {
-    fontSize: 12,
+    fontSize: isMobile ? 10 : 12,
     fontWeight: '700',
     color: '#FFF',
   },
   secureText: {
-    fontSize: 12,
+    fontSize: isMobile ? 10 : 12,
     color: '#666',
     marginLeft: 8,
   },
@@ -896,10 +1042,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   transactionInfo: {
-    marginTop: 'auto',
+    marginTop: isMobile ? 12 : 'auto',
   },
   transactionLabel: {
-    fontSize: 12,
+    fontSize: isMobile ? 11 : 12,
     color: '#666',
     marginBottom: 6,
   },
@@ -912,9 +1058,9 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   invoiceText: {
-    fontSize: 12,
+    fontSize: isMobile ? 10 : 12,
     color: '#F44336',
-    fontFamily: 'monospace',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   tokenBox: {
     borderWidth: 1,
@@ -924,24 +1070,25 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     alignSelf: 'flex-start',
     backgroundColor: '#F3F4F6',
+    maxWidth: '100%',
   },
   tokenText: {
-    fontSize: 12,
+    fontSize: isMobile ? 10 : 12,
     color: '#374151',
-    fontFamily: 'monospace',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   showInvoicesButton: {
     marginTop: 16,
     backgroundColor: '#FFFFFF',
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+    paddingVertical: isMobile ? 8 : 10,
+    paddingHorizontal: isMobile ? 12 : 14,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E0E0E0',
     alignSelf: 'flex-start',
   },
   showInvoicesButtonText: {
-    fontSize: 14,
+    fontSize: isMobile ? 12 : 14,
     color: '#333',
     fontWeight: '600',
   },
@@ -951,13 +1098,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 24,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
+    paddingVertical: isMobile ? 12 : 16,
+    borderBottomWidth: isMobile ? 0 : 1,
     borderBottomColor: '#F0F0F0',
   },
   backButton: {
@@ -970,14 +1121,14 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   testModeLabel: {
-    fontSize: 36,
+    fontSize: isMobile ? 20 : 36,
     color: '#D32F2F',
     fontWeight: '900',
-    marginLeft: 12,
+    marginLeft: isMobile ? 0 : 12,
     alignSelf: 'center',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
-    marginTop: 20,
+    marginTop: isMobile ? 8 : 20,
   },
   backIconContainer: {
     width: 20,
@@ -994,9 +1145,9 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '45deg' }],
   },
   testModeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: isMobile ? 32 : 36,
+    height: isMobile ? 32 : 36,
+    borderRadius: isMobile ? 16 : 18,
     backgroundColor: '#F5F5F5',
     justifyContent: 'center',
     alignItems: 'center',
@@ -1010,12 +1161,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   testModeIconText: {
-    fontSize: 20,
+    fontSize: isMobile ? 16 : 20,
     color: '#666',
-  },
-  scrollContent: {
-    flex: 1,
-    paddingHorizontal: 20,
   },
   
   // BHIM UPI Header
@@ -1023,27 +1170,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
+    paddingVertical: isMobile ? 12 : 20,
   },
   bhimText: {
-    fontSize: 24,
+    fontSize: isMobile ? 18 : 24,
     fontWeight: '700',
     color: '#00695C',
     marginRight: 8,
   },
   bhimLogoImg: {
-    width: 64,
-    height: 28,
+    width: isMobile ? 48 : 64,
+    height: isMobile ? 21 : 28,
     marginRight: 8,
   },
   upiLogoContainer: {
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: isMobile ? 6 : 8,
+    paddingVertical: isMobile ? 3 : 4,
     borderRadius: 4,
   },
   upiText: {
-    fontSize: 14,
+    fontSize: isMobile ? 12 : 14,
     fontWeight: '700',
     color: '#FFF',
   },
@@ -1051,16 +1198,17 @@ const styles = StyleSheet.create({
   // QR Section
   qrSection: {
     backgroundColor: '#FAFAFA',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 24,
+    borderRadius: isMobile ? 8 : 12,
+    padding: isMobile ? 12 : 20,
+    marginBottom: isMobile ? 16 : 24,
   },
   qrTitle: {
-    fontSize: 12,
+    fontSize: isMobile ? 10 : 12,
     fontWeight: '600',
     color: '#666',
     letterSpacing: 1,
-    marginBottom: 16,
+    marginBottom: isMobile ? 12 : 16,
+    textAlign: isMobile ? 'center' : 'left',
   },
   qrContent: {
     flexDirection: 'row',
@@ -1072,19 +1220,20 @@ const styles = StyleSheet.create({
     paddingRight: 16,
   },
   qrInfoTitle: {
-    fontSize: 16,
+    fontSize: isMobile ? 14 : 16,
     fontWeight: '600',
     color: '#333',
     marginBottom: 4,
   },
   qrInfoSubtitle: {
-    fontSize: 13,
+    fontSize: isMobile ? 11 : 13,
     color: '#666',
-    marginBottom: 16,
+    marginBottom: isMobile ? 12 : 16,
   },
   upiPoweredBy: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: isMobile ? 'center' : 'flex-start',
   },
   poweredByText: {
     fontSize: 8,
@@ -1104,12 +1253,12 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   upiSmallLogoImg: {
-    width: 48,
-    height: 16,
+    width: isMobile ? 36 : 48,
+    height: isMobile ? 12 : 16,
   },
   upiLogoImg: {
-    width: 64,
-    height: 24,
+    width: isMobile ? 48 : 64,
+    height: isMobile ? 18 : 24,
   },
   qrCodeWrapper: {
     alignItems: 'center',
@@ -1167,12 +1316,12 @@ const styles = StyleSheet.create({
 
   // UPI Apps Section
   upiAppsSection: {
-    marginBottom: 24,
+    marginBottom: isMobile ? 12 : 24,
   },
   upiAppsHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: isMobile ? 12 : 16,
   },
   upiLogoSmall: {
     backgroundColor: '#00695C',
@@ -1194,76 +1343,46 @@ const styles = StyleSheet.create({
   },
   upiAppsGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginBottom: 12,
   },
   upiAppButton: {
-    flex: 1,
+    width: isMobile ? `${100/3 - 2}%` : `${100/3 - 2}%`,
     alignItems: 'center',
-    paddingVertical: 16,
-    marginHorizontal: 6,
+    paddingVertical: isMobile ? 12 : 16,
+    marginBottom: isMobile ? 8 : 12,
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: isMobile ? 8 : 12,
     borderWidth: 1,
     borderColor: '#E8E8E8',
   },
   upiAppIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
   },
-  upiAppIcon: {
-    width: 28,
-    height: 28,
-  },
-  upiAppIconLarge: {
-    width: 88,
-    height: 88,
-  },
+  upiAppIcon: {},
+  upiAppIconLarge: {},
   upiAppIconContainerLarge: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
   },
   upiAppIconContainerAmazon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
     marginTop: 8,
   },
-  upiAppIconAmazon: {
-    width: 64,
-    height: 64,
-  },
+  upiAppIconAmazon: {},
   upiAppIconContainerGpay: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
   },
-  upiAppIconGpay: {
-    width: 96,
-    height: 96,
-  },
+  upiAppIconGpay: {},
   
   upiAppName: {
     fontSize: 12,
     color: '#333',
     fontWeight: '500',
-  },
-  rightFlatListContent: {
-    paddingHorizontal: 20,
   },
   qrStaticImg: {
     width: 140,
@@ -1272,21 +1391,22 @@ const styles = StyleSheet.create({
 
   // Partners Section
   partnersSection: {
-    paddingVertical: 20,
+    paddingVertical: isMobile ? 12 : 20,
     borderTopWidth: 1,
     borderTopColor: '#F0F0F0',
   },
   partnerLogos: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: isMobile ? 'center' : 'flex-end',
     alignItems: 'center',
+    flexWrap: 'wrap',
   },
   getButton: {
     marginTop: 18,
-    alignSelf: 'flex-end',
+    alignSelf: isMobile ? 'center' : 'flex-end',
     backgroundColor: '#2563EB',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingVertical: isMobile ? 10 : 12,
+    paddingHorizontal: isMobile ? 18 : 20,
     borderRadius: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -1300,9 +1420,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   getButtonIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: isMobile ? 24 : 28,
+    height: isMobile ? 24 : 28,
+    borderRadius: isMobile ? 12 : 14,
     backgroundColor: 'rgba(255,255,255,0.12)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -1310,12 +1430,12 @@ const styles = StyleSheet.create({
   },
   getButtonIconText: {
     color: '#FFF',
-    fontSize: 14,
+    fontSize: isMobile ? 12 : 14,
     fontWeight: '700',
   },
   getButtonText: {
     color: '#FFF',
-    fontSize: 15,
+    fontSize: isMobile ? 14 : 15,
     fontWeight: '700',
     letterSpacing: 0.6,
   },
@@ -1323,9 +1443,10 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   partnerLogo: {
-    width: 40,
-    height: 24,
-    marginLeft: 12,
+    width: isMobile ? 32 : 40,
+    height: isMobile ? 20 : 24,
+    marginLeft: isMobile ? 8 : 12,
+    marginVertical: isMobile ? 4 : 0,
   },
 
   // Modal Styles
@@ -1334,84 +1455,86 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: isMobile ? 20 : 0,
   },
   modalContent: {
     backgroundColor: '#FFF',
-    borderRadius: 20,
-    padding: 32,
-    width: width * 0.85,
+    borderRadius: isMobile ? 16 : 20,
+    padding: isMobile ? 24 : 32,
+    width: isMobile ? '100%' : (width * 0.85),
     maxWidth: 400,
     alignItems: 'center',
   },
   successIconWrapper: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: isMobile ? 64 : 80,
+    height: isMobile ? 64 : 80,
+    borderRadius: isMobile ? 32 : 40,
     backgroundColor: '#E8F5E9',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: isMobile ? 16 : 24,
   },
   checkIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: isMobile ? 40 : 48,
+    height: isMobile ? 40 : 48,
+    borderRadius: isMobile ? 20 : 24,
     backgroundColor: '#4CAF50',
     justifyContent: 'center',
     alignItems: 'center',
   },
   checkIconText: {
-    fontSize: 28,
+    fontSize: isMobile ? 24 : 28,
     color: '#FFF',
     fontWeight: '700',
   },
   failIconWrapper: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: isMobile ? 64 : 80,
+    height: isMobile ? 64 : 80,
+    borderRadius: isMobile ? 32 : 40,
     backgroundColor: '#FFEBEE',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: isMobile ? 16 : 24,
   },
   failIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: isMobile ? 40 : 48,
+    height: isMobile ? 40 : 48,
+    borderRadius: isMobile ? 20 : 24,
     backgroundColor: '#F44336',
     justifyContent: 'center',
     alignItems: 'center',
   },
   failIconText: {
-    fontSize: 28,
+    fontSize: isMobile ? 24 : 28,
     color: '#FFF',
     fontWeight: '700',
   },
   modalTitle: {
-    fontSize: 22,
+    fontSize: isMobile ? 18 : 22,
     fontWeight: '700',
     color: '#333',
     marginBottom: 8,
+    textAlign: 'center',
   },
   modalSubtitle: {
-    fontSize: 14,
+    fontSize: isMobile ? 13 : 14,
     color: '#666',
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: isMobile ? 16 : 24,
     lineHeight: 20,
   },
   modalAmount: {
-    fontSize: 32,
+    fontSize: isMobile ? 28 : 32,
     fontWeight: '700',
     color: '#4CAF50',
-    marginBottom: 24,
+    marginBottom: isMobile ? 16 : 24,
   },
   modalDetails: {
     width: '100%',
     backgroundColor: '#F8F8F8',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
+    borderRadius: isMobile ? 8 : 12,
+    padding: isMobile ? 12 : 16,
+    marginBottom: isMobile ? 16 : 24,
   },
   modalDetailRow: {
     flexDirection: 'row',
@@ -1419,23 +1542,23 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   modalDetailLabel: {
-    fontSize: 13,
+    fontSize: isMobile ? 12 : 13,
     color: '#666',
   },
   modalDetailValue: {
-    fontSize: 13,
+    fontSize: isMobile ? 12 : 13,
     fontWeight: '600',
     color: '#333',
   },
   modalButton: {
     width: '100%',
     backgroundColor: '#4CAF50',
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: isMobile ? 14 : 16,
+    borderRadius: isMobile ? 8 : 12,
     alignItems: 'center',
   },
   modalButtonText: {
-    fontSize: 16,
+    fontSize: isMobile ? 15 : 16,
     fontWeight: '600',
     color: '#FFF',
   },
@@ -1465,13 +1588,13 @@ const styles = StyleSheet.create({
   },
   loadingContent: {
     backgroundColor: '#FFF',
-    padding: 32,
-    borderRadius: 16,
+    padding: isMobile ? 24 : 32,
+    borderRadius: isMobile ? 12 : 16,
     alignItems: 'center',
   },
   loadingText: {
     marginTop: 16,
-    fontSize: 16,
+    fontSize: isMobile ? 14 : 16,
     color: '#333',
     fontWeight: '500',
   },
@@ -1485,95 +1608,3 @@ const styles = StyleSheet.create({
 });
 
 export default PaymentScreen;
-
-
-// ============================================
-// USAGE EXAMPLE
-// ============================================
-/*
-
-import PaymentScreen from './PaymentScreen';
-
-const App = () => {
-  const handlePaymentSuccess = (data) => {
-    console.log('Payment Success:', data);
-    // Navigate to success screen or update order status
-  };
-
-  const handlePaymentFailure = (data) => {
-    console.log('Payment Failed:', data);
-    // Show error message or retry option
-  };
-
-  const handleBack = () => {
-    // Navigate back to previous screen
-    navigation.goBack();
-  };
-
-  return (
-    <PaymentScreen
-      amount={1799}
-      invoiceNumber="INV11_20251218155902"
-      merchantName="Your Store Name"
-      merchantUpiId="yourstore@upi"
-      testModeApiEndpoint="https://your-api.com/test-payment"
-      qrGenerateApiEndpoint="https://your-api.com/generate-qr"
-      onPaymentSuccess={handlePaymentSuccess}
-      onPaymentFailure={handlePaymentFailure}
-      onBack={handleBack}
-    />
-  );
-};
-
-*/
-
-
-// ============================================
-// API PAYLOAD SPECIFICATIONS
-// ============================================
-/*
-
-1. QR GENERATE API
-   Endpoint: POST /generate-qr
-   Request Body:
-   {
-     "amount": 1799,
-     "invoice_number": "INV11_20251218155902",
-     "merchant_upi_id": "merchant@upi",
-     "merchant_name": "Merchant Store"
-   }
-   
-   Response (Success):
-   {
-     "success": true,
-     "qr_string": "upi://pay?pa=merchant@upi&pn=Merchant%20Store&am=1799&tn=INV11_20251218155902&cu=INR",
-     "qr_image_url": "https://api.example.com/qr/abc123.png" // Optional
-   }
-
-
-2. TEST MODE PAYMENT API
-   Endpoint: POST /test-payment
-   Request Body:
-   {
-     "amount": 1799,
-     "invoice_number": "INV11_20251218155902",
-     "test_mode": true
-   }
-   
-   Response (Success):
-   {
-     "success": true,
-     "transaction_id": "TXN123456789",
-     "status": "completed",
-     "message": "Payment successful"
-   }
-   
-   Response (Failure):
-   {
-     "success": false,
-     "error": "Payment declined",
-     "error_code": "INSUFFICIENT_FUNDS",
-     "status": "failed"
-   }
-
-*/
