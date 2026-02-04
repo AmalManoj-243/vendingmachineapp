@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "vending 369",
+    "slug": "vending369",
+    "version": "1.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
+    },
+    "android": {
+      "splash": {
+        "image": "./assets/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      },
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "icon": "./assets/icon.png",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ],
+      "package": "com.vending369.app",
+      "usesCleartextTraffic": true
+    },
+    "plugins": [
+      "./plugins/android-cleartext-traffic.js"
+    ],
+    "owner": "sajin2004",
+    "extra": {
+      "eas": {
+        "projectId": "70b50e32-a208-4409-88c8-461a7c58adf8"
+      }
+    }
+  }
+}
