@@ -17,7 +17,7 @@ export const setOdooConfig = async (url, db) => {
     await AsyncStorage.setItem('odoo_base_url', _odooBaseUrl);
     await AsyncStorage.setItem('odoo_db', _odooDb);
   } catch (e) {
-    console.warn('Failed to persist Odoo config:', e);
+    console.warn('Failed to persist Odooo config:', e);
   }
 };
 
